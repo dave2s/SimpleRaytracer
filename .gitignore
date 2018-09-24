@@ -1,0 +1,17 @@
+*.zip
+OpenGlCourseApp/
+*************************
+** Visual Studio Files **
+*************************
+*VC.opendb
+*VC.db
+*.suo
+*.obj
+*.exe
+*.iobj
+*.pch
+*.ipch
+*.pdb
+*.ipdb
+*.log
+*.tlog/
