@@ -16,3 +16,4 @@ OpenGlCourseApp/
 *.log
 *.tlog/
 *.sln
+*.vcxproj
