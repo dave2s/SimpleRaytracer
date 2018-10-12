@@ -34,6 +34,31 @@ void Mesh::CreateMesh(GLfloat *vertices, GLuint *indices, unsigned int vertex_co
 	glBindVertexArray(0);
 }
 
+void Mesh::RenderMesh()
+{
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void Mesh::ClearMesh()
+{
+	if (IBO != 0){
+		glDeleteBuffers(1, &IBO);
+		IBO = 0;
+	}
+	if (VBO != 0) {
+		glDeleteBuffers(1, &VBO);
+		VBO = 0;
+	}if (VAO != 0) {
+		glDeleteVertexArrays(1, &VAO);
+		VAO = 0;
+	}
+}
+
 Mesh::~Mesh()
 {
+	ClearMesh();
 }
