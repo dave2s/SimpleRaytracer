@@ -19,23 +19,26 @@ std::string Shader::ReadShaderFile(const char* file_path) {
 	if(!fileStream.is_open()) {
 		std::cerr << "could not open given file path: " << file_path;
 		return code;
-	}
-	
+	}	
 	line = "";
 	while (!fileStream.eof()) {		
 		std::getline(fileStream, line);
 		code.append(line + "\n");
-		std::cout << code << "\n";
 	}
 	fileStream.close();
-
 	return code;
 }
 
 void Shader::CreateShader(const char * vs_path, const char * fs_path)
 {
-	const char * code_vs = ReadShaderFile(vs_path).c_str();
-	const char * code_fs = ReadShaderFile(fs_path).c_str();
+	std::string vs, fs;
+
+	vs = ReadShaderFile(vs_path).c_str();
+	fs = ReadShaderFile(fs_path).c_str();
+
+	const char * code_vs = vs.c_str();
+	const char * code_fs = fs.c_str();
+
 	CompileShader(code_vs, code_fs);
 }
 
