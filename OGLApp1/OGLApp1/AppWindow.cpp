@@ -2,7 +2,7 @@
 #include <iostream>
 
 //DELETE THESE AFTER PRINTS
-//#include <string>
+#include <string>
 
 #define NUM_KEYS 1024
 
@@ -10,12 +10,15 @@ AppWindow::AppWindow()
 {
 	width = 800;
 	height = 600;
+	mouse_x = mouse_y = mouse_delta_x = mouse_delta_y = 0;
 	KeysInit();
 }
 
-AppWindow::AppWindow(GLint window_width, GLint window_height) {
+AppWindow::AppWindow(GLint window_width, GLint window_height)
+{
 	width = window_width;
 	height = window_height;
+	mouse_x = mouse_y = mouse_delta_x = mouse_delta_y = 0;
 	KeysInit();
 }
 
@@ -65,8 +68,16 @@ int AppWindow::Init() {
 	glfwSetWindowUserPointer(main_window, this);
 
 	CreateCallbacks();
+	glfwSetInputMode(main_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	return 0;
+}
+
+std::tuple<GLfloat, GLfloat> AppWindow::getMouseChange()
+{
+	std::tuple<GLfloat,GLfloat> mouse_change = std::make_tuple(mouse_delta_x, mouse_delta_y);
+	mouse_delta_x = mouse_delta_y = 0.0f;
+	return mouse_change;
 }
 
 void AppWindow::KeysInit()
@@ -79,10 +90,11 @@ void AppWindow::KeysInit()
 
 void AppWindow::CreateCallbacks()
 {
-	glfwSetKeyCallback(main_window, HandleKeys);
+	glfwSetKeyCallback(main_window, HandleKeysCB);
+	glfwSetCursorPosCallback(main_window, HandleMouseCB);
 }
 
-void AppWindow::HandleKeys(GLFWwindow * window, int key, int code, int action, int mode)
+void AppWindow::HandleKeysCB(GLFWwindow * window, int key, int code, int action, int mode)
 {
 	AppWindow* _window = static_cast<AppWindow*>(glfwGetWindowUserPointer(window));
 
@@ -103,6 +115,25 @@ void AppWindow::HandleKeys(GLFWwindow * window, int key, int code, int action, i
 			//std::cout << "Released: " << std::to_string(key) << "\n";
 		}
 	}
+}
+
+void AppWindow::HandleMouseCB(GLFWwindow * window, double x_pos, double y_pos)
+{
+	AppWindow* _window = static_cast<AppWindow*>(glfwGetWindowUserPointer(window));
+
+	if (!_window->mouse_moved) {
+		_window->mouse_x = GLfloat(x_pos);
+		_window->mouse_y = GLfloat(y_pos);
+		_window->mouse_moved = true;
+	}
+
+	_window->mouse_delta_x = x_pos - _window->mouse_x;
+	_window->mouse_delta_y = y_pos - _window->mouse_y;
+	_window->mouse_x = GLfloat(x_pos);
+	_window->mouse_y = GLfloat(y_pos);
+
+	/*std::cout << "Mouse x: " << std::to_string(_window->mouse_x) << " y: "<< std::to_string(_window->mouse_y) <<"\n";
+	std::cout << "Mouse movement x: " << std::to_string(_window->mouse_delta_x) << " y: " << std::to_string(_window->mouse_delta_y) << "\n";*/
 }
 
 AppWindow::~AppWindow()

@@ -109,7 +109,7 @@ void Shader::ClearShader()
 		glDeleteProgram(shader_id);
 		shader_id = 0;
 	}
-	uniform_model = uniform_projection = 0;
+	uniform_model = uniform_projection = uniform_view = 0;
 }
 
 Shader::~Shader()
