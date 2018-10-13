@@ -1,16 +1,22 @@
 #include "AppWindow.h"
 #include <iostream>
 
+//DELETE THESE AFTER PRINTS
+//#include <string>
+
+#define NUM_KEYS 1024
 
 AppWindow::AppWindow()
 {
 	width = 800;
 	height = 600;
+	KeysInit();
 }
 
 AppWindow::AppWindow(GLint window_width, GLint window_height) {
 	width = window_width;
 	height = window_height;
+	KeysInit();
 }
 
 int AppWindow::Init() {
@@ -55,6 +61,48 @@ int AppWindow::Init() {
 
 	// Set viewport to window size
 	glViewport(0, 0, buffer_width, buffer_height);
+
+	glfwSetWindowUserPointer(main_window, this);
+
+	CreateCallbacks();
+
+	return 0;
+}
+
+void AppWindow::KeysInit()
+{
+	keys.reserve(NUM_KEYS);
+	for (int i = 0; i < NUM_KEYS; ++i) {
+		keys.push_back(false);
+	}
+}
+
+void AppWindow::CreateCallbacks()
+{
+	glfwSetKeyCallback(main_window, HandleKeys);
+}
+
+void AppWindow::HandleKeys(GLFWwindow * window, int key, int code, int action, int mode)
+{
+	AppWindow* _window = static_cast<AppWindow*>(glfwGetWindowUserPointer(window));
+
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (key >= 0 && key < NUM_KEYS)
+	{
+		if (action == GLFW_PRESS)
+		{
+			_window->keys[key] = true;
+			//std::cout << "Pressed: "<< std::to_string(key) <<"\n";
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			_window->keys[key] = false;
+			//std::cout << "Released: " << std::to_string(key) << "\n";
+		}
+	}
 }
 
 AppWindow::~AppWindow()

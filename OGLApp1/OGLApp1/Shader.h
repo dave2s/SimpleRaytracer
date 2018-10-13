@@ -18,12 +18,13 @@ public:
 
 	GLuint GetLocationProjection();
 	GLuint GetLocationModel();
+	GLuint GetLocationView();
 
 	void UseShader();
 	void ClearShader();
 
 private:
-	GLuint shader_id, uniform_projection, uniform_model;
+	GLuint shader_id, uniform_projection, uniform_view, uniform_model;
 
 	void CompileShader(const char * code_vs, const char * code_fs);
 	void AddShader(GLuint program, const char* content, GLenum type);

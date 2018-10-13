@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <stdio.h>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
@@ -16,7 +17,7 @@ public:
 
 	bool shouldClose() { return glfwWindowShouldClose(main_window); }
 
-	void swapBuffers() { glfwSwapBuffers(main_window); }
+	void SwapBuffers() { glfwSwapBuffers(main_window); }
 
 	~AppWindow();
 
@@ -24,5 +25,12 @@ private:
 	GLFWwindow *main_window;
 	GLint width, height;
 	GLint buffer_width, buffer_height;
+
+	std::vector<bool> keys;
+
+	void KeysInit();
+
+	static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode);
+	void CreateCallbacks();
 };
 
