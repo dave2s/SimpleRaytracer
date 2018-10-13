@@ -1,8 +1,6 @@
 *.zip
 OpenGlCourseApp/
-*************************
-** Visual Studio Files **
-*************************
+*.dll
 *VC.opendb
 *VC.db
 *.suo
@@ -15,5 +13,4 @@ OpenGlCourseApp/
 *.ipdb
 *.log
 *.tlog/
-*.sln
-*.vcxproj
+*x64/
