@@ -1,18 +1,24 @@
 #pragma once
-#include <GL\glew.h>
-class Mesh
+#include <GLM\glm.hpp>
+class RT_Mesh
 {
 public:
-	Mesh();
+	RT_Mesh();
 	
-	void CreateMesh(GLfloat *vertices, GLuint *indices, unsigned int vertex_count, unsigned int index_count);
+	void CreateMesh(float *vertices, unsigned int *indices, unsigned int vertex_count, unsigned int index_count);
 	void RenderMesh();
 	void ClearMesh();
 
-	~Mesh();
+	static glm::vec3 getTriangleNormal(glm::vec3 vertices[3]){return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));}
+
+	~RT_Mesh();
 
 private:
-	GLuint VAO, VBO, IBO;
-	GLsizei _index_count;
+	unsigned int index_count;
+	float* vertices;
+	unsigned int* indices;
+	unsigned int vertex_count;
+
+	void Triangulate();
 };
 
