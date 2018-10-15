@@ -9,12 +9,12 @@ public:
 	void CreateMesh(float *vertices, unsigned int *indices, unsigned int vertex_count, unsigned int index_count);
 	void ClearMesh();
 
-	int getTriangleCount() { return (sizeof(indices)/sizeof(*indices)) / 3; }
+	int getTriangleCount() { return 1;/* return (sizeof(indices)/sizeof(*indices)) / 3; */ }
 	//Return triangle by index of the triangle
 	glm::vec3* getTriangle(unsigned int idx) {
-		glm::vec3 v0 = { vertices[indices[idx * 9 + 0]], vertices[indices[idx * 9 + 1]], vertices[indices[idx * 9 + 2]]};
-		glm::vec3 v1 = { vertices[indices[idx * 9 + 3]], vertices[indices[idx * 9 + 4]], vertices[indices[idx * 9 + 6]] };
-		glm::vec3 v2 = { vertices[indices[idx * 9 + 6]], vertices[indices[idx * 9 + 5]], vertices[indices[idx * 9 + 7]] };
+		glm::vec3 v0 = { vertices[indices[0] * idx + 0], vertices[indices[0] * idx + 1], vertices[indices[0] * idx + 2] };
+		glm::vec3 v1 = { vertices[indices[1] * idx + 0], vertices[indices[1] * idx + 1], vertices[indices[1] * idx + 2] };
+		glm::vec3 v2 = { vertices[indices[2] * idx + 0], vertices[indices[2] * idx + 1], vertices[indices[2] * idx + 2] };
 		glm::vec3 triangle[3] = { v0,v1,v2 };
 		return triangle;
 	}
