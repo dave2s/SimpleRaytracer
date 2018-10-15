@@ -23,6 +23,7 @@ void RT_Mesh::ClearMesh()
 
 bool RT_Mesh::rayHitTriangle(glm::vec3 triangle[3],glm::vec3 origin,glm::vec3 ray_dir, Camera camera, bool& _singleSided)
 {//TODO edit to use references or pointers?
+	//std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(triangle);//is normalized
 
 	float d = getDistanceFromOrigin(normal, triangle[0]);

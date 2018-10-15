@@ -1,6 +1,9 @@
 #pragma once
 #include <GLM\glm.hpp>
 #include "Camera.h"
+#include <iostream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 class RT_Mesh
 {
 public:
@@ -11,12 +14,14 @@ public:
 
 	bool isSingleSided() { return singleSided; };
 	int getTriangleCount() { return 1;/* return (sizeof(indices)/sizeof(*indices)) / 3; */ }
+
 	//Return triangle by index of the triangle
 	glm::vec3* getTriangle(unsigned int idx) {
-		glm::vec3 v0 = { vertices[indices[0] * idx + 0], vertices[indices[0] * idx + 1], vertices[indices[0] * idx + 2] };
-		glm::vec3 v1 = { vertices[indices[1] * idx + 0], vertices[indices[1] * idx + 1], vertices[indices[1] * idx + 2] };
-		glm::vec3 v2 = { vertices[indices[2] * idx + 0], vertices[indices[2] * idx + 1], vertices[indices[2] * idx + 2] };
-		glm::vec3 triangle[3] = { v0,v1,v2 };
+		glm::vec3 v0 = { vertices[indices[0 + 3 * idx] * 3 + 0], vertices[indices[0 + 3 * idx] * 3 + 1], vertices[indices[0 + 3 * idx] * 3 + 2] };
+		glm::vec3 v1 = { vertices[indices[1 + 3 * idx] * 3 + 0], vertices[indices[1 + 3 * idx] * 3 + 1], vertices[indices[1 + 3 * idx] * 3 + 2] };
+		glm::vec3 v2 = { vertices[indices[2 + 3 * idx] * 3 + 0], vertices[indices[2 + 3 * idx] * 3 + 1], vertices[indices[2 + 3 * idx] * 3 + 2] };
+		glm::vec3 triangle[3] = { v0,v1,v2 };		
+		std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
 		return triangle;
 	}
 
