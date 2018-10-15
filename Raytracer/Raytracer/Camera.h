@@ -1,7 +1,7 @@
 #pragma once
 
-#define NEAR_PLANE 0.1f
-#define FAR_PLANE 100.0f
+#define CAM_NEAR_PLANE 0.1f
+#define CAM_FAR_PLANE 100.0f
 
 class Camera
 {
