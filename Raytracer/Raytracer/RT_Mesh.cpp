@@ -14,11 +14,6 @@ void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int 
 	indices = _indices;
 }
 
-void RT_Mesh::IntersectPlane()
-{
-
-}
-
 void RT_Mesh::ClearMesh()
 {
 
