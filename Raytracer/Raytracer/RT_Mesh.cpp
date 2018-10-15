@@ -5,13 +5,15 @@
 RT_Mesh::RT_Mesh()
 {
 	index_count = 0;
+	singleSided = false;
 }
 
-void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count) {
+void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided) {
 	index_count = _index_count;
 	vertices = _vertices;
 	vertex_count = _vertex_count;
 	indices = _indices;
+	singleSided = _singleSided;
 }
 
 void RT_Mesh::ClearMesh()
@@ -19,14 +21,15 @@ void RT_Mesh::ClearMesh()
 
 }
 
-bool RT_Mesh::rayHitTriangle(glm::vec3 triangle[3],glm::vec3 origin,glm::vec3 ray_dir, Camera camera)
+bool RT_Mesh::rayHitTriangle(glm::vec3 triangle[3],glm::vec3 origin,glm::vec3 ray_dir, Camera camera, bool& _singleSided)
 {//TODO edit to use references or pointers?
-	glm::vec3 normal = RT_Mesh::getTriangleNormal(triangle);
+	glm::vec3 normal = RT_Mesh::getTriangleNormal(triangle);//is normalized
+
 	float d = getDistanceFromOrigin(normal, triangle[0]);
-	float hit_distance = getPlaneIntersectionDistance(d, normal, origin, ray_dir);
+	float hit_distance = getPlaneIntersectionDistance(d, normal, origin, ray_dir, _singleSided);
 
 	if (hit_distance <= CAM_NEAR_PLANE/*&&hit_distance==0*/) {
-		return false; // Triangle is behind the camera OR it's parallel with the ray - both invisible ///TODO too far - fake dust in air
+		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
 	}
 	glm::vec3 Phit = getPlaneIntersection(origin, hit_distance, ray_dir);
 
