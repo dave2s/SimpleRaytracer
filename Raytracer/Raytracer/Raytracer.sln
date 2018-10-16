@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OGLAPP1", "OGLAPP1.vcxproj", "{DCFBC604-CF0F-4903-A8C6-D090C41C1FCF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raytracer", "Raytracer.vcxproj", "{DCFBC604-CF0F-4903-A8C6-D090C41C1FCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
