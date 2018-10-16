@@ -90,6 +90,7 @@
     <Link>
       <AdditionalDependencies>sdl2.lib;sdl2main.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
