@@ -66,4 +66,5 @@ bool RT_Mesh::VerticesAreUnique(float* vertices,unsigned int vertex_count)
 
 	return true;*/
 	//bit array?,, hash? sort? find all X-values, for all the same ones find those with same Y, then Z
+	return true;
 }
