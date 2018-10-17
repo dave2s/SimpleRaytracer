@@ -14,7 +14,7 @@ public:
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
-	int getTriangleCount() { return 1;/* return (sizeof(indices)/sizeof(*indices)) / 3; */ }
+	int getTriangleCount() { return index_count/3;}//indices len/3
 
 	//Return triangle by index of the triangle
 	std::vector<glm::vec3> getTriangle(unsigned int idx) {
@@ -47,6 +47,9 @@ private:
 	unsigned int vertex_count;
 	bool singleSided;
 
+	///Not implemented
 	void Triangulate();
+	///Not implemented
+	bool VerticesAreUnique(float * vertices, unsigned int vertex_count);
 };
 

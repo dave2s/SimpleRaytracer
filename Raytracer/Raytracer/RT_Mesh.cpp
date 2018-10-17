@@ -11,7 +11,7 @@ RT_Mesh::RT_Mesh()
 void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided) {
 	index_count = _index_count;
 	vertices = new float[_vertex_count];
-	memcpy(vertices,_vertices,sizeof(float)*_vertex_count);
+	memcpy(vertices,_vertices,sizeof(float)*_vertex_count);	
 	vertex_count = _vertex_count;
 	indices = new unsigned int[_index_count];
 	memcpy(indices,_indices,sizeof(unsigned int)*_index_count);
@@ -54,4 +54,16 @@ bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, glm::vec3 origin,
 RT_Mesh::~RT_Mesh()
 {
 	ClearMesh();
+}
+
+bool RT_Mesh::VerticesAreUnique(float* vertices,unsigned int vertex_count)
+{
+	/*glm::vec3 vertex;
+	for(int i = 0; i<vertex_count; i+=3)
+	{
+		glm::vec3(vertices[i], vertices[i + 1], vertices[i + 2]);
+	}
+
+	return true;*/
+	//bit array?,, hash? sort? find all X-values, for all the same ones find those with same Y, then Z
 }
