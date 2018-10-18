@@ -3,15 +3,25 @@
 
 #define CAM_NEAR_PLANE 0.1f
 #define CAM_FAR_PLANE 100.0f
+#define COORDS_FLOAT_WIDTH 2.0f
+#define COORDS_FLOAT_HEIGHT 2.0f
+#define PI 3.14159265358979323846264f
+#define TO_RADIANS(x)  x*PI/180.f
+
+const float inf = std::numeric_limits<float>::max();
 
 class Camera
 {
 public:
-	Camera(glm::vec3 origin);
+	Camera(glm::vec3 origin, float fovy, float aspect_ratio);
 	~Camera();
 
 	glm::mat4 view_matrix;
 	glm::vec3 camera_position;
+	glm::mat4 projection_matrix;
+	float aspect_ratio;
+	float fovy;
+	float scale;
 
 	void CalcCamView(glm::vec3 camera_target);
 	/*float near_plane = NEAR_PLANE;
