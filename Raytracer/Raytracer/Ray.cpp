@@ -19,7 +19,7 @@ glm::vec3 Ray::calcRayPerspectiveDirection( float x, float y,float w, int width,
 	//x = (-1.f + ((COORDS_FLOAT_WIDTH / (float)width)*(float)x));// *camera.scale);
 	//y = (-1.f + ((COORDS_FLOAT_HEIGHT / (float)height)*(float)y));// *camera.scale) * 1 / camera.aspect_ratio;
 
-	glm::vec3 ray_direction =glm::normalize(glm::vec3(x,y,-1.0*near) - glm::vec3(0));
+	glm::vec3 ray_direction = glm::normalize(glm::vec3(x,y,-1.0*near) - (glm::vec3(0)- camera.camera_position));
 
 	//return glm::vec3(glm::vec3((-width/2)+x,(-height/2)+y,near) - origin);
 	//return glm::vec3(origin - glm::vec3(x, y, near));
