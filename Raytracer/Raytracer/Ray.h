@@ -7,6 +7,6 @@ public:
 	Ray();
 	~Ray();
 
-	glm::vec3 calcRayPerspectiveDirection(float x, float y,float w, int width, int height, float near, Camera camera);
+	glm::vec3 calcRayPerspectiveDirection(float x, float y, float w, float near, Camera camera);
 };
 
