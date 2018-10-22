@@ -10,8 +10,10 @@ class RT_Mesh
 {
 public:
 	RT_Mesh();
+
+	glm::u8vec4 color;
 	
-	void CreateMesh(float *vertices, unsigned int *indices, unsigned int vertex_count, unsigned int index_count, bool singleSided);
+	void CreateMesh(float *vertices, unsigned int *indices, unsigned int vertex_count, unsigned int index_count, bool singleSided, glm::u8vec4 _color);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
@@ -37,7 +39,7 @@ public:
 	}
 	static glm::vec3 getPlaneIntersection(glm::vec3 origin, float intersection_distance,glm::vec3 ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 	///TODO
-	static bool rayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, Camera camera, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
+	static bool rayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 

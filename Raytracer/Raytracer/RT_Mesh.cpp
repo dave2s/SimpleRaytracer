@@ -6,7 +6,8 @@ RT_Mesh::RT_Mesh()
 	singleSided = false;
 }
 
-void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided) {
+void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided, glm::u8vec4 _color) {
+	color = _color;
 	index_count = _index_count;
 	vertices = new float[_vertex_count];
 	memcpy(vertices,_vertices,sizeof(float)*_vertex_count);	
@@ -21,7 +22,7 @@ void RT_Mesh::ClearMesh()
 
 }
 //min_distance is lastly hit triangle PHit distance
-bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, Camera camera, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
+bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
 {//TODO edit to use references or pointers?
 	//std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
