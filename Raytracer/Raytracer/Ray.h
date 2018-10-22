@@ -1,4 +1,5 @@
 #pragma once
+#define GLM_LEFT_HANDED
 #include <GLM\glm.hpp>
 #include "Camera.h"
 class Ray

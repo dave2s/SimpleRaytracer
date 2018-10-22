@@ -1,7 +1,8 @@
 #pragma once
+#define GLM_LEFT_HANDED
 #include "GLM\glm.hpp"
 
-#define CAM_NEAR_PLANE 1.0f
+#define CAM_NEAR_PLANE 0.5f
 #define CAM_FAR_PLANE 1000.0f
 #define COORDS_FLOAT_WIDTH 2.0f
 #define COORDS_FLOAT_HEIGHT 2.0f
