@@ -5,6 +5,7 @@
 #include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
+#include "Ray.h"
 class RT_Mesh
 {
 public:
@@ -36,7 +37,7 @@ public:
 	}
 	static glm::vec3 getPlaneIntersection(glm::vec3 origin, float intersection_distance,glm::vec3 ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 	///TODO
-	static bool rayHitTriangle(std::vector<glm::vec3> triangle, glm::vec3 origin, glm::vec3 ray_dir, Camera camera, bool singleSided);
+	static bool rayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, Camera camera, bool singleSided);
 
 	~RT_Mesh();
 

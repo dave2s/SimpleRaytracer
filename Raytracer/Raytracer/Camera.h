@@ -1,8 +1,8 @@
 #pragma once
 #include "GLM\glm.hpp"
 
-#define CAM_NEAR_PLANE -1.f
-#define CAM_FAR_PLANE -1000.0f
+#define CAM_NEAR_PLANE 1.0f
+#define CAM_FAR_PLANE 1000.0f
 #define COORDS_FLOAT_WIDTH 2.0f
 #define COORDS_FLOAT_HEIGHT 2.0f
 #define PI 3.14159265358979323846264f
