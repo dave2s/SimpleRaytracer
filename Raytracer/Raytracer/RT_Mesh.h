@@ -32,12 +32,12 @@ public:
 
 	static glm::vec3 getTriangleNormal(std::vector<glm::vec3> vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }
 	static float getDistanceFromOrigin(glm::vec3 normal, glm::vec3 vertex) { return glm::dot(normal,vertex); }
-	static float getPlaneIntersectionDistance(float distance_from_origin,glm::vec3 plane_normal,glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided) {	float ray_dot_normal = glm::dot(plane_normal, ray_direction);if (ray_dot_normal == 0 || (ray_dot_normal > 0 && _singleSided)/*ray&plane parallel + dont divide by zero*/) { return 0;}	else { return ((glm::dot(plane_normal, origin) + distance_from_origin) / ray_dot_normal);}
+	static float getPlaneIntersectionDistance(float distance_from_origin,glm::vec3 plane_normal,glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided) { float ray_dot_normal = glm::dot(plane_normal, ray_direction);if (ray_dot_normal == 0 || (ray_dot_normal > 0 && _singleSided)/*ray&plane parallel + dont divide by zero*/) { return 0;}	else { return ((glm::dot(plane_normal, origin) + distance_from_origin) / ray_dot_normal);}
 	
 	}
 	static glm::vec3 getPlaneIntersection(glm::vec3 origin, float intersection_distance,glm::vec3 ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 	///TODO
-	static bool rayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, Camera camera, bool singleSided);
+	static bool rayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, Camera camera, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 

@@ -1,8 +1,5 @@
 #include "RT_Mesh.h"
 
-
-
-
 RT_Mesh::RT_Mesh()
 {
 	index_count = 0;
@@ -23,19 +20,19 @@ void RT_Mesh::ClearMesh()
 {
 
 }
-
-bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, Camera camera, bool _singleSided)
+//min_distance is lastly hit triangle PHit distance
+bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, Camera camera, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
 {//TODO edit to use references or pointers?
 	//std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	//std::cout <<"normala: "<< glm::to_string(normal) << " vertex 0 = " << glm::to_string(_triangle[0])<<"\n";
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
-	float hit_distance = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
-	
-	if (hit_distance <= CAM_NEAR_PLANE/*&&hit_distance==0*/) {
+	distance = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
+										///Distance > min_dist <-this triangle is further than previously hit
+	if (distance <= CAM_NEAR_PLANE || distance > min_dist) {
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
 	}
-	glm::vec3 Phit = getPlaneIntersection(ray->origin, hit_distance, ray->direction);
+	glm::vec3 Phit = getPlaneIntersection(ray->origin, distance, ray->direction);
 
 	///is Phit inside the triangle? test against each edge
 	if (glm::dot(normal, glm::cross(_triangle[1] - _triangle[0], Phit - _triangle[0])) < 0) { return false; }
