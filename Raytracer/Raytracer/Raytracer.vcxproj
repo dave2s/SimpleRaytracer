@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bunny.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="RT_Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bunny.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RT_Light.h" />

@@ -6,7 +6,7 @@ RT_Mesh::RT_Mesh()
 	singleSided = false;
 }
 
-void RT_Mesh::CreateMesh(float *_vertices, unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided, glm::u8vec4 _color) {
+void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided, glm::u8vec4 _color) {
 	color = _color;
 	index_count = _index_count;
 	vertices = new float[_vertex_count];
@@ -28,19 +28,19 @@ bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _s
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	//std::cout <<"normala: "<< glm::to_string(normal) << " vertex 0 = " << glm::to_string(_triangle[0])<<"\n";
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
-	distance = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
+	float _distance = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
 										///Distance > min_dist <-this triangle is further than previously hit
-	if (distance <= CAM_NEAR_PLANE || distance > min_dist) {
+	if (_distance <= CAM_NEAR_PLANE || _distance > min_dist) {
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
 	}
-	glm::vec3 _PHit = getPlaneIntersection(ray->origin, distance, ray->direction);
+	glm::vec3 _PHit = getPlaneIntersection(ray->origin, _distance, ray->direction);
 
 	///is Phit inside the triangle? test against each edge
 	if (glm::dot(normal, glm::cross(_triangle[1] - _triangle[0], _PHit - _triangle[0])) < 0) { return false; }
 	if (glm::dot(normal, glm::cross(_triangle[2] - _triangle[1], _PHit - _triangle[1])) < 0) { return false; }
 	if (glm::dot(normal, glm::cross(_triangle[0] - _triangle[2], _PHit - _triangle[2])) < 0) { return false; }
 	PHit = _PHit;
-
+	distance = _distance;
 	return true; //successful hit
 }
 

@@ -13,7 +13,7 @@ public:
 
 	glm::u8vec4 color;
 	
-	void CreateMesh(float *vertices, unsigned int *indices, unsigned int vertex_count, unsigned int index_count, bool singleSided, glm::u8vec4 _color);
+	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertex_count, unsigned int index_count, bool singleSided, glm::u8vec4 _color);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
