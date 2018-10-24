@@ -12,6 +12,10 @@ Ray::~Ray()
 {
 }
 
+glm::vec3 Ray::calcRayDirection(glm::vec3 origin, glm::vec3 target) {
+	return glm::normalize(target - origin);
+}
+
 void Ray::calcRayPerspectiveDirection(Ray *ray, float x, float y,float w, float near,Camera camera)
 {
 	//glm::vec3 ray_direction = glm::normalize(/*glm::vec4(camera.camera_position,w) -*/ camera.view_matrix*glm::vec4( glm::vec3(x,y,near),w));
