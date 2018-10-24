@@ -17,6 +17,9 @@ Camera::Camera(glm::vec3 origin, float _fovy, float _aspect_ratio)
 	scale = glm::tan(TO_RADIANS(fovy*0.5));
 	CalcCamView(glm::vec3(0.f,0.f,1.0));
 }
+void Camera::Move() {
+	view_matrix
+}
 
 Camera::~Camera()
 {

@@ -16,6 +16,7 @@ class Camera
 public:
 	Camera(glm::vec3 origin, float fovy, float aspect_ratio);
 	~Camera();
+	void Move();
 
 	glm::mat4 view_matrix;
 	glm::vec3 camera_position;
