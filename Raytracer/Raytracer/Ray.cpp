@@ -1,7 +1,13 @@
 #include "Ray.h"
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL
+
+#ifdef DEBUG
+#define GLM_ENABLE_EXPERIMENTAL
 #include "GLM\gtx\string_cast.hpp"
+#endif // DEBUG
+
+
 
 Ray::Ray()
 {

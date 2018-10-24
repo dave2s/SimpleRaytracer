@@ -14,9 +14,8 @@ const float inf = std::numeric_limits<float>::max();
 class Camera
 {
 public:
-	Camera(glm::vec3 origin, float fovy, float aspect_ratio);
+	Camera(glm::vec3 origin, glm::vec3 front, float fovy, float aspect_ratio);
 	~Camera();
-	void Move();
 
 	glm::mat4 view_matrix;
 	glm::vec3 camera_position;
@@ -25,7 +24,7 @@ public:
 	float fovy;
 	float scale;
 
-	void CalcCamView(glm::vec3 camera_target);
+	void Update(glm::vec3 direction);
 	/*float near_plane = NEAR_PLANE;
 	float far_plane = FAR_PLANE;*/
 

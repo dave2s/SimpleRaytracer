@@ -29,9 +29,10 @@ bool RT_Mesh::shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, b
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	//std::cout <<"normala: "<< glm::to_string(normal) << " vertex 0 = " << glm::to_string(_triangle[0])<<"\n";
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
-	 d = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
+	int e = 0;
+	 d = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided,e);
 	///Distance > min_dist <-this triangle is further than previously hit
-	if (d > min_dist||d==0) {
+	if (d > min_dist||e==1) {
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
 	}
 	glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
@@ -52,9 +53,10 @@ bool RT_Mesh::primaryRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, 
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	//std::cout <<"normala: "<< glm::to_string(normal) << " vertex 0 = " << glm::to_string(_triangle[0])<<"\n";
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
-	d = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided);
+	int e = 0;
+	d = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided,e);
 										///Distance > min_dist <-this triangle is further than previously hit
-	if (d <= CAM_NEAR_PLANE || d > min_dist||d==0) {
+	if (d <= CAM_NEAR_PLANE || d > min_dist||e==1/*d==0*/) {
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
 	}
 	glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
