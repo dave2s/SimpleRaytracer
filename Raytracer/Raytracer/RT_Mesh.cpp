@@ -2,24 +2,25 @@
 
 RT_Mesh::RT_Mesh()
 {
-	index_count = 0;
+	indices_len = 0;
 	singleSided = false;
 }
 
-void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertex_count, unsigned int _index_count, bool _singleSided, glm::u8vec4 _color) {
+void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::u8vec4 _color) {
 	color = _color;
-	index_count = _index_count;
-	vertices = new float[_vertex_count];
-	memcpy(vertices,_vertices,sizeof(float)*_vertex_count);	
-	vertex_count = _vertex_count;
-	indices = new unsigned int[_index_count];
-	memcpy(indices,_indices,sizeof(unsigned int)*_index_count);
+	indices_len = _indices_len;
+	vertices = new float[_vertices_len];
+	memcpy(vertices,_vertices,sizeof(float)*_vertices_len);	
+	vertex_count = _vertices_len;
+	indices = new unsigned int[_indices_len];
+	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	singleSided = _singleSided;
 }
 
 void RT_Mesh::ClearMesh()
 {
-
+	free(indices);
+	free(vertices);
 }
 //min_distance is lastly hit triangle PHit distance
 bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)

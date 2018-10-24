@@ -13,11 +13,11 @@ public:
 
 	glm::u8vec4 color;
 	
-	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertex_count, unsigned int index_count, bool singleSided, glm::u8vec4 _color);
+	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec4 _color);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
-	int getTriangleCount() { return index_count/3;}//indices len/3
+	int getTriangleCount() { return indices_len/3;}
 
 	//Return triangle by index of the triangle
 	std::vector<glm::vec3> getTriangle(unsigned int idx) {
@@ -44,7 +44,7 @@ public:
 	~RT_Mesh();
 
 private:
-	unsigned int index_count;
+	unsigned int indices_len;
 	float* vertices;
 	unsigned int* indices;
 	unsigned int vertex_count;
