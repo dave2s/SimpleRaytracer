@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include "GLM\gtc\matrix_transform.hpp"
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 #define GLM_ENABLE_EXPERIMENTAL
 #include "GLM\gtx\string_cast.hpp"
