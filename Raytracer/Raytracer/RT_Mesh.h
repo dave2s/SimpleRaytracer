@@ -42,8 +42,8 @@ public:
 
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 	///TODO
-	static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);
-	static bool primaryRayHitTriangle(std::vector<glm::vec3> triangle, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
+	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
+	static bool rayHitTriangle(std::vector<glm::vec3> triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 

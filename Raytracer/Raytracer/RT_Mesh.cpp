@@ -22,7 +22,7 @@ void RT_Mesh::ClearMesh()
 	free(indices);
 	free(vertices);
 }
-
+/*
 bool RT_Mesh::shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist)
 {//TODO edit to use references or pointers?
 	//std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
@@ -44,20 +44,20 @@ bool RT_Mesh::shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, b
 	PHit = _PHit;
 	distance = d;
 	return true; //successful hit
-}
+}*/
 
 //min_distance is lastly hit triangle PHit distance
-bool RT_Mesh::primaryRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
+bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
 {//TODO edit to use references or pointers?
-	//std::cout << "kreslim vertexy: v0: " << glm::to_string(triangle[0]) << " a v1: " << glm::to_string(triangle[1]) << " a v2: " << glm::to_string(triangle[2]) << " \n";
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
-	//std::cout <<"normala: "<< glm::to_string(normal) << " vertex 0 = " << glm::to_string(_triangle[0])<<"\n";
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
 	int e = 0;
 	d/*parametr t z P=O+tR*/ = getPlaneIntersectionDistance(d, normal, ray->origin, ray->direction, _singleSided,e);
-										///Distance > min_dist <-this triangle is further than previously hit
-	if (d <= CAM_NEAR_PLANE+0.001f || d > min_dist||e==1/*d==0*/) {//e==1 odvraceny trojuhelnik,
-		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible ///TODO too far - fake dust in air
+	///Distance > min_dist <-this triangle is further than previously hit
+	d *= (isPrimary? 1.f : -1.f);
+	//std::cout << "vzdalenost: " << d << std::endl;
+	if (d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.001f || d > min_dist||e==1/*d==0*/) {//e==1 odvraceny trojuhelnik,
+		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible
 	}
 	glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
 
