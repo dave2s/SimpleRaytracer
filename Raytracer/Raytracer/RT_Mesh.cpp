@@ -54,9 +54,9 @@ bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle,bool isPrimary, Ra
 	int e = 0;
 	d/*parametr t z P=O+tR*/ = (isPrimary ? 1.f : -1.f)* getPlaneIntersectionDistance(isPrimary,d, normal, ray->origin, ray->direction, _singleSided,e);
 	///Distance > min_dist <-this triangle is further than previously hit
-	//d *= (isPrimary? 1.f : -1.f);
+	d *= (isPrimary? 1.f : -1.f);//camera has negative z, ray doesnt...
 	//std::cout << "vzdalenost: " << d << std::endl;
-	if (d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.001f || d > min_dist||e==1/*d==0*/) {//e==1 odvraceny trojuhelnik,
+	if ((d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.001f) || (d > min_dist)||(e==1)/*d==0*/) {//e==1 odvraceny trojuhelnik,
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible
 	}
 	glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
