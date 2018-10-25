@@ -32,7 +32,7 @@ public:
 		return triangle;
 	}
 
-	static glm::vec3 getTriangleNormal(std::vector<glm::vec3> vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }
+	static glm::vec3 getTriangleNormal(std::vector<glm::vec3> vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }//triangle normal
 	static float getDistanceFromOrigin(glm::vec3 normal, glm::vec3 vertex) { return glm::dot(normal,vertex); }
 	static float getPlaneIntersectionDistance(float distance_from_origin, glm::vec3 plane_normal, glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided, int &e) {
 		float ray_dot_normal = glm::dot(plane_normal, ray_direction); if (ray_dot_normal<0||ray_dot_normal == 0 || (ray_dot_normal > 0 && _singleSided)/*ray&plane parallel + if singlesided, looking otherway + dont divide by zero*/) { e=1; return 0; }
