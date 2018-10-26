@@ -46,6 +46,7 @@ public:
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
 	static bool intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
+	static bool intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
 	static bool rayHitTriangle(std::vector<glm::vec3> triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();

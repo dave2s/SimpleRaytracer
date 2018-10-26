@@ -92,6 +92,47 @@ bool RT_Mesh::intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle,
 	u /= NN; v /= NN;
 	return true;
 }
+//Moller-Trumbore
+bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist) {
+	glm::vec3 edge01 = _triangle[1] - _triangle[0];
+	glm::vec3 edge02 = _triangle[2] - _triangle[0];
+	glm::vec3 pvec = glm::cross(ray->direction, edge02);
+	float D = glm::dot(edge01, pvec);
+	
+	if (isPrimary) {
+		if ((D<0.001f && _singleSided) ) return false; // 0 backfacing, close to zero miss
+		//if (glm::abs(D) < 0.0001f) return false;//parallel
+	}
+	else {
+		//if () return false;
+		//if (glm::abs(D) == 0) return false; // 0 backfacing, close to zero miss
+		//if (glm::abs(D) < 0.0001f) return false;//parallel
+		if (D > -0.0001f&& D < 0.0001) return false;
+	}
+	glm::vec3 tvec = ray->origin - _triangle[0];
+	float D_inv = 1 / D;
+	u = glm::dot(tvec, pvec) * D_inv;
+	if (u < 0 || u>1) return false;
+
+	tvec = glm::cross(tvec, edge01);
+	v = glm::dot(ray->direction, tvec)*D_inv;
+	if (v < 0 || u + v>1) return false;
+
+	t = glm::dot(edge02, tvec) * D_inv;
+	if (isPrimary) {
+		if ((t < CAM_NEAR_PLANE ) || (t > min_dist)) {
+			return false;
+		}
+	}
+	else {
+		if (t > -0.0001f||(t > min_dist)) {
+			return false;
+		}
+	}
+
+	PHit = ray->origin + t * ray->direction;
+	return true;
+}
 
 //min_distance is lastly hit triangle PHit distance
 bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)

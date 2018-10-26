@@ -26,7 +26,7 @@ void Camera::Update(glm::vec3 direction) {
 #ifdef DEBUG
 	std::cout << glm::to_string(camera_position) << std::endl;
 #endif
-	view_matrix = glm::lookAt(camera_position, camera_position + direction, glm::vec3(0.f, 1.f, 0.f));
+	//view_matrix = glm::lookAt(camera_position, camera_position + direction, glm::vec3(0.f, 1.f, 0.f));
 }
 
 Camera::~Camera()
