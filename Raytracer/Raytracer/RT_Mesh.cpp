@@ -46,6 +46,53 @@ bool RT_Mesh::shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, b
 	return true; //successful hit
 }*/
 
+bool RT_Mesh::intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v,float &min_dist) {
+	glm::fvec3 N = getTriangleUnNormal(_triangle);
+	//float triangle_area = N.length()/2.f; //plocha Rovnobezniku/2 dana vektorovym soucinem dvou vektoru (nenormovana normala)
+	//std::cout << triangle_area << " << tohle by nemelo hazet kraviny" << std::endl;
+	//v = N.(AB x AP) / N.N
+	float NN = glm::dot(N, N);//N.N
+
+	///Calc PHit 
+	//Let's ommit H's functions and code everything again in here..hopefully helps
+	//check for parallelism
+	float RdotN = glm::dot(N, ray->direction);
+	//if (isPrimary) RdotN*=(-1.0f);
+
+	if ((0.0001f > glm::abs(RdotN)) || (RdotN > 0 && _singleSided)) {//parallel or facing other way
+		return false;
+	}
+
+	float d = glm::dot(N, _triangle[0]); // using first vertex by convention, distance to triangle plane
+
+	t = (glm::dot(N, ray->origin) + d)/RdotN;
+	if (t < 0 + (isPrimary ? CAM_NEAR_PLANE : 0.001f) || t>min_dist) return false; //triangle is behind the origin
+	
+	PHit = ray->origin + t * ray->direction; //P=O+tR parametricke vyjadreni primky, t je vzdalenost od O po smeru R
+
+	///je v trojuhelniku?
+
+	glm::vec3 edge = _triangle[1] - _triangle[0];
+	glm::vec3 vp = PHit - _triangle[0];
+	glm::vec3 C = glm::cross(edge, vp); //kolmobezka s rovinou trojuhelniku
+	if (glm::dot(N, C) < 0) return false; //
+
+	edge = _triangle[2] - _triangle[1];
+	vp = PHit - _triangle[1];
+	C = glm::cross(edge, vp);
+	u = glm::dot(N, C);
+	if (u < 0) return false;
+
+	edge = _triangle[0] - _triangle[2];
+	vp = PHit - _triangle[2];
+	C = glm::cross(edge, vp);
+	v = glm::dot(N, C);
+	if (v < 0) return false;
+	
+	u /= NN; v /= NN;
+	return true;
+}
+
 //min_distance is lastly hit triangle PHit distance
 bool RT_Mesh::rayHitTriangle(std::vector<glm::vec3> _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
 {//TODO edit to use references or pointers?
