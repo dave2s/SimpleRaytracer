@@ -4,6 +4,7 @@ RT_Mesh::RT_Mesh()
 {
 	indices_len = 0;
 	singleSided = false;
+	glm::mat4 object_to_world;
 }
 
 void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::u8vec4 _color) {
@@ -93,6 +94,8 @@ bool RT_Mesh::intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle,
 	return true;
 }
 //Moller-Trumbore
+///Split this into primary and secondary function - optimize
+//float margin = 0.001f;
 bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist) {
 	glm::vec3 edge01 = _triangle[1] - _triangle[0];
 	glm::vec3 edge02 = _triangle[2] - _triangle[0];
@@ -100,37 +103,43 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triang
 	float D = glm::dot(edge01, pvec);
 	
 	if (isPrimary) {
-		if ((D<0.001f && _singleSided) ) return false; // 0 backfacing, close to zero miss
-		//if (glm::abs(D) < 0.0001f) return false;//parallel
+		if ((D < 0.001f && _singleSided)) {
+			return false;
+		} // 0 backfacing, close to zero miss
+		//if (glm::abs(D) < 0.0001f) return false;//ortho, parallel with normal
 	}
 	else {
-		//if () return false;
-		//if (glm::abs(D) == 0) return false; // 0 backfacing, close to zero miss
-		//if (glm::abs(D) < 0.0001f) return false;//parallel
-		if (D > -0.0001f&& D < 0.0001) return false;
+		if ( (D > -0.001f) && (D < 0.001f) ) return false;
 	}
 	glm::vec3 tvec = ray->origin - _triangle[0];
 	float D_inv = 1 / D;
 	u = glm::dot(tvec, pvec) * D_inv;
-	if (u < 0 || u>1) return false;
+	if (u < 0 || u>1) { return false; }
 
 	tvec = glm::cross(tvec, edge01);
 	v = glm::dot(ray->direction, tvec)*D_inv;
-	if (v < 0 || u + v>1) return false;
+	if (v < 0 || u + v>1) { return false; }
 
 	t = glm::dot(edge02, tvec) * D_inv;
-	if (isPrimary) {
-		if ((t < CAM_NEAR_PLANE ) || (t > min_dist)) {
+	if (isPrimary && ((t < CAM_NEAR_PLANE) || (t > min_dist))) {
+			PHit = ray->origin + t * ray->direction;
+			return false;
+	}
+	else if (-1.f*t > min_dist) {
+		return false;
+	}
+	else if (t < 0.001f)
+	{		
+		if (((t < 0.001f)&&(t>-0.01f)) && (((ray->prev_D < 0.f) && (D < 0.f)) || ((ray->prev_D > 0.f) && (D > 0.001f))))// goto jmp;
+		{
+		}
+		else {
+			PHit = ray->origin + t * ray->direction;
 			return false;
 		}
 	}
-	else {
-		if (t > -0.0001f||(t > min_dist)) {
-			return false;
-		}
-	}
-
 	PHit = ray->origin + t * ray->direction;
+
 	return true;
 }
 

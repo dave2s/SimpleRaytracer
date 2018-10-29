@@ -17,7 +17,7 @@ public:
 	Camera(glm::vec3 origin, glm::vec3 front, float fovy, float aspect_ratio);
 	~Camera();
 
-	//glm::mat4 view_matrix;
+	glm::mat4 view_matrix;
 	glm::vec3 camera_position;
 	glm::mat4 projection_matrix;
 	float aspect_ratio;
