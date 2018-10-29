@@ -6,8 +6,12 @@
 #define CAM_FAR_PLANE 1000.0f
 #define COORDS_FLOAT_WIDTH 2.0f
 #define COORDS_FLOAT_HEIGHT 2.0f
-#define PI 3.14159265358979323846264f
-#define TO_RADIANS(x)  x*PI/180.f
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264f
+#endif
+
+#define TO_RADIANS(x)  x*M_PI/180.f
 
 const float inf = std::numeric_limits<float>::max();
 
