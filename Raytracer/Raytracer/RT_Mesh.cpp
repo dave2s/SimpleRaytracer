@@ -7,7 +7,7 @@ RT_Mesh::RT_Mesh()
 	glm::mat4 object_to_world;
 }
 
-void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::u8vec4 _color) {
+void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::u8vec4 _color,float _albedo) {
 	color = _color;
 	indices_len = _indices_len;
 	vertices = new float[_vertices_len];
@@ -16,6 +16,7 @@ void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, u
 	indices = new unsigned int[_indices_len];
 	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	singleSided = _singleSided;
+	albedo = glm::vec3(_albedo);
 }
 
 void RT_Mesh::ClearMesh()

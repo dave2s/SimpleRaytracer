@@ -13,7 +13,7 @@ public:
 
 	glm::u8vec4 color;
 	
-	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec4 _color);
+	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec4 _color,float albedo);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
@@ -57,6 +57,7 @@ private:
 	unsigned int* indices;
 	unsigned int vertex_count;
 	bool singleSided;
+	glm::vec3 albedo;
 
 	///Not implemented
 	void Triangulate();
