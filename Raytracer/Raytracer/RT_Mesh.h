@@ -12,7 +12,8 @@ public:
 	RT_Mesh();
 
 	glm::u8vec4 color;
-	
+	glm::f32vec3 albedo;
+
 	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec4 _color,float albedo);
 	void ClearMesh();
 
@@ -46,7 +47,7 @@ public:
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
 	static bool intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
-	static bool intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
+	static bool intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
 	static bool rayHitTriangle(std::vector<glm::vec3> triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
@@ -57,7 +58,7 @@ private:
 	unsigned int* indices;
 	unsigned int vertex_count;
 	bool singleSided;
-	glm::vec3 albedo;
+	
 
 	///Not implemented
 	void Triangulate();

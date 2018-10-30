@@ -12,11 +12,10 @@ void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, u
 	indices_len = _indices_len;
 	vertices = new float[_vertices_len];
 	memcpy(vertices,_vertices,sizeof(float)*_vertices_len);	
-	vertex_count = _vertices_len;
 	indices = new unsigned int[_indices_len];
 	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	singleSided = _singleSided;
-	albedo = glm::vec3(_albedo);
+	albedo = glm::f32vec3(_albedo);
 }
 
 void RT_Mesh::ClearMesh()
@@ -97,7 +96,7 @@ bool RT_Mesh::intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle,
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist) {
+bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit,glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
 	glm::vec3 edge01 = _triangle[1] - _triangle[0];
 	glm::vec3 edge02 = _triangle[2] - _triangle[0];
 	glm::vec3 pvec = glm::cross(ray->direction, edge02);
@@ -140,7 +139,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triang
 		}
 	}
 	PHit = ray->origin + t * ray->direction;
-
+	NHit = glm::normalize(glm::cross(edge01, edge02));
 	return true;
 }
 
