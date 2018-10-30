@@ -16,7 +16,7 @@ public:
 	glm::vec3 color;
 	float intensity;
 
-	virtual void shine(glm::vec3& light_intensity, glm::vec3& light_dir, glm::vec3& P);
+	virtual void shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 };
 
 class RT_PointLight : public RT_Light

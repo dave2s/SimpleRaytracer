@@ -10,7 +10,7 @@ RT_Light::RT_Light(float _intensity, glm::vec3 col)
 	color = col;
 }
 
-void RT_Light::shine(glm::vec3& light_intensity, glm::vec3& light_dir, glm::vec3& P)
+void RT_Light::shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P)
 {
 }
 
