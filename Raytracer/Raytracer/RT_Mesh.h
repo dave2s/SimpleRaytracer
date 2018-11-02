@@ -11,10 +11,10 @@ class RT_Mesh
 public:
 	RT_Mesh();
 
-	glm::u8vec4 color;
+	glm::u8vec3 color;
 	glm::f32vec3 albedo;
 
-	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec4 _color,float albedo);
+	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::u8vec3 _color,float albedo);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
