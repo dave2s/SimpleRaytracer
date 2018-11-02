@@ -4,6 +4,7 @@
 
 
 
+
 RT_Light::RT_Light(float _intensity, glm::vec3 col)
 {
 	intensity = _intensity;
@@ -45,7 +46,7 @@ RT_PointLight::RT_PointLight(glm::vec3 pos, float _intensity, glm::vec3 col):RT_
 
 void RT_DistantLight::shine(glm::vec3& light_intensity,float& light_distance, glm::vec3& light_dir, glm::vec3& P) {
 	light_dir = direction;
-	light_intensity = color * intensity;
+	light_intensity = glm::clamp(color * intensity,0.f,FLT_MAX);
 	light_distance = inf;
 	//NHit, shadow_ray->direction)
 	//hit_color = (albedo)*intensity*glm::vec3(light->color)*std::max(0.f, NdotRay);
