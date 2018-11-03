@@ -10,7 +10,7 @@ public:
 
 	enum LIGHT_TYPE { point, distant};
 
-	RT_Light(float intensity, glm::vec3 color);
+	RT_Light(float intensity, glm::f32vec3 color);
 	virtual ~RT_Light();
 
 	glm::vec3 color;
@@ -24,7 +24,7 @@ class RT_PointLight : public RT_Light
 	
 public:
 	glm::vec3 position;
-	RT_PointLight(glm::vec3 pos, float intensity, glm::vec3 color);
+	RT_PointLight(glm::vec3 pos, float intensity, glm::f32vec3 color);
 
 	void shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 
@@ -35,7 +35,7 @@ class RT_DistantLight : public RT_Light
 	
 public:
 	glm::vec3 direction;
-	RT_DistantLight(glm::vec3 dir, float intensity, glm::vec3 color);
+	RT_DistantLight(glm::vec3 dir, float intensity, glm::f32vec3 color);
 
 	void shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 };
