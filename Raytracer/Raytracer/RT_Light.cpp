@@ -15,6 +15,7 @@ void RT_Light::shine(glm::vec3& light_intensity, float& light_distance, glm::vec
 {
 }
 
+
 RT_Light::~RT_Light()
 {
 }
