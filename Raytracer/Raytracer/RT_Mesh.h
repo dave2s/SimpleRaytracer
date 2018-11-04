@@ -21,20 +21,20 @@ public:
 	int getTriangleCount() { return indices_len/3;}
 
 	//Return triangle by index of the triangle
-	std::vector<glm::vec3> getTriangle(unsigned int idx) {
+	glm::vec3* getTriangle(unsigned int idx) {
 		glm::vec3 v0 = { vertices[indices[0 + 3 * idx] * 3 + 0], vertices[indices[0 + 3 * idx] * 3 + 1], vertices[indices[0 + 3 * idx] * 3 + 2] };
 		glm::vec3 v1 = { vertices[indices[1 + 3 * idx] * 3 + 0], vertices[indices[1 + 3 * idx] * 3 + 1], vertices[indices[1 + 3 * idx] * 3 + 2] };
 		glm::vec3 v2 = { vertices[indices[2 + 3 * idx] * 3 + 0], vertices[indices[2 + 3 * idx] * 3 + 1], vertices[indices[2 + 3 * idx] * 3 + 2] };
-		std::vector<glm::vec3> triangle;
+		/*std::vector<glm::vec3> triangle;
 		triangle.push_back(v0);
 		triangle.push_back(v1);
-		triangle.push_back(v2);
-
+		triangle.push_back(v2);*/
+		glm::vec3 triangle[3] = { v0,v1,v2 };
 		return triangle;
 	}
 
-	static glm::vec3 getTriangleNormal(std::vector<glm::vec3> vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }//triangle normal
-	static glm::vec3 getTriangleUnNormal(std::vector<glm::vec3> vertices) { return glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]); }//triangle normal not normalized
+	static glm::vec3 getTriangleNormal(glm::vec3* vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }//triangle normal
+	static glm::vec3 getTriangleUnNormal(glm::vec3* vertices) { return glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]); }//triangle normal not normalized
 	static float getDistanceFromOrigin(glm::vec3 normal, glm::vec3 vertex) { return glm::dot(normal,vertex); }
 	static float getPlaneIntersectionDistance(bool &isPrimary, float distance_from_origin, glm::vec3 plane_normal, glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided, int &e) {
 		//if (!isPrimary) { std::cout << "shadow ray je singlesided? " << _singleSided << std::endl; }
@@ -46,9 +46,9 @@ public:
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
-	static bool intersectTriangle(bool isPrimary,std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
-	static bool intersectTriangleMT(bool isPrimary, std::vector<glm::vec3> _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
-	static bool rayHitTriangle(std::vector<glm::vec3> triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
+	static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
+	static bool intersectTriangleMT(bool isPrimary, glm::vec3* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
+	static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 

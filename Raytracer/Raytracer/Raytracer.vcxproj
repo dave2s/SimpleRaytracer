@@ -137,7 +137,6 @@
   <ItemGroup>
     <ClInclude Include="Bunny.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="fastpow.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RT_Light.h" />
     <ClInclude Include="RT_Mesh.h" />

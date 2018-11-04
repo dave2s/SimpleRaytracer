@@ -16,6 +16,7 @@ Ray::Ray()
 
 Ray::~Ray()
 {
+
 }
 
 glm::vec3 Ray::calcRayDirection(glm::vec3 origin, glm::vec3 target) {

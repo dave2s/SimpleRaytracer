@@ -53,8 +53,5 @@
     <ClInclude Include="Bunny.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fastpow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
