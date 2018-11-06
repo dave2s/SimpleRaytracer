@@ -16,6 +16,7 @@ void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, u
 	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
+	material = _material;
 }
 
 void RT_Mesh::ClearMesh()
