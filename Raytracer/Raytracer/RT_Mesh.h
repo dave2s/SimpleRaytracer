@@ -11,10 +11,13 @@ class RT_Mesh
 public:
 	RT_Mesh();
 
+	enum MATERIAL_TYPE {DIFFUSE, REFLECTIVE, MIRROR};
+
 	glm::f32vec3 color;
 	glm::f32vec3 albedo;
+	MATERIAL_TYPE material;
 
-	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo);
+	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo, MATERIAL_TYPE material);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
