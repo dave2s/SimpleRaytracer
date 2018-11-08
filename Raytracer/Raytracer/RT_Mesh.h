@@ -13,26 +13,35 @@ public:
 
 	enum MATERIAL_TYPE {DIFFUSE, REFLECTIVE, MIRROR};
 
+	struct Vertex {
+		glm::f32vec3 position;
+		glm::f32vec3 normal;
+		glm::f32vec2 tex_coords;
+	};
+
 	glm::f32vec3 color;
 	glm::f32vec3 albedo;
-	MATERIAL_TYPE material;
+	MATERIAL_TYPE material_type;
 
-	void CreateMesh(const float *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo, MATERIAL_TYPE material);
+	void CreateMesh(Vertex *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo, MATERIAL_TYPE material);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
 	int getTriangleCount() { return indices_len/3;}
 
 	//Return triangle by index of the triangle
-	glm::vec3* getTriangle(unsigned int idx) {
-		glm::vec3 v0 = { vertices[indices[0 + 3 * idx] * 3 + 0], vertices[indices[0 + 3 * idx] * 3 + 1], vertices[indices[0 + 3 * idx] * 3 + 2] };
+	Vertex* getTriangle(unsigned int idx) {
+		/*glm::vec3 v0 = { vertices[indices[0 + 3 * idx] * 3 + 0], vertices[indices[0 + 3 * idx] * 3 + 1], vertices[indices[0 + 3 * idx] * 3 + 2] };
 		glm::vec3 v1 = { vertices[indices[1 + 3 * idx] * 3 + 0], vertices[indices[1 + 3 * idx] * 3 + 1], vertices[indices[1 + 3 * idx] * 3 + 2] };
-		glm::vec3 v2 = { vertices[indices[2 + 3 * idx] * 3 + 0], vertices[indices[2 + 3 * idx] * 3 + 1], vertices[indices[2 + 3 * idx] * 3 + 2] };
+		glm::vec3 v2 = { vertices[indices[2 + 3 * idx] * 3 + 0], vertices[indices[2 + 3 * idx] * 3 + 1], vertices[indices[2 + 3 * idx] * 3 + 2] };*/
+		//glm::f32vec3 v0 = vertices[0 + 3 * idx].position;
+		//glm::f32vec3 v1 = vertices[1 + 3 * idx].position;
+		//glm::f32vec3 v2 = vertices[2 + 3 * idx].position;
 		/*std::vector<glm::vec3> triangle;
 		triangle.push_back(v0);
 		triangle.push_back(v1);
 		triangle.push_back(v2);*/
-		glm::vec3 triangle[3] = { v0,v1,v2 };
+		Vertex triangle[3] = { vertices[0 + 3 * idx].position,vertices[1 + 3 * idx].position, vertices[2 + 3 * idx].position };
 		return triangle;
 	}
 
@@ -50,19 +59,18 @@ public:
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
 	static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
-	static bool intersectTriangleMT(bool isPrimary, glm::vec3* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
+	static bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
 	static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 
 private:
 	unsigned int indices_len;
-	float* vertices;
 	unsigned int* indices;
+	Vertex* vertices;
 	unsigned int vertex_count;
 	bool singleSided;
 	
-
 	///Not implemented
 	void Triangulate();
 	///Not implemented

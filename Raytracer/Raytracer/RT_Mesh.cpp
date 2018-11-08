@@ -7,16 +7,21 @@ RT_Mesh::RT_Mesh()
 	glm::mat4 object_to_world;
 }
 
-void RT_Mesh::CreateMesh(const float *_vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color,float _albedo, MATERIAL_TYPE _material) {
+void RT_Mesh::CreateMesh( Vertex* _vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color,float _albedo, MATERIAL_TYPE _material) {
 	color = _color;
 	indices_len = _indices_len;
-	vertices = new float[_vertices_len];
-	memcpy(vertices,_vertices,sizeof(float)*_vertices_len);	
+	vertices = new Vertex[_vertices_len];
+	memcpy(vertices, _vertices, sizeof(Vertex)*_vertices_len);
+	//delete(_vertices);
+	/*vertices = new Vertex[_vertices_len/3.];
+	for (int i = 0; i < _vertices_len; ++i) {
+		vertices[i].position = glm::f32vec3()
+	}*/
 	indices = new unsigned int[_indices_len];
 	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
-	material = _material;
+	material_type = _material;
 }
 
 void RT_Mesh::ClearMesh()
@@ -98,9 +103,9 @@ bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _sing
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-bool RT_Mesh::intersectTriangleMT(bool isPrimary, glm::vec3* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit,glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
-	glm::vec3 edge01 = _triangle[1] - _triangle[0];
-	glm::vec3 edge02 = _triangle[2] - _triangle[0];
+bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit,glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
+	glm::vec3 edge01 = (_triangle[1]).position - (_triangle[0]).position;
+	glm::vec3 edge02 = _triangle[2].position - _triangle[0].position;
 	glm::vec3 pvec = glm::cross(ray->direction, edge02);
 	float D = glm::dot(edge01, pvec);
 	
@@ -113,7 +118,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, glm::vec3* _triangle, bool _si
 	else {
 		if ( (D > -0.001f) && (D < 0.001f) ) return false;
 	}
-	glm::vec3 tvec = ray->origin - _triangle[0];
+	glm::vec3 tvec = ray->origin - _triangle[0].position;
 	float D_inv = 1 / D;
 	u = glm::dot(tvec, pvec) * D_inv;
 	if (u < 0 || u>1) { return false; }
