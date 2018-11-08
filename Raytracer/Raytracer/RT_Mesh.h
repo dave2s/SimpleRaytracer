@@ -23,7 +23,7 @@ public:
 	glm::f32vec3 albedo;
 	MATERIAL_TYPE material_type;
 
-	void CreateMesh(Vertex *vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo, MATERIAL_TYPE material);
+	void CreateMesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color,float albedo, MATERIAL_TYPE material);
 	void ClearMesh();
 
 	bool isSingleSided() { return singleSided; };
