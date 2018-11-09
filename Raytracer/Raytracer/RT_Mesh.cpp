@@ -129,7 +129,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 
 	t = glm::dot(edge02, tvec) * D_inv;
 	if (isPrimary && ((t < CAM_NEAR_PLANE) || (t > min_dist))) {
-			PHit = ray->origin + t * ray->direction;
+			//PHit = ray->origin + t * ray->direction;
 			return false;
 	}
 	else if (-1.f*t > min_dist) {
@@ -141,7 +141,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 		{
 		}
 		else {
-			PHit = ray->origin + t * ray->direction;
+			//PHit = ray->origin + t * ray->direction;
 			return false;
 		}
 	}
@@ -151,7 +151,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 }
 
 //min_distance is lastly hit triangle PHit distance
-bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & PHit,float min_dist)
+bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & _PHit,float min_dist)
 {//TODO edit to use references or pointers?
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
@@ -163,13 +163,14 @@ bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool
 	if ((d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.00f) || (d > min_dist)||(e==1)/*d==0*/) {//e==1 odvraceny trojuhelnik,
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible
 	}
-	glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
+	//glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
+	_PHit = getPlaneIntersection(ray->origin, d, ray->direction);
 
 	///is Phit inside the triangle? test against each edge
 	if (glm::dot(normal, glm::cross(_triangle[1] - _triangle[0], _PHit - _triangle[0])) < 0) { return false; }
 	if (glm::dot(normal, glm::cross(_triangle[2] - _triangle[1], _PHit - _triangle[1])) < 0) { return false; }
 	if (glm::dot(normal, glm::cross(_triangle[0] - _triangle[2], _PHit - _triangle[2])) < 0) { return false; }
-	PHit = _PHit;
+	//PHit = _PHit;
 	distance = d;
 	return true; //successful hit
 }
