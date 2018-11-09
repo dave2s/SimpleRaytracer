@@ -41,7 +41,7 @@ public:
 		triangle.push_back(v0);
 		triangle.push_back(v1);
 		triangle.push_back(v2);*/
-		Vertex triangle[3] = { vertices[0 + 3 * idx].position,vertices[1 + 3 * idx].position, vertices[2 + 3 * idx].position };
+		Vertex triangle[3] = { vertices[indices[0 + 3 * idx]],vertices[indices[1 + 3 * idx]], vertices[indices[2 + 3 * idx]] };
 		return triangle;
 	}
 
