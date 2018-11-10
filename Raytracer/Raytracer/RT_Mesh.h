@@ -18,6 +18,12 @@ public:
 		glm::f32vec3 normal;
 		glm::f32vec2 tex_coords;
 	};
+	struct Texture {
+		unsigned int id;
+		std::string type;
+	};
+
+	std::vector<Texture> textures;
 
 	glm::f32vec3 color;
 	glm::f32vec3 albedo;
