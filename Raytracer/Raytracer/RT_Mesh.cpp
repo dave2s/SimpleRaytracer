@@ -110,7 +110,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 	float D = glm::dot(edge01, pvec);
 	
 	if (isPrimary) {
-		if ((D < 0.001f && _singleSided)) {
+		if ((D < 0.001f && _singleSided)|| (glm::abs(D) < 0.0001f)) {
 			return false;
 		} // 0 backfacing, close to zero miss
 		//if (glm::abs(D) < 0.0001f) return false;//ortho, parallel with normal
