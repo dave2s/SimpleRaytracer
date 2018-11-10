@@ -1,5 +1,5 @@
 *.zip
-*Models/
+
 OpenGlCourseApp/
 *.dll
 *VC.opendb
