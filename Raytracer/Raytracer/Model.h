@@ -4,23 +4,36 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "RT_Mesh.h"
 
-class ModelLoader
+class Model
 {
 public:
-	ModelLoader();
+	Model();
 
-	
-	struct Texture {
+	/*struct Texture {
 		unsigned int id;
 		std::string path;
 		std::string type;
-	};
-	std::vector<Texture> textures;
+	};*/
 
-	void load(std::string path);
-	std::vector<Texture> loadTextures();
+	std::vector<RT_Mesh::Texture> textures;
 
-	~ModelLoader();
+	void loadScene(std::string model_path, std::vector<RT_Mesh*>& meshes);
+	//void processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> meshes);
+
+
+	~Model();
+private:
+
+	//const aiScene* scene;
+	void processSceneTree(const aiScene* scene, std::vector<RT_Mesh*>& meshes, aiNode* node);
+	RT_Mesh* processTreeMesh(const aiScene* scene, aiMesh* mesh);
+//	std::vector<RT_Mesh::Texture> loadTextures();
+
+	//std::vector<RT_Mesh::Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName);
 };
+
+
+
 

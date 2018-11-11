@@ -2,12 +2,15 @@
 
 RT_Mesh::RT_Mesh()
 {
+
+}
+
+RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color,float _albedo, MATERIAL_TYPE _material) {
+
 	indices_len = 0;
 	singleSided = false;
 	glm::mat4 object_to_world;
-}
 
-void RT_Mesh::CreateMesh( Vertex* _vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color,float _albedo, MATERIAL_TYPE _material) {
 	color = _color;
 	indices_len = _indices_len;
 	vertices = new Vertex[_vertices_len];
