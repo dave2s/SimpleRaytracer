@@ -33,9 +33,9 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color, float _albedo, MATERIAL_TYPE _material)
 {
 	vertices = new Vertex[_vertices_len];
-	 memcpy(vertices,&_vertices[0],sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
+	 memcpy(vertices,&_vertices,sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
 	 indices = new unsigned int[_indices_len];
-	 memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
+	 memcpy(indices, &_indices, sizeof(unsigned int)*_indices_len);
 	//indices = &_indices[0];
 
 	color = _color;
