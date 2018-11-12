@@ -15,6 +15,8 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	indices_len = _indices_len;
 	vertices = new Vertex[_vertices_len];
 	memcpy(vertices, _vertices, sizeof(Vertex)*_vertices_len);
+	
+	//delete(_vertices);
 	//delete(_vertices);
 	/*vertices = new Vertex[_vertices_len/3.];
 	for (int i = 0; i < _vertices_len; ++i) {
@@ -22,6 +24,19 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	}*/
 	indices = new unsigned int[_indices_len];
 	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
+	//delete(indices);
+	singleSided = _singleSided;
+	albedo = glm::f32vec3(_albedo);
+	material_type = _material;
+}
+
+RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color, float _albedo, MATERIAL_TYPE _material)
+{
+	vertices = &_vertices[0]; //vector to array. Vectors are contiguous
+	indices = &_indices[0];
+
+	color = _color;
+	indices_len = _indices_len;
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
 	material_type = _material;
@@ -119,7 +134,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 		//if (glm::abs(D) < 0.0001f) return false;//ortho, parallel with normal
 	}
 	else {
-		if ( (D > -0.001f) && (D < 0.001f) ) return false;
+		if ( (D > -0.0001f) && (D < 0.0001f) ) return false;
 	}
 	glm::vec3 tvec = ray->origin - _triangle[0].position;
 	float D_inv = 1 / D;

@@ -17,9 +17,9 @@ public:
 		std::string type;
 	};*/
 
-	std::vector<RT_Mesh::Texture> textures;
+	static std::vector<RT_Mesh::Texture> textures;
 
-	void loadScene(std::string model_path, std::vector<RT_Mesh*>& meshes);
+	static void loadScene(std::string model_path, std::vector<RT_Mesh*>& meshes);
 	//void processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> meshes);
 
 
@@ -27,8 +27,8 @@ public:
 private:
 
 	//const aiScene* scene;
-	void processSceneTree(const aiScene* scene, std::vector<RT_Mesh*>& meshes, aiNode* node);
-	RT_Mesh* processTreeMesh(const aiScene* scene, aiMesh* mesh);
+	static void processSceneTree(const aiScene* scene, std::vector<RT_Mesh*>& meshes, aiNode* node);
+	static RT_Mesh* processTreeMesh(const aiScene* scene, aiMesh* mesh);
 //	std::vector<RT_Mesh::Texture> loadTextures();
 
 	//std::vector<RT_Mesh::Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName);

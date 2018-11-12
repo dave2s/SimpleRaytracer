@@ -32,49 +32,54 @@ void Model::processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> meshes)
 }*/
 
 void Model::processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> &meshes, aiNode* node){
-	for (int i = 0; i < node->mNumMeshes; ++i)
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
 	{
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(processTreeMesh(scene, mesh));
 	}
 
-	for (int i = 0; i < node->mNumChildren; ++i)
+	for (unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
 		processSceneTree(scene, meshes, node->mChildren[i]);
 	}
 }
 
 RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
-	RT_Mesh::Vertex* vertices;
-	unsigned int* indices;
-	glm::f32vec3 color;
-	RT_Mesh::MATERIAL_TYPE type;
+	std::vector< RT_Mesh::Vertex >vertices;
+	std::vector<unsigned int> indices;
+
+	glm::f32vec3 color = glm::f32vec3(0.5f,0.75f,1.f);
+	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
 	
-	vertices = new RT_Mesh::Vertex[mesh->mNumVertices];
+	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
+	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
 	glm::vec3 tmp;
-	for (int i = 0; i < mesh->mNumVertices; ++i) {
+	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
+		RT_Mesh::Vertex v;
 		tmp.x = mesh->mVertices[i].x;
 		tmp.y = mesh->mVertices[i].y;
 		tmp.z = mesh->mVertices[i].z;
-		vertices[i].position = tmp;
+		v.position = tmp;
 
 		tmp.x = mesh->mNormals[i].x;
 		tmp.y = mesh->mNormals[i].y;
 		tmp.z = mesh->mNormals[i].z;
-		vertices[i].normal = tmp;
+		v.normal= tmp;
 
 		if (mesh->mTextureCoords[0]) {
-			vertices[i].tex_coords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+			v.tex_coords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		}
 		else {
-			vertices[i].tex_coords = glm::vec2(0.f, 0.f);
+			v.tex_coords = glm::vec2(0.f, 0.f);
 		}
+		vertices.push_back(v);
 	}
-	indices = new unsigned int[mesh->mNumFaces];
-	for (int i = 0; i < mesh->mNumFaces; ++i){
+	//indices = new unsigned int[mesh->mNumFaces];
+	//indices = new unsigned int[mesh->mNumFaces]();
+	for (unsigned int i = 0; i < mesh->mNumFaces; ++i){
 		aiFace face = mesh->mFaces[i];
-		for (int j = 0; j < face.mNumIndices; ++j) {
-			indices[i]=face.mIndices[j];
+		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+			indices.push_back(face.mIndices[j]);
 		}
 	}
 
@@ -88,8 +93,8 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 			aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}*/
-
-	return new RT_Mesh(vertices, indices, *(&vertices + 1) - vertices, *(&indices + 1) - indices, false, color, 0.2f, type);
+	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, color, 0.2f, type);
+	return my_mesh;
 }
 
 /*std::vector<RT_Mesh::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
