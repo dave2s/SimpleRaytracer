@@ -74,8 +74,8 @@ public:
 
 private:
 	unsigned int indices_len;
-	unsigned int* indices;
-	Vertex* vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Vertex> vertices;
 	unsigned int vertex_count;
 	bool singleSided;
 	

@@ -48,7 +48,7 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 	std::vector< RT_Mesh::Vertex >vertices;
 	std::vector<unsigned int> indices;
 
-	glm::f32vec3 color = glm::f32vec3(0.5f,0.75f,1.f);
+	glm::f32vec3 color = glm::f32vec3(1.f,1.f,1.f);
 	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
 	
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();

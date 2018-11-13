@@ -13,8 +13,10 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 
 	color = _color;
 	indices_len = _indices_len;
-	vertices = new Vertex[_vertices_len];
-	memcpy(vertices, _vertices, sizeof(Vertex)*_vertices_len);
+
+	vertices = std::vector(_vertices,_vertices + sizeof _vertices /sizeof _vertices[0]);
+	//vertices = new Vertex[_vertices_len];
+	//memcpy(vertices, _vertices, sizeof(Vertex)*_vertices_len);
 	
 	//delete(_vertices);
 	//delete(_vertices);
@@ -22,9 +24,10 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	for (int i = 0; i < _vertices_len; ++i) {
 		vertices[i].position = glm::f32vec3()
 	}*/
-	indices = new unsigned int[_indices_len];
-	memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
+	//indices = new unsigned int[_indices_len];
+	//memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
 	//delete(indices);
+	indices = std::vector(_indices, _indices + sizeof _indices / sizeof _indices[0]);
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
 	material_type = _material;
@@ -32,10 +35,10 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 
 RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color, float _albedo, MATERIAL_TYPE _material)
 {
-	vertices = new Vertex[_vertices_len];
-	 memcpy(vertices,&_vertices[0],sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
-	 indices = new unsigned int[_indices_len];
-	 memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
+	vertices = _vertices;
+	//memcpy(vertices,&_vertices[0],sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
+	indices = _indices;
+	//memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
 	//indices = &_indices[0];
 
 	color = _color;
@@ -47,8 +50,8 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indic
 
 void RT_Mesh::ClearMesh()
 {
-	delete(indices);
-	delete(vertices);
+	//delete(indices);
+	//delete(vertices);
 	//delete(this);
 }
 /*
