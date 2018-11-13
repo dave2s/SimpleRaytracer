@@ -98,7 +98,7 @@ bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _sing
 	float d = glm::dot(N, _triangle[0]); // using first vertex by convention, distance to triangle plane
 
 	t = (glm::dot(N, ray->origin) + d)/RdotN;
-	if (t < 0 + (isPrimary ? 0.001f : 0.001f) || t>min_dist) return false; //triangle is behind the origin
+	if (t < 0 + (isPrimary ? CAM_NEAR_PLANE : 0.001f) || t>min_dist) return false; //triangle is behind the origin
 	
 	PHit = ray->origin + t * ray->direction; //P=O+tR parametricke vyjadreni primky, t je vzdalenost od O po smeru R
 
@@ -152,7 +152,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 	if (v < 0 || u + v>1) { return false; }
 
 	t = glm::dot(edge02, tvec) * D_inv;
-	if (isPrimary && ((t < CAM_NEAR_PLANE) || (t > min_dist))) {
+	if (isPrimary && ((t < 0) || (t > min_dist))) {
 			//PHit = ray->origin + t * ray->direction;
 			return false;
 	}
