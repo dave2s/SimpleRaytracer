@@ -47,8 +47,10 @@ void Model::processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> &meshes
 RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 	std::vector< RT_Mesh::Vertex >vertices;
 	std::vector<unsigned int> indices;
-
 	glm::f32vec3 color = glm::f32vec3(1.f,1.f,1.f);
+	aiMaterial *mtl;
+	RT_Mesh::Material my_material;
+
 	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
 	
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
@@ -82,22 +84,41 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-
-	/*if (mesh->mMaterialIndex >= 0)
+	
+	if (mesh->mMaterialIndex >= 0)
 	{
-		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<RT_Mesh::Texture> diffuseMaps = loadMaterialTextures(material,
-			aiTextureType_DIFFUSE, "texture_diffuse");
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		vector<Texture> specularMaps = loadMaterialTextures(material,
-			aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-	}*/
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, color, 0.2f, type);
+		mtl = scene->mMaterials[mesh->mMaterialIndex];
+		aiColor4D diffuse;
+		aiColor4D ambient;
+		aiColor4D specular;
+		float shininess;
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient);
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular);
+		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
+		
+			///TODO alpha
+		my_material.ambient_color = glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
+		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
+		my_material.shininess = shininess;
+
+		if (shininess > 999)
+			type = RT_Mesh::MIRROR;
+		
+		//color = glm::f32vec3(diffuse.r, diffuse.g, diffuse.b);
+
+		//std::vector<RT_Mesh::Texture> diff_Map = loadTextures(mtl, aiTextureType_DIFFUSE, "texture_diffuse");
+		//textures.insert(textures.end(), diff_Map.begin(), diff_Map.end());
+		//std::vector<RT_Mesh::Texture> spec_map = loadTextures(mtl, aiTextureType_SPECULAR, "texture_specular");
+		//textures.insert(textures.end(), spec_map.begin(), spec_map.end());
+	}
+
+	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, my_material, 0.2f, type);
 	return my_mesh;
 }
-
-/*std::vector<RT_Mesh::Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+/*
+std::vector<RT_Mesh::Texture> loadTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
 {
 	std::vector<RT_Mesh::Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)

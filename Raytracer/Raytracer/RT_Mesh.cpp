@@ -33,15 +33,15 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	material_type = _material;
 }
 
-RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color, float _albedo, MATERIAL_TYPE _material)
+RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, RT_Mesh::Material my_material, float _albedo, MATERIAL_TYPE _material)
 {
 	vertices = _vertices;
 	//memcpy(vertices,&_vertices[0],sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
 	indices = _indices;
 	//memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
 	//indices = &_indices[0];
-
-	color = _color;
+	material = my_material;
+	color = material.diffuse_color;
 	indices_len = _indices_len;
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
@@ -98,7 +98,7 @@ bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _sing
 	float d = glm::dot(N, _triangle[0]); // using first vertex by convention, distance to triangle plane
 
 	t = (glm::dot(N, ray->origin) + d)/RdotN;
-	if (t < 0 + (isPrimary ? CAM_NEAR_PLANE : 0.001f) || t>min_dist) return false; //triangle is behind the origin
+	if (t < 0 + (isPrimary ? 0.001f : 0.001f) || t>min_dist) return false; //triangle is behind the origin
 	
 	PHit = ray->origin + t * ray->direction; //P=O+tR parametricke vyjadreni primky, t je vzdalenost od O po smeru R
 
