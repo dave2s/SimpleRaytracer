@@ -15,22 +15,26 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	indices_len = _indices_len;
 
 	vertices = std::vector(_vertices,_vertices + sizeof _vertices /sizeof _vertices[0]);
-	//vertices = new Vertex[_vertices_len];
-	//memcpy(vertices, _vertices, sizeof(Vertex)*_vertices_len);
-	
-	//delete(_vertices);
-	//delete(_vertices);
-	/*vertices = new Vertex[_vertices_len/3.];
-	for (int i = 0; i < _vertices_len; ++i) {
-		vertices[i].position = glm::f32vec3()
-	}*/
-	//indices = new unsigned int[_indices_len];
-	//memcpy(indices,_indices,sizeof(unsigned int)*_indices_len);
-	//delete(indices);
+
+	for (unsigned int i = 0; i < _vertices_len; ++i) {
+		updateBoundaries(vertices[i]);
+	}
+
 	indices = std::vector(_indices, _indices + sizeof _indices / sizeof _indices[0]);
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
 	material_type = _material;
+}
+
+void RT_Mesh::updateBoundaries(Vertex &vertex) {
+	for (unsigned char i = 0; i < (char)vertex.position.length; ++i) {
+		if (vertex.position[i] < boundary_points[0][i]) {
+			boundary_points[0][i] = vertex.position[i];
+		}
+		if (vertex.position[i] > boundary_points[1][i]) {
+			boundary_points[1][i] = vertex.position[i];
+		}
+	}
 }
 
 RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, RT_Mesh::Material my_material, float _albedo, MATERIAL_TYPE _material)

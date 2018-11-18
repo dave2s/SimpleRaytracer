@@ -31,12 +31,15 @@ public:
 		glm::f32vec2 ambient_color;
 		float shininess;
 	};
+	///Two points furthest apart to form a axis aligned bouning box
+	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
 
 	std::vector<Texture> textures;
 	Material material;
 	glm::f32vec3 color;
 	glm::f32vec3 albedo;
 	MATERIAL_TYPE material_type;
+
 
 	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color, float albedo, MATERIAL_TYPE material);
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, RT_Mesh::Material my_material, float albedo, MATERIAL_TYPE material);
@@ -45,18 +48,10 @@ public:
 	bool isSingleSided() { return singleSided; };
 	int getTriangleCount() { return indices_len/3;}
 
+    void updateBoundaries(Vertex &vertex);
+
 	//Return triangle by index of the triangle
 	Vertex* getTriangle(unsigned int idx) {
-		/*glm::vec3 v0 = { vertices[indices[0 + 3 * idx] * 3 + 0], vertices[indices[0 + 3 * idx] * 3 + 1], vertices[indices[0 + 3 * idx] * 3 + 2] };
-		glm::vec3 v1 = { vertices[indices[1 + 3 * idx] * 3 + 0], vertices[indices[1 + 3 * idx] * 3 + 1], vertices[indices[1 + 3 * idx] * 3 + 2] };
-		glm::vec3 v2 = { vertices[indices[2 + 3 * idx] * 3 + 0], vertices[indices[2 + 3 * idx] * 3 + 1], vertices[indices[2 + 3 * idx] * 3 + 2] };*/
-		//glm::f32vec3 v0 = vertices[0 + 3 * idx].position;
-		//glm::f32vec3 v1 = vertices[1 + 3 * idx].position;
-		//glm::f32vec3 v2 = vertices[2 + 3 * idx].position;
-		/*std::vector<glm::vec3> triangle;
-		triangle.push_back(v0);
-		triangle.push_back(v1);
-		triangle.push_back(v2);*/
 		Vertex triangle[3] = { vertices[indices[0 + 3 * idx]],vertices[indices[1 + 3 * idx]], vertices[indices[2 + 3 * idx]] };
 		return triangle;
 	}
@@ -70,12 +65,25 @@ public:
 		else { return (/*(-1* */(glm::dot(plane_normal, origin) + distance_from_origin)/*)*/ / /*-1* */ ray_dot_normal); }
 	
 	}
-
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
+
+
+	static bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
+
+	static bool intersectBB(Ray* ray, glm::vec3 (&bounds)[2]) {
+		float tmin; float tmax;
+		//t0
+		//if()
+		//t1
+		return true;
+	}
+
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
+	///Deprecated
 	static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
-	static bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
+
+	///Deprecated
 	static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
