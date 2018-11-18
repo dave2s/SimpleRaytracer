@@ -174,6 +174,7 @@ bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singl
 	return true;
 }
 
+///DEPRECATED
 //min_distance is lastly hit triangle PHit distance
 bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & _PHit,float min_dist)
 {//TODO edit to use references or pointers?
