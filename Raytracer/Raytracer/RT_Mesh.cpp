@@ -32,6 +32,9 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indic
 	vertices = _vertices;
 	//memcpy(vertices,&_vertices[0],sizeof(Vertex*)*_vertices_len); //vector to array. Vectors are contiguous
 	indices = _indices;
+	for (unsigned int i = 0; i < _vertices_len; ++i) {
+		updateBoundaries(vertices[i]);
+	}
 	//memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
 	//indices = &_indices[0];
 	material = my_material;
@@ -43,7 +46,7 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indic
 }
 
 void RT_Mesh::updateBoundaries(Vertex &vertex) {
-	for (unsigned char i = 0; i < (char)vertex.position.length; ++i) {
+	for (unsigned char i = 0; i < (char)vertex.position.length(); ++i) {
 		if (vertex.position[i] < boundary_points[0][i]) {
 			boundary_points[0][i] = vertex.position[i];
 		}

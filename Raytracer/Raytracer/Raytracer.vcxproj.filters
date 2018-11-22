@@ -56,9 +56,6 @@
     <ClInclude Include="RT_Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bunny.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>

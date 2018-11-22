@@ -38,13 +38,40 @@ public:
 
 	static float norm(glm::vec3 vec) { return (vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]); }
 
+	/*bool intersectBB(glm::vec3(&bounds)[2], float &t) {
+		glm::vec3 t0 = (bounds[0] - origin)*inv_dir;
+		glm::vec3 t1 = (bounds[1] - origin)*inv_dir;
+		glm::vec3 tmin = glm::min(t0, t1);
+	
 
+		return true;
+	}*/
 
+	bool intersectBB( glm::vec3(&bounds)[2],float &t) {
+		float tx0; float ty0; float tx1; float ty1;
+		
+		tx0 = (bounds[sign[0]].x - origin.x) * inv_dir.x;
+		tx1 = (bounds[1-sign[0]].x - origin.x) * inv_dir.x;
+		ty0 = (bounds[sign[1]].y - origin.y) * inv_dir.y;
+		ty1 = (bounds[1 - sign[1]].y - origin.y) * inv_dir.y;
 
-	bool intersectBB( glm::vec3(&bounds)[2] ) {
-		float tmin; float tmax;
+		if ((tx0 > ty1) || (ty0 > tx1)) return false;
+		if (ty0 > tx0) tx0 = ty0;
+		if (ty1 < tx1) tx1 = ty1;
 
+		float tz0; float tz1;
+		tz0 = (bounds[sign[2]].z-origin.z)*inv_dir.z;
+		tz1 = (bounds[1-sign[2]].z - origin.z)*inv_dir.z;
+		
+		if ((tx0 > tz1) || (tz0 > tx1)) return false;
+		if (tz0 > tx0) tx0 = tz0;
+		if (tz1 < tx1) tx1 = tz1;
 
+		t = tx0;
+		if (t < 0) {
+			t = tx1;
+			if (t < 0) return false;
+		}
 
 		return true;
 	}

@@ -137,7 +137,6 @@
     <ClCompile Include="RT_Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bunny.h" />
     <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Model.h" />
