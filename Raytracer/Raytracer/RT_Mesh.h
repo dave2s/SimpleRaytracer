@@ -5,7 +5,7 @@
 #include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
-#include "Ray.h"
+
 class RT_Mesh
 {
 public:
@@ -68,23 +68,13 @@ public:
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 
 
-	static bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
-
-	static bool intersectBB(Ray* ray, glm::vec3 (&bounds)[2]) {
-		float tmin; float tmax;
-		//t0
-		//if()
-		//t1
-		return true;
-	}
-
 	///TODO
 	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
 	///Deprecated
-	static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
+	//static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
 
 	///Deprecated
-	static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
+	//static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 

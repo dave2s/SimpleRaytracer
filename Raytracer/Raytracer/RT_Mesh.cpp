@@ -1,4 +1,5 @@
 #include "RT_Mesh.h"
+#include "Ray.h"
 
 RT_Mesh::RT_Mesh()
 {
@@ -26,17 +27,6 @@ RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int 
 	material_type = _material;
 }
 
-void RT_Mesh::updateBoundaries(Vertex &vertex) {
-	for (unsigned char i = 0; i < (char)vertex.position.length; ++i) {
-		if (vertex.position[i] < boundary_points[0][i]) {
-			boundary_points[0][i] = vertex.position[i];
-		}
-		if (vertex.position[i] > boundary_points[1][i]) {
-			boundary_points[1][i] = vertex.position[i];
-		}
-	}
-}
-
 RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, RT_Mesh::Material my_material, float _albedo, MATERIAL_TYPE _material)
 {
 	vertices = _vertices;
@@ -50,6 +40,17 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indic
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
 	material_type = _material;
+}
+
+void RT_Mesh::updateBoundaries(Vertex &vertex) {
+	for (unsigned char i = 0; i < (char)vertex.position.length; ++i) {
+		if (vertex.position[i] < boundary_points[0][i]) {
+			boundary_points[0][i] = vertex.position[i];
+		}
+		if (vertex.position[i] > boundary_points[1][i]) {
+			boundary_points[1][i] = vertex.position[i];
+		}
+	}
 }
 
 void RT_Mesh::ClearMesh()
@@ -82,7 +83,7 @@ bool RT_Mesh::shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, b
 	return true; //successful hit
 }*/
 
-bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v,float &min_dist) {
+/*bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, float &t, float &u, float &v,float &min_dist) {
 	glm::fvec3 N = getTriangleUnNormal(_triangle);
 	//float triangle_area = N.length()/2.f; //plocha Rovnobezniku/2 dana vektorovym soucinem dvou vektoru (nenormovana normala)
 	//std::cout << triangle_area << " << tohle by nemelo hazet kraviny" << std::endl;
@@ -127,57 +128,10 @@ bool RT_Mesh::intersectTriangle(bool isPrimary, glm::vec3* _triangle, bool _sing
 	
 	u /= NN; v /= NN;
 	return true;
-}
-//Moller-Trumbore
-///Split this into primary and secondary function - optimize
-//float margin = 0.001f;
-bool RT_Mesh::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit,glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
-	glm::vec3 edge01 = (_triangle[1]).position - (_triangle[0]).position;
-	glm::vec3 edge02 = _triangle[2].position - _triangle[0].position;
-	glm::vec3 pvec = glm::cross(ray->direction, edge02);
-	float D = glm::dot(edge01, pvec);
-	
-	if (isPrimary) {
-		if ((D < 0.001f && _singleSided)|| (glm::abs(D) < 0.0001f)) {
-			return false;
-		} // 0 backfacing, close to zero miss
-		//if (glm::abs(D) < 0.0001f) return false;//ortho, parallel with normal
-	}
-	else {
-		if ( (D > -0.0001f) && (D < 0.0001f) ) return false;
-	}
-	glm::vec3 tvec = ray->origin - _triangle[0].position;
-	float D_inv = 1 / D;
-	u = glm::dot(tvec, pvec) * D_inv;
-	if (u < 0 || u>1) { return false; }
+}*/
 
-	tvec = glm::cross(tvec, edge01);
-	v = glm::dot(ray->direction, tvec)*D_inv;
-	if (v < 0 || u + v>1) { return false; }
 
-	t = glm::dot(edge02, tvec) * D_inv;
-	if (isPrimary && ((t < 0) || (t > min_dist))) {
-			//PHit = ray->origin + t * ray->direction;
-			return false;
-	}
-	else if (-1.f*t > min_dist) {
-		return false;
-	}
-	else if (t < 0.001f)
-	{		
-		if (((t < 0.001f)&&(t>-0.01f)) && (((ray->prev_D < 0.f) && (D < 0.f)) || ((ray->prev_D > 0.f) && (D > 0.001f))))// goto jmp;
-		{
-		}
-		else {
-			//PHit = ray->origin + t * ray->direction;
-			return false;
-		}
-	}
-	PHit = ray->origin + t * ray->direction;
-	NHit = glm::normalize(glm::cross(edge01, edge02));
-	return true;
-}
-
+/*
 ///DEPRECATED
 //min_distance is lastly hit triangle PHit distance
 bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool _singleSided,float& distance, glm::vec3 & _PHit,float min_dist)
@@ -185,11 +139,12 @@ bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool
 	glm::vec3 normal = RT_Mesh::getTriangleNormal(_triangle);//is normalized
 	float d = getDistanceFromOrigin(normal, _triangle[0]);
 	int e = 0;
-	d/*parametr t z P=O+tR*/ = (isPrimary ? 1.f : -1.f)* getPlaneIntersectionDistance(isPrimary,d, normal, ray->origin, ray->direction, _singleSided,e);
+	//parametr t z P=O+tR
+	d = (isPrimary ? 1.f : -1.f)* getPlaneIntersectionDistance(isPrimary,d, normal, ray->origin, ray->direction, _singleSided,e);
 	///Distance > min_dist <-this triangle is further than previously hit
 	d *= (isPrimary? 1.f : -1.f);//camera has negative z, ray doesnt...
 	//std::cout << "vzdalenost: " << d << std::endl;
-	if ((d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.00f) || (d > min_dist)||(e==1)/*d==0*/) {//e==1 odvraceny trojuhelnik,
+	if ((d <= (isPrimary? CAM_NEAR_PLANE: 0.f) +0.00f) || (d > min_dist)||(e==1)) {//e==1 odvraceny trojuhelnik,
 		return false; // Triangle is behind the camera OR it's parallel with the ray OR it's faced the other way and is single sided - both invisible
 	}
 	//glm::vec3 _PHit = getPlaneIntersection(ray->origin, d, ray->direction);
@@ -202,7 +157,7 @@ bool RT_Mesh::rayHitTriangle(glm::vec3* _triangle,bool isPrimary, Ray *ray, bool
 	//PHit = _PHit;
 	distance = d;
 	return true; //successful hit
-}
+}*/
 
 RT_Mesh::~RT_Mesh()
 {

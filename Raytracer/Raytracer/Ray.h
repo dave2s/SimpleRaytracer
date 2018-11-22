@@ -2,6 +2,7 @@
 #define GLM_LEFT_HANDED
 #include <GLM\glm.hpp>
 #include "Camera.h"
+#include "RT_Mesh.h"
 class Ray
 {
 public:
@@ -11,16 +12,43 @@ public:
 	glm::vec3 origin;
 	glm::vec3 direction;
 	glm::vec3 hit_normal;
-	glm::vec3 invdir;
+	glm::vec3 inv_dir;
+	bool sign[3];
+
 	float	prev_D; //if primary, set, if shadow - read
 
 	static glm::vec3 calcRayDirection(glm::vec3 origin, glm::vec3 target);
-	static void calcRayPerspectiveDirection(glm::vec3 &origin, glm::vec3 &dir,float x, float y, float near, Camera &camera);
+	static void calcRayPerspectiveDirection(glm::vec3 &origin, glm::vec3 &dir, float x, float y, float near, Camera &camera) {
+		origin = glm::inverse(camera.view_matrix)*glm::vec4(0.f, 0.f, 0.f, 1.f);
+		dir = glm::normalize(glm::vec3(glm::inverse(camera.view_matrix)*glm::vec4(x, y, -near, 1.f)) - origin);
+		return;
+	}
 	static void calcReflectedDirection(glm::vec3 &NHit, glm::vec3 & raydir) { 
 		raydir = raydir - 2.f * NHit*(glm::dot(NHit, raydir));
 		int a=1;
 	}
 
+	void precomputeValues() {
+		inv_dir = 1.f / direction;
+
+		sign[0] = inv_dir.x < 0.f;
+		sign[1] = inv_dir.y < 0.f;
+		sign[2] = inv_dir.z < 0.f;
+	}
+
 	static float norm(glm::vec3 vec) { return (vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]); }
+
+
+
+
+	bool intersectBB( glm::vec3(&bounds)[2] ) {
+		float tmin; float tmax;
+
+
+
+		return true;
+	}
+
+	bool intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
 };
 
