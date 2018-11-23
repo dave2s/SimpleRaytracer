@@ -1,0 +1,43 @@
+BBAccel  bez shadow ray accel
+Frametime: 1.81s; 0.55 fps
+Primary rays: 1310720
+BBox tests: 9761.129K
+Triangles intersected: 580.684K
+Triangles tested: 56.384M
+
+No BBAccel
+Frametime: 2.36s; 0.42 fps
+Primary rays: 1310720
+BBox tests: 0.000K
+Triangles intersected: 366.137K
+Triangles tested: 62.193M
+
+
+
+OPRAVA BBAccel
+
+
+
+
+
+sponza s opravenou akceleraci
+Frametime: 57.73s; 0.02 fps
+Primary rays: 172800
+BBox tests: 14611.870K
+Triangles intersected: 345.600K
+Triangles tested: 1000.137M
+
+2x space subsample jiny rozlisko
+sponza s acceleraci bez shadow ray accel
+Frametime: 60.48s; 0.02        fps
+Primary rays: 76800
+BBox tests: 2918.400K
+Triangles intersected: 153.600K
+Triangles tested: 1993.649M
+
+sponza bez accelerace
+Frametime: 150.82s; 0.01       fps
+Primary rays: 76800
+BBox tests: 0.000K
+Triangles intersected: 153.600K
+Triangles tested: 1992.859M
