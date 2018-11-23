@@ -38,7 +38,7 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> _vertices, std::vector<unsigned int> _indic
 	//memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);
 	//indices = &_indices[0];
 	material = my_material;
-	color = material.diffuse_color;
+	//color = material.diffuse_color;
 	indices_len = _indices_len;
 	singleSided = _singleSided;
 	albedo = glm::f32vec3(_albedo);
