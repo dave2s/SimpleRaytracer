@@ -47,12 +47,12 @@ void Model::processSceneTree(const aiScene* scene, std::vector<RT_Mesh*> &meshes
 RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 	std::vector< RT_Mesh::Vertex >vertices;
 	std::vector<unsigned int> indices;
-	glm::f32vec3 color = glm::f32vec3(1.f,1.f,1.f);
+	//glm::f32vec3 color = glm::f32vec3(1.f,1.f,1.f);
 	aiMaterial *mtl;
 	RT_Mesh::Material my_material;
 
-	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
-	//RT_Mesh::MATERIAL_TYPE type = RT_Mesh::PHONG;
+	//RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
+	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::PHONG;
 	
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
@@ -115,7 +115,7 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 		//textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, my_material, 0.2f, type);
+	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, my_material, 0.18f, type);
 	return my_mesh;
 }
 /*

@@ -6,13 +6,13 @@ RT_Mesh::RT_Mesh()
 
 }
 
-RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided, glm::f32vec3 _color,float _albedo, MATERIAL_TYPE _material) {
+RT_Mesh::RT_Mesh( Vertex* _vertices, const unsigned int *_indices, unsigned int _vertices_len, unsigned int _indices_len, bool _singleSided/*, glm::f32vec3 _color*/,float _albedo, MATERIAL_TYPE _material) {
 
 	indices_len = 0;
 	singleSided = false;
 	glm::mat4 object_to_world;
 
-	color = _color;
+	//color = _color;s
 	indices_len = _indices_len;
 
 	vertices = std::vector(_vertices,_vertices + sizeof _vertices /sizeof _vertices[0]);

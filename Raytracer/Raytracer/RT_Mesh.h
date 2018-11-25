@@ -36,12 +36,11 @@ public:
 
 	std::vector<Texture> textures;
 	Material material;
-	glm::f32vec3 color;
 	glm::f32vec3 albedo;
 	MATERIAL_TYPE material_type;
 
 
-	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, glm::f32vec3 _color, float albedo, MATERIAL_TYPE material);
+	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, /*glm::f32vec3 _color,*/ float albedo, MATERIAL_TYPE material);
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, RT_Mesh::Material my_material, float albedo, MATERIAL_TYPE material);
 	void ClearMesh();
 
