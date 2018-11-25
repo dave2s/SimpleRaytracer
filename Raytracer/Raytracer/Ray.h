@@ -25,7 +25,6 @@ public:
 	}
 	static void calcReflectedDirection(glm::vec3 &NHit, glm::vec3 & raydir) { 
 		raydir = raydir - 2.f * NHit*(glm::dot(NHit, raydir));
-		int a=1;
 	}
 
 	void precomputeValues() {
@@ -76,6 +75,6 @@ public:
 		return true;
 	}
 
-	bool intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
+	bool intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist);
 };
 

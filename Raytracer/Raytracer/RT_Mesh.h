@@ -11,7 +11,7 @@ class RT_Mesh
 public:
 	RT_Mesh();
 
-	enum MATERIAL_TYPE : int {DIFFUSE, REFLECTIVE, MIRROR};
+	enum MATERIAL_TYPE : int {DIFFUSE, REFLECTIVE, MIRROR, PHONG};
 
 	struct Vertex {
 		glm::f32vec3 position;
@@ -28,7 +28,7 @@ public:
 	struct Material {
 		glm::f32vec3 diffuse_color;
 		glm::f32vec3 specluar_color;
-		glm::f32vec2 ambient_color;
+		glm::f32vec3 ambient_color;
 		float shininess;
 	};
 	///Two points furthest apart to form a axis aligned bouning box

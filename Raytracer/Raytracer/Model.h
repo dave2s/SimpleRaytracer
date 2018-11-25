@@ -5,7 +5,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "RT_Mesh.h"
-
+#define AMBIENT_LIGHT 0.075f
 class Model
 {
 public:

@@ -26,10 +26,10 @@ glm::vec3 Ray::calcRayDirection(glm::vec3 origin, glm::vec3 target) {
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, Ray *ray, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
+bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
 	glm::vec3 edge01 = (_triangle[1]).position - (_triangle[0]).position;
 	glm::vec3 edge02 = _triangle[2].position - _triangle[0].position;
-	glm::vec3 pvec = glm::cross(ray->direction, edge02);
+	glm::vec3 pvec = glm::cross(direction, edge02);
 	float D = glm::dot(edge01, pvec);
 
 	if (isPrimary) {
@@ -41,13 +41,13 @@ bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _
 	else {
 		if ((D > -0.0001f) && (D < 0.0001f)) return false;
 	}
-	glm::vec3 tvec = ray->origin - _triangle[0].position;
+	glm::vec3 tvec = origin - _triangle[0].position;
 	float D_inv = 1 / D;
 	u = glm::dot(tvec, pvec) * D_inv;
 	if (u < 0 || u>1) { return false; }
 
 	tvec = glm::cross(tvec, edge01);
-	v = glm::dot(ray->direction, tvec)*D_inv;
+	v = glm::dot(direction, tvec)*D_inv;
 	if (v < 0 || u + v>1) { return false; }
 
 	t = glm::dot(edge02, tvec) * D_inv;
@@ -60,7 +60,7 @@ bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _
 	}
 	else if (t < 0.001f)
 	{
-		if (((t < 0.001f) && (t > -0.01f)) && (((ray->prev_D < 0.f) && (D < 0.f)) || ((ray->prev_D > 0.f) && (D > 0.001f))))// goto jmp;
+		if (((t < 0.001f) && (t > -0.01f)) && (((prev_D < 0.f) && (D < 0.f)) || ((prev_D > 0.f) && (D > 0.001f))))// goto jmp;
 		{
 		}
 		else {
@@ -68,7 +68,7 @@ bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _
 			return false;
 		}
 	}
-	PHit = ray->origin + t * ray->direction;
+	PHit = origin + t * direction;
 	NHit = glm::normalize(glm::cross(edge01, edge02));
 	return true;
 }

@@ -52,6 +52,7 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 	RT_Mesh::Material my_material;
 
 	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
+	//RT_Mesh::MATERIAL_TYPE type = RT_Mesh::PHONG;
 	
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
@@ -98,7 +99,7 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
 		
 			///TODO alpha
-		my_material.ambient_color = glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
+		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a)==glm::f32vec4(0))?glm::f32vec3(AMBIENT_LIGHT): glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
 		my_material.shininess = shininess;
