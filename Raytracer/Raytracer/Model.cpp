@@ -115,7 +115,7 @@ RT_Mesh* Model::processTreeMesh(const aiScene* scene, aiMesh* mesh) {
 		//textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), false, my_material, 0.18f, type);
+	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, vertices.size(),indices.size(), true, my_material, 0.18f, type);
 	return my_mesh;
 }
 /*
