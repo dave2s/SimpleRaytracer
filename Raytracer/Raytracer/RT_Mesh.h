@@ -6,6 +6,43 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 
+struct Vertex {
+	glm::f32vec3 position;
+	glm::f32vec3 normal;
+	glm::f32vec2 _tex_coords;
+};
+
+struct Texture {
+	unsigned char* data;
+	uint32_t id;
+	std::string type;
+	std::string path;
+	int width;
+	int height;
+	int channels;
+};
+
+struct Material {
+	glm::f32vec3 diffuse_color;
+	glm::f32vec3 specluar_color;
+	glm::f32vec3 ambient_color;
+	glm::f32vec3 emissiveColor;
+	float shininess;
+};
+
+inline glm::vec3 getTriangleNormal(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2)
+{
+	return glm::normalize(glm::cross(v1 - v0, v2 - v0));
+}
+inline glm::vec3 getTriangleUnNormal(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2)
+{
+	return glm::cross(v1 - v0, v2 - v0);
+}
+
+void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords);
+
+void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float u, float v, glm::vec3& N);
+
 class RT_Mesh
 {
 public:
@@ -13,50 +50,35 @@ public:
 
 	enum MATERIAL_TYPE : int {DIFFUSE, REFLECTIVE, MIRROR, PHONG};
 
-	struct Vertex {
-		glm::f32vec3 position;
-		glm::f32vec3 normal;
-		glm::f32vec2 tex_coords;
-	};
-
-	struct Texture {
-		unsigned int id;
-		std::string type;
-		std::string path;
-	};
-
-	struct Material {
-		glm::f32vec3 diffuse_color;
-		glm::f32vec3 specluar_color;
-		glm::f32vec3 ambient_color;
-		float shininess;
-	};
 	///Two points furthest apart to form a axis aligned bouning box
 	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
 
-	std::vector<Texture> textures;
-	Material material;
-	glm::f32vec3 albedo;
-	MATERIAL_TYPE material_type;
+	
+	Material _material;
+	glm::f32vec3 _albedo;
+	MATERIAL_TYPE _material_type;
 
 
 	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, /*glm::f32vec3 _color,*/ float albedo, MATERIAL_TYPE material);
-	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, RT_Mesh::Material my_material, float albedo, MATERIAL_TYPE material);
+	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
 
-	bool isSingleSided() { return singleSided; };
-	int getTriangleCount() { return indices_len/3;}
+	inline bool isSingleSided() { return _singleSided; };
+	inline int getTriangleCount() { return _indices_len/3;}
+	inline std::vector<Texture>& GetTextures()
+	{
+		return _textures;
+	}
 
     void updateBoundaries(Vertex &vertex);
 
 	//Return triangle by index of the triangle
 	Vertex* getTriangle(unsigned int idx) {
-		Vertex triangle[3] = { vertices[indices[0 + 3 * idx]],vertices[indices[1 + 3 * idx]], vertices[indices[2 + 3 * idx]] };
+		Vertex triangle[3] = { _vertices[_indices[0 + 3 * idx]],_vertices[_indices[1 + 3 * idx]], _vertices[_indices[2 + 3 * idx]] };
 		return triangle;
 	}
 
-	static glm::vec3 getTriangleNormal(glm::vec3* vertices){ return glm::normalize(glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])); }//triangle normal
-	static glm::vec3 getTriangleUnNormal(glm::vec3* vertices) { return glm::cross(vertices[1] - vertices[0], vertices[2] - vertices[0]); }//triangle normal not normalized
+//triangle normal not normalized
 	static float getDistanceFromOrigin(glm::vec3 normal, glm::vec3 vertex) { return glm::dot(normal,vertex); }
 	static float getPlaneIntersectionDistance(bool &isPrimary, float distance_from_origin, glm::vec3 plane_normal, glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided, int &e) {
 		//if (!isPrimary) { std::cout << "shadow ray je singlesided? " << _singleSided << std::endl; }
@@ -78,11 +100,13 @@ public:
 	~RT_Mesh();
 
 private:
-	unsigned int indices_len;
-	std::vector<unsigned int> indices;
-	std::vector<Vertex> vertices;
-	unsigned int vertex_count;
-	bool singleSided;
+	unsigned int _indices_len;
+	std::vector<unsigned int> _indices;
+	std::vector<Vertex> _vertices;
+	unsigned int _vertices_len;
+	bool _singleSided;
+	uint32_t _triangleCount;
+	std::vector<Texture> _textures;
 	
 	///Not implemented
 	void Triangulate();
