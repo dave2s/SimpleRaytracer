@@ -72,14 +72,16 @@ RT_Mesh::RT_Mesh( Vertex* vertices, const unsigned int *indices, unsigned int ve
 	_material_type = material;
 }
 
-RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, unsigned int _vertices_len, unsigned int indices_len, bool singleSided, Material material, float albedo, MATERIAL_TYPE material_type, std::vector<Texture> textures)
+RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, bool singleSided, Material material, float albedo, MATERIAL_TYPE material_type, std::vector<Texture> textures)
 	: _albedo(albedo),
 	_material(material),
 	_material_type(material_type),
 	_textures(textures),
 	_indices(indices),
+	//_indices_len(indices_len),
 	_vertices(vertices),
 	_triangleCount(indices.size() / 3),
+	_vertices_len(vertices.size()),
 	_singleSided(singleSided)
 {
 	//_vertices = vertices;

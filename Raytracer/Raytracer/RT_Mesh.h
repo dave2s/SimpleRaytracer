@@ -26,7 +26,7 @@ struct Material {
 	glm::f32vec3 diffuse_color;
 	glm::f32vec3 specluar_color;
 	glm::f32vec3 ambient_color;
-	glm::f32vec3 emissiveColor;
+	glm::f32vec3 emissive_color;
 	float shininess;
 };
 
@@ -60,11 +60,11 @@ public:
 
 
 	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, /*glm::f32vec3 _color,*/ float albedo, MATERIAL_TYPE material);
-	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
+	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
 
 	inline bool isSingleSided() { return _singleSided; };
-	inline int getTriangleCount() { return _indices_len/3;}
+	inline int getTriangleCount() { return _triangleCount; }
 	inline std::vector<Texture>& GetTextures()
 	{
 		return _textures;

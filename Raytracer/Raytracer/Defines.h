@@ -33,7 +33,7 @@
 #define TEXTURE_REPEAT
 
 #ifndef FINAL_RENDER
-#define SCREEN_SPACE_SUBSAMPLE 2
+#define SCREEN_SPACE_SUBSAMPLE 1
 #define WIDTH 640.f
 #define HEIGHT 480.f
 #define MAX_DEPTH 3

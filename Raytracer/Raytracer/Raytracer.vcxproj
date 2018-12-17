@@ -84,12 +84,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..\SDL2\include\;$(SolutionDir)\..\..\..\GLFW\include\;$(SolutionDir)\..\..\..\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\..\..\..\ModelTools\Assimp\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\res\;$(SolutionDir)\res\SDL2\include\;$(SolutionDir)\res\GLFW\include\;$(SolutionDir)\res\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\res\Assimp\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\ModelTools\Assimp\lib\Release\;$(SolutionDir)\..\..\..\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\res\Assimp\lib\Release\;$(SolutionDir)\res\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -115,14 +115,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\..\SDL2\include\;$(SolutionDir)\..\..\..\GLFW\include\;$(SolutionDir)\..\..\..\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\..\..\..\ModelTools\Assimp\include\;$(SolutionDir)\..\..\..\SDL2\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\res\;$(SolutionDir)\res\SDL2\include\;$(SolutionDir)\res\GLFW\include\;$(SolutionDir)\res\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\res\Assimp\include\;$(SolutionDir)\..\..\..\SDL2\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;opengl32.lib;glew32.lib;glfw3.lib;vulkan-1.lib;sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\..\ModelTools\Assimp\lib\Release\;$(SolutionDir)\..\..\..\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;vulkan-1.lib;sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\res\Assimp\lib\Release\;$(SolutionDir)\res\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Defines.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RT_Light.h" />
