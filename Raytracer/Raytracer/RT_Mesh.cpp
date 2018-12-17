@@ -86,7 +86,7 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 {
 	//_vertices = vertices;
 	//_indices = indices;
-	for (unsigned int i = 0; i < _vertices_len; ++i) {
+	for (uint64_t i = 0; i < _vertices_len; ++i) {
 		updateBoundaries(_vertices[i]);
 	}
 	////memcpy(indices, &_indices[0], sizeof(unsigned int)*_indices_len);

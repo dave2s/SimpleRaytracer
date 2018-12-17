@@ -82,16 +82,19 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		aiColor4D diffuse;
 		aiColor4D ambient;
 		aiColor4D specular;
+		aiColor4D emissive;
 		float shininess;
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular);
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emissive);
 		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
 
 		///TODO alpha
 		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a) == glm::f32vec4(0)) ? glm::f32vec3(AMBIENT_LIGHT) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
+		my_material.emissive_color = glm::f32vec4(emissive.r, emissive.g, emissive.b, emissive.a);
 		my_material.shininess = shininess;
 
 		if (shininess > 999)
@@ -127,7 +130,7 @@ void LoadScene(std::string& modelPath, std::vector<RT_Mesh*>& meshes)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = nullptr;
-	scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_GenNormals);
+	scene = importer.ReadFile(modelPath, aiProcess_FixInfacingNormals | aiProcess_Triangulate | aiProcess_GenNormals);
 	if (!scene || !scene->mRootNode || scene->mFlags & (AI_SCENE_FLAGS_INCOMPLETE | AI_SCENE_FLAGS_VALIDATION_WARNING))
 	{
 		std::cerr << "Model importer failed. flags: " << scene->mFlags << std::endl;

@@ -33,7 +33,7 @@
 #define TEXTURE_REPEAT
 
 #ifndef FINAL_RENDER
-#define SCREEN_SPACE_SUBSAMPLE 1
+#define SCREEN_SPACE_SUBSAMPLE 3
 #define WIDTH 640.f
 #define HEIGHT 480.f
 #define MAX_DEPTH 3
@@ -46,11 +46,13 @@
 #define SMOOTH_SHADING
 #endif
 
+const float global_light_intensity = 2.f;
+const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 //const std::string DEFAULT_MODEL = "example/sponza/sponza.obj";
-const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+//const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
 //const std::string DEFAULT_MODEL = "example/bunny/bunny.obj";
-//const std::string DEFAULT_MODEL = "example/f16/f16.obj";
+const std::string DEFAULT_MODEL = "example/f16/f16.obj";
 //const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";
 //const std::string DEFAULT_MODEL = "example/cruiser/cruiser.obj";
 //const std::string DEFAULT_MODEL = "example/armadillo/armadillo.ply";
