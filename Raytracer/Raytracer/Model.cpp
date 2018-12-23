@@ -130,7 +130,7 @@ void LoadScene(std::string& modelPath, std::vector<RT_Mesh*>& meshes)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = nullptr;
-	scene = importer.ReadFile(modelPath, aiProcess_FixInfacingNormals | aiProcess_Triangulate | aiProcess_GenNormals);
+	scene = importer.ReadFile(modelPath, aiProcess_FixInfacingNormals | aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 	if (!scene || !scene->mRootNode || scene->mFlags & (AI_SCENE_FLAGS_INCOMPLETE | AI_SCENE_FLAGS_VALIDATION_WARNING))
 	{
 		std::cerr << "Model importer failed. flags: " << scene->mFlags << std::endl;

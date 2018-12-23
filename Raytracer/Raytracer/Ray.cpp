@@ -26,7 +26,7 @@ glm::vec3 Ray::calcRayDirection(glm::vec3 origin, glm::vec3 target) {
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-bool Ray::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float &min_dist) {
+bool Ray::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist) {
 	glm::vec3 edge01 = (_triangle[1]).position - (_triangle[0]).position;
 	glm::vec3 edge02 = _triangle[2].position - _triangle[0].position;
 	glm::vec3 pvec = glm::cross(direction, edge02);
@@ -51,13 +51,13 @@ bool Ray::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSid
 	if (v < 0 || u + v>1) { return false; }
 
 	t = glm::dot(edge02, tvec) * D_inv;
-	if (isPrimary && ((t < 0) || (t > min_dist))) {
+	if ((t < 0) || (t > min_dist)) {
 		//PHit = ray->origin + t * ray->direction;
 		return false;
 	}
-	else if (-1.f*t > min_dist) {
+	/*else if (t > min_dist) {
 		return false;
-	}
+	}*/
 	else if (t < 0.001f)
 	{
 		if (((t < 0.001f) && (t > -0.01f)) && (((prev_D < 0.f) && (D < 0.f)) || ((prev_D > 0.f) && (D > 0.001f))))// goto jmp;
