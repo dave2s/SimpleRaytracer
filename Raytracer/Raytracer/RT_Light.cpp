@@ -26,7 +26,7 @@ RT_PointLight::RT_PointLight(glm::vec3 pos, float _intensity, glm::f32vec3 col) 
 {
 	position = pos;
 }
-void RT_PointLight::shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& PHit) {
+void RT_PointLight::shine(glm::f32vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& PHit) {
 	float distance_squared;
 	light_dir = (PHit-position);
 	distance_squared = Ray::norm(light_dir);

@@ -21,11 +21,6 @@
 #define U2F(uint_x) (float)uint_x/255.0f
 #define U8vec2F32vec(uint_vec) glm::f32vec3(U2F(uint_vec[0]),U2F(uint_vec[1]),U2F(uint_vec[2]))
 
-#define WIDTH 600
-#define HEIGHT 480
-
-#define PROFILE
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264f
 #endif
@@ -34,16 +29,20 @@
 
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 3
-#define WIDTH 640.f
+#define MSAA
+#define WIDTH 640
 #define HEIGHT 480.f
 #define MAX_DEPTH 3
 #define SMOOTH_SHADING
+#define PROFILE
 #else
 #define SCREEN_SPACE_SUBSAMPLE 1
-#define WIDTH 1024.f
-#define HEIGHT 768.f
+#define MSAA
+#define WIDTH 1920
+#define HEIGHT 1080
 #define MAX_DEPTH 3
 #define SMOOTH_SHADING
+#define PROFILE
 #endif
 
 const float global_light_intensity = 2.f;

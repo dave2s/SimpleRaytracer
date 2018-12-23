@@ -108,7 +108,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, true, my_material, 0.18f, type,textures);
+	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures);
 	return my_mesh;
 }
 

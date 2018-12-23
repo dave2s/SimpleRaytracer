@@ -27,7 +27,7 @@ public:
 	glm::vec3 position;
 	RT_PointLight(glm::vec3 pos, float intensity, glm::f32vec3 color);
 
-	void shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
+	void shine(glm::f32vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 	LIGHT_TYPE getType() { return point; }
 };
 
