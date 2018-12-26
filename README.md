@@ -6,5 +6,5 @@
 <img src="Raytracer/sponza-fhd-2912s.png">
 
 4xMSAA
-<img src="Raytracer/f16-800x600-day-4xMSAA.png">
+<img src="Raytracer/f16-800x600-night-4xMSAA.png">
 
