@@ -5,7 +5,6 @@
 
 <img src="Raytracer/sponza-fhd-2912s.png">
 
+4xMSAA
+<img src="Raytracer/f16-800x600-day-4xMSAA.png">
 
-
-![alt text](https://raw.githubusercontent.com/dave2s/OpenGLApps/SimpleRaytracer/Raytracer/f16-fhd-night.png)
-![alt text](https://raw.githubusercontent.com/dave2s/OpenGLApps/SimpleRaytracer/Raytracer/sponza-fhd-2912s.png)
