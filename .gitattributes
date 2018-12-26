@@ -3,3 +3,4 @@
 *.cpp text eol=lf
 *.h text eol=lf
 *.dll binary
+*.png binary
