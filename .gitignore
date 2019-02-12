@@ -1,5 +1,6 @@
 *.zip
-
+dokumentace/
+odevzdani/
 OpenGlCourseApp/
 *.dll
 *VC.opendb
