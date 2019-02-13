@@ -5,6 +5,66 @@
 #include "RT_Mesh.h"
 class Ray
 {
+	/**
+	*From https://github.com/lkesteloot/prism/blob/master/Vec3.cpp#L128
+ ** which is from: https://www.johndcook.com/wavelength_to_RGB.html
+ */
+	glm::vec3 wavelength2rgb(int wavelength) {
+		float red, green, blue;
+
+		if (wavelength >= 380 && wavelength < 440) {
+			red = -(wavelength - 440) / (440 - 380.);
+			green = 0.0;
+			blue = 1.0;
+		}
+		else if (wavelength >= 440 && wavelength < 490) {
+			red = 0.0;
+			green = (wavelength - 440) / (490 - 440.);
+			blue = 1.0;
+		}
+		else if (wavelength >= 490 && wavelength < 510) {
+			red = 0.0;
+			green = 1.0;
+			blue = -(wavelength - 510) / (510 - 490.);
+		}
+		else if (wavelength >= 510 && wavelength < 580) {
+			red = (wavelength - 510) / (580 - 510.);
+			green = 1.0;
+			blue = 0.0;
+		}
+		else if (wavelength >= 580 && wavelength < 645) {
+			red = 1.0;
+			green = -(wavelength - 645) / (645 - 580.);
+			blue = 0.0;
+		}
+		else if (wavelength >= 645 && wavelength < 781) {
+			red = 1.0;
+			green = 0.0;
+			blue = 0.0;
+		}
+		else {
+			red = 0.0;
+			green = 0.0;
+			blue = 0.0;
+		}
+
+		// Let the intensity fall off near the vision limits.
+		float factor;
+		if (wavelength >= 380 && wavelength < 420) {
+			factor = 0.3 + 0.7*(wavelength - 380) / (420 - 380.);
+		}
+		else if (wavelength >= 420 && wavelength < 701) {
+			factor = 1.0;
+		}
+		else if (wavelength >= 701 && wavelength < 781) {
+			factor = 0.3 + 0.7*(780 - wavelength) / (780 - 700.);
+		}
+		else {
+			factor = 0.0;
+		}
+
+		return glm::vec3(red*factor, green*factor, blue*factor);
+	}
 public:
 	Ray();
 	~Ray();
@@ -13,6 +73,7 @@ public:
 	glm::vec3 direction;
 	glm::vec3 hit_normal;
 	glm::vec3 inv_dir;
+	glm::vec3 wavelength;
 	bool sign[3];
 
 	float	prev_D; //if primary, set, if shadow - read
@@ -75,6 +136,7 @@ public:
 		return true;
 	}
 
-	bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
+	bool intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
+	bool intersectSphericalLight(glm::vec3 &dir, glm::vec3 &orig, glm::vec3 &center, float &radius2, glm::vec3 &PHit, glm::vec3 &NHit, float &min_dist,float &t);
 };
 

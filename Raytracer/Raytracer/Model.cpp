@@ -42,7 +42,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 	Material my_material;
 
 	//RT_Mesh::MATERIAL_TYPE type = RT_Mesh::DIFFUSE;
-	RT_Mesh::MATERIAL_TYPE type = RT_Mesh::PHONG;
+	RT_Mesh::MATERIAL_TYPE material_type = RT_Mesh::PHONG;
 
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
@@ -98,7 +98,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		my_material.shininess = shininess;
 
 		if (shininess > 999)
-			type = RT_Mesh::MIRROR;
+			material_type = RT_Mesh::MIRROR;
 
 		//color = glm::f32vec3(diffuse.r, diffuse.g, diffuse.b);
 
@@ -108,7 +108,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures);
+	RT_Mesh* my_mesh = new RT_Mesh(RT_Mesh::polygon,vertices, indices, false, my_material, 0.18f, material_type,textures);
 	return my_mesh;
 }
 

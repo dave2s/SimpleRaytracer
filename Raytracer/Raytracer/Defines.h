@@ -24,15 +24,15 @@
 #endif
 
 #define TEXTURE_REPEAT
-#define FINAL_RENDER
+//#define FINAL_RENDER
 
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 1
 #define BBAccel
 //#define MSAA
-#define WIDTH 1280
-#define HEIGHT 720
-#define MAX_DEPTH 3
+#define WIDTH 320
+#define HEIGHT 240
+#define MAX_DEPTH 4
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -60,13 +60,14 @@ const std::vector<std::vector<float>> msaa_sample_coords/*(2, std::vector< float
 #define U8vec2F32vec(uint_vec) glm::f32vec3(U2F(uint_vec[0]),U2F(uint_vec[1]),U2F(uint_vec[2]))
 
 
-const float global_light_intensity = .7f;
+const float global_light_intensity = .8f;
 const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
 //const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+const std::string DEFAULT_MODEL = "example/prism/prism.obj";
 //const std::string DEFAULT_MODEL = "example/bunny/bunny.obj";
 //const std::string DEFAULT_MODEL = "example/f16/f16.obj";
-const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";
+//const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";
 //const std::string DEFAULT_MODEL = "example/cruiser/cruiser.obj";
 //const std::string DEFAULT_MODEL = "example/armadillo/armadillo.ply";

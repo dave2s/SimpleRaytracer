@@ -26,7 +26,7 @@ glm::vec3 Ray::calcRayDirection(glm::vec3 origin, glm::vec3 target) {
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-bool Ray::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist) {
+bool Ray::intersectTriangleMT(bool isPrimary, RT_Mesh::Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist) {
 	glm::vec3 edge01 = (_triangle[1]).position - (_triangle[0]).position;
 	glm::vec3 edge02 = _triangle[2].position - _triangle[0].position;
 	glm::vec3 pvec = glm::cross(direction, edge02);
@@ -70,6 +70,38 @@ bool Ray::intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSid
 	}
 	PHit = origin + t * direction;
 	NHit = glm::normalize(glm::cross(edge01, edge02));
+	return true;
+}
+
+bool Ray::intersectSphericalLight(glm::vec3 &dir, glm::vec3 &orig, glm::vec3 &center, float &radius2, glm::vec3 &PHit, glm::vec3 &NHit, float &min_dist, float &t) {
+	float t0, t1;
+#if 1
+		// geometric solution
+	glm::vec3 L = center - orig;
+	float tca = glm::dot(L,dir);
+	// if (tca < 0) return false;
+	float d2 = glm::dot(L,L) - tca * tca;
+	if (d2 > radius2) return false;
+	float thc = sqrt(radius2 - d2);
+	t0 = tca - thc;
+	t1 = tca + thc;
+#else 
+		// analytic solution
+	glm::vec3 L = orig - center;
+	float a = glm::dot(dir,dir);
+	float b = 2 * glm::dot(dir,L);
+	float c = glm::dot(L,L) - radius2;
+	if (!solveQuadratic(a, b, c, t0, t1)) return false;
+#endif 
+	if (t0 > t1) std::swap(t0, t1);
+
+	if (t0 < 0) {
+		t0 = t1; // if t0 is negative, let's use t1 instead 
+		if (t0 < 0) return false; // both t0 and t1 are negative 
+	}
+
+	t = t0;
+
 	return true;
 }
 
