@@ -34,7 +34,7 @@ std::vector<Texture> LoadTextures(aiMaterial *mtl, aiTextureType type, std::stri
 }
 
 RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
-	std::vector< Vertex >vertices;
+	std::vector<RT_Mesh::Vertex>vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 	//glm::f32vec3 color = glm::f32vec3(1.f,1.f,1.f);
@@ -48,7 +48,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 	//vertices = new RT_Mesh::Vertex[mesh->mNumVertices]();
 	glm::vec3 tmp;
 	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
-		Vertex v;
+		RT_Mesh::Vertex v;
 		tmp.x = mesh->mVertices[i].x;
 		tmp.y = mesh->mVertices[i].y;
 		tmp.z = mesh->mVertices[i].z;
@@ -108,7 +108,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(RT_Mesh::polygon,vertices, indices, false, my_material, 0.18f, material_type,textures);
+	RT_Mesh* my_mesh = new RT_PolygonMesh(vertices, indices, false, my_material, 0.18f, material_type,textures);
 	return my_mesh;
 }
 

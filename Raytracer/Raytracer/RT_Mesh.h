@@ -28,9 +28,9 @@ class RT_Mesh
 {
 public:
 	RT_Mesh();
-	virtual ~RT_Mesh();
+	//virtual ~RT_Mesh();
 
-	enum TYPE { polygon = 0, sphere = 1 };
+	//enum TYPE { polygon = 0, sphere = 1 };
 	enum MATERIAL_TYPE : int { DIFFUSE, REFLECTIVE, MIRROR, PHONG };
 
 	struct Vertex {
@@ -39,19 +39,56 @@ public:
 		glm::f32vec2 _tex_coords;
 	};
 
-	inline TYPE getType() { return _type; }
-	
-	
-private:
-	TYPE _type;
+	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
+//	inline TYPE getType() { return _type; }
+	static void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords);
+	static void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float u, float v, glm::vec3& N);
+	virtual void ClearMesh() = 0;
+	virtual int getTriangleCount() = 0;
+	virtual bool isSingleSided() = 0;
+	virtual Vertex* getTriangle(unsigned int triangle) = 0;
+	inline virtual std::vector<Texture>& GetTextures() = 0;
 
+	Material _material;
+	glm::f32vec3 _albedo;
+	MATERIAL_TYPE _material_type;
+
+private:
+	std::vector<Texture> _textures;
+//	TYPE _type;
 };
 
 class RT_Sphere : public RT_Mesh
 {
 public:
+	RT_Sphere();
+	RT_Sphere(glm::vec3 pos, float radius, RT_Mesh::MATERIAL_TYPE type);
 	
+	inline glm::vec3 getPosition(){
+		return _position;
+	}
+
+	inline float getRadius() {
+		return _radius;
+	}
+
+	inline float getType() {
+		return _type;
+	}
+
+	//static void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords);
+	//static void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float u, float v, glm::vec3& N);
+	void ClearMesh();
+	int getTriangleCount();
+	bool isSingleSided();
+    Vertex* getTriangle(unsigned int triangle);
+	inline std::vector<Texture>& GetTextures();
+
 private:
+	glm::vec3 _position;
+	float _radius;
+	RT_Mesh::MATERIAL_TYPE _type;
+	std::vector<Texture> _textures;
 };
 
 class RT_PolygonMesh : public RT_Mesh
@@ -68,21 +105,15 @@ public:
 		return glm::cross(v1 - v0, v2 - v0);
 	}
 
-	void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords);
-
-	void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float u, float v, glm::vec3& N);
-
 	///Two points furthest apart to form a axis aligned bouning box
-	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
+	//glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
 
-	
 	Material _material;
 	glm::f32vec3 _albedo;
 	MATERIAL_TYPE _material_type;
 	
 	RT_PolygonMesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, /*glm::f32vec3 _color,*/ float albedo, MATERIAL_TYPE material);
-	RT_PolygonMesh(TYPE type,std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
-	void ClearMesh();
+	RT_PolygonMesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 
 	inline bool isSingleSided() { return _singleSided; };
 	inline int getTriangleCount() { return _triangleCount; }
@@ -93,7 +124,7 @@ public:
 	}
 
     void updateBoundaries(Vertex &vertex);
-
+	void ClearMesh();
 	//Return triangle by index of the triangle
 	Vertex* getTriangle(unsigned int idx) {
 		Vertex triangle[3] = { _vertices[_indices[0 + 3 * idx]],_vertices[_indices[1 + 3 * idx]], _vertices[_indices[2 + 3 * idx]] };
@@ -116,7 +147,7 @@ public:
 	///Deprecated
 	//static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
 
-	///Deprecated
+	///Deprecated 
 	//static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_PolygonMesh();
@@ -129,8 +160,6 @@ private:
 	bool _singleSided;
 	uint32_t _triangleCount;
 	std::vector<Texture> _textures;
-	
-
 	
 	///Not implemented
 	void Triangulate();

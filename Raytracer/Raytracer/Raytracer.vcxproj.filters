@@ -27,9 +27,6 @@
     <ClCompile Include="Ray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RT_Sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RT_Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RT_Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RT_Light.h">
