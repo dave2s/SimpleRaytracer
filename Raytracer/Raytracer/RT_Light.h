@@ -10,6 +10,7 @@ public:
 
 	enum LIGHT_TYPE {none = 0, point = 1, distant=2};
 
+	static inline glm::vec3 wavelen2rgb(int wavelength);
 	RT_Light(float intensity, glm::f32vec3 color);
 	virtual ~RT_Light();
 
