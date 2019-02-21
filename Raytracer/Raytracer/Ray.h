@@ -45,6 +45,31 @@ public:
 
 		return true;
 	}*/
+	//True -refracted, false- reflection
+	bool refract(glm::vec3& dirOut,const float& ior){
+		float angle_in = 1;
+		float angle_out = ior;
+		glm::vec3 n = this->hit_normal;
+		float angle_in_cosine = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
+
+		if(angle_in_cosine < 0) {
+			angle_in_cosine = -angle_in_cosine;
+		}
+		else {
+			std::swap(angle_in, angle_out);
+			n = -n;
+		}
+
+		float  ni_over_nt = angle_in / angle_out;
+		float k = 1 - ni_over_nt * ni_over_nt * (1 - angle_in_cosine * angle_in_cosine);
+
+		if (k>0.f) {
+			dirOut = ni_over_nt * this->direction + (ni_over_nt * angle_in_cosine - glm::sqrt(k))*n;
+			return true;
+		}
+		dirOut = glm::vec3(0);
+		return false;
+	}
 
 	bool intersectBB( glm::vec3(&bounds)[2],float &t) {
 		float tx0; float ty0; float tx1; float ty1;
