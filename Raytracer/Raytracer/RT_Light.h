@@ -24,20 +24,26 @@ class RT_PointLight : public RT_Light
 {
 	
 public:
-	glm::vec3 position;
+	glm::vec3 _position;
 	RT_PointLight(glm::vec3 pos, float intensity, glm::f32vec3 color);
 
+	void resetPosition();
 	void shine(glm::f32vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 	LIGHT_TYPE getType() { return point; }
+private:
+	glm::vec3 _initialPosition;
 };
 
 class RT_DistantLight : public RT_Light
 {
 	
 public:
-	glm::vec3 direction;
+	glm::vec3 _direction;
 	RT_DistantLight(glm::vec3 dir, float intensity, glm::f32vec3 color);
 
+	void resetDirection();
 	void shine(glm::vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& P);
 	LIGHT_TYPE getType() { return distant; }
+private:
+	glm::vec3 _initialDirection;
 };

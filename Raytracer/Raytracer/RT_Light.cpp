@@ -24,11 +24,16 @@ RT_Light::~RT_Light()
 
 RT_PointLight::RT_PointLight(glm::vec3 pos, float _intensity, glm::f32vec3 col) :RT_Light(_intensity, col)
 {
-	position = pos;
+	_position = _initialPosition  =pos;
 }
+void RT_PointLight::resetPosition()
+{
+	_position = _initialPosition;
+}
+
 void RT_PointLight::shine(glm::f32vec3& light_intensity, float& light_distance, glm::vec3& light_dir, glm::vec3& PHit) {
 	float distance_squared;
-	light_dir = (PHit-position);
+	light_dir = (PHit-_position);
 	distance_squared = Ray::norm(light_dir);
 	light_intensity = color*intensity / glm::vec3((float)(4.f*M_PI*(distance_squared)));
 	light_distance = sqrt(distance_squared);
@@ -41,10 +46,15 @@ void RT_PointLight::shine(glm::f32vec3& light_intensity, float& light_distance, 
 
 RT_DistantLight::RT_DistantLight(glm::vec3 dir, float _intensity, glm::f32vec3 col) : RT_Light(_intensity, col)
 {
-	direction = dir;
+	_direction = _initialDirection = dir;
 }
+void RT_DistantLight::resetDirection()
+{
+	_direction = _initialDirection;
+}
+
 void RT_DistantLight::shine(glm::vec3& light_intensity,float& light_distance, glm::vec3& light_dir, glm::vec3& P) {
-	light_dir = direction;
+	light_dir = _direction;
 	light_intensity = color * intensity;
 	light_distance = inf;
 	//NHit, shadow_ray->direction)
