@@ -51,27 +51,6 @@ RT_Mesh::RT_Mesh()
 
 }
 
-RT_Mesh::RT_Mesh( Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided/*, glm::f32vec3 _color*/,float albedo, MATERIAL_TYPE material) {
-
-	_indices_len = 0;
-	_singleSided = false;
-	glm::mat4 object_to_world;
-
-	//color = _color;s
-	_indices_len = indices_len;
-
-	_vertices = std::vector(vertices,vertices + sizeof vertices /sizeof vertices[0]);
-
-	for (unsigned int i = 0; i < vertices_len; ++i) {
-		updateBoundaries(vertices[i]);
-	}
-
-	_indices = std::vector(indices, indices + sizeof indices / sizeof indices[0]);
-	_singleSided = singleSided;
-	_albedo = glm::f32vec3(albedo);
-	_material_type = material;
-}
-
 RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, bool singleSided, Material material, float albedo, MATERIAL_TYPE material_type, std::vector<Texture> textures)
 	: _albedo(albedo),
 	_material(material),

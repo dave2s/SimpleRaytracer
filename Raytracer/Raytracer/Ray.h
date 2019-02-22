@@ -3,6 +3,7 @@
 #include <GLM\glm.hpp>
 #include "Camera.h"
 #include "RT_Mesh.h"
+#include <algorithm>
 class Ray
 {
 public:
@@ -46,29 +47,57 @@ public:
 		return true;
 	}*/
 	//True -refracted, false- reflection
-	bool refract(glm::vec3& dirOut,const float& ior){
-		float angle_in = 1;
-		float angle_out = ior;
+	glm::vec3 refract(/*glm::vec3& dirOut,*/const float& ior){
+		float ior_in = 1;
+		float ior_out = ior;
 		glm::vec3 n = this->hit_normal;
-		float angle_in_cosine = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
+		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
 
-		if(angle_in_cosine < 0) {
-			angle_in_cosine = -angle_in_cosine;
+		if(cos_in < 0) {
+			cos_in = -cos_in;
 		}
 		else {
-			std::swap(angle_in, angle_out);
+			std::swap(ior_in, ior_out);
 			n = -n;
 		}
+		//ratio of light propagation in incoming space / outcoming space
+		float  in_out_ratio = ior_in / ior_out;
+		float k = 1 - in_out_ratio * in_out_ratio * (1 - cos_in * cos_in);
 
-		float  ni_over_nt = angle_in / angle_out;
-		float k = 1 - ni_over_nt * ni_over_nt * (1 - angle_in_cosine * angle_in_cosine);
+		return (k>0.f) ?  
+			 in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n 
+			: glm::vec3(0); 
+	}
 
-		if (k>0.f) {
-			dirOut = ni_over_nt * this->direction + (ni_over_nt * angle_in_cosine - glm::sqrt(k))*n;
-			return true;
+	void fresnel(const float& ior, float& kr){
+		float ior_in = 1;
+		float ior_out = ior;
+		glm::vec3 n = this->hit_normal;
+		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
+
+		if (cos_in > 0) {
+			std::swap(ior_in, ior_out);
 		}
-		dirOut = glm::vec3(0);
-		return false;
+		//sin_out = ior1/ior2  *   sqrt(1-cos_in^2) = (ior1/ior2)*sin_in
+		float sin_out = ior_in / ior_out * sqrtf(std::max(0.f, 1 - cos_in * cos_in));
+
+		///(ior1/ior2)*sin_in = sin_out
+		//if sin_out>1, total internal reflection - light is not transmitted
+		if (sin_out >= 1) {
+			kr = 1;
+		}
+		else {//cos^2 = 1 - sin^2
+			float cos_out = sqrtf(std::max(0.f, 1 - sin_out * sin_out));
+			cos_in = fabsf(cos_in);
+
+			float Rs = ((ior_out * cos_in) - (ior_in * cos_out))
+				     / ((ior_out*cos_in) + (ior_in*cos_out));
+
+			float Rp = ((ior_in * cos_in) - (ior_out * cos_out))
+				     / ((ior_in * cos_in) + (ior_out * cos_out));
+
+			kr = (Rs * Rs + Rp * Rp) / 2;
+		}
 	}
 
 	bool intersectBB( glm::vec3(&bounds)[2],float &t) {

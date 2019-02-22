@@ -27,6 +27,7 @@ struct Material {
 	glm::f32vec3 specluar_color;
 	glm::f32vec3 ambient_color;
 	glm::f32vec3 emissive_color;
+	float _indexOfRefraction;
 	float shininess;
 };
 
@@ -48,7 +49,7 @@ class RT_Mesh
 public:
 	RT_Mesh();
 
-	enum MATERIAL_TYPE : int {DIFFUSE, REFLECTIVE, MIRROR, PHONG};
+	enum MATERIAL_TYPE : int {DIFFUSE, REFLECTIVE, MIRROR, PHONG, REFRACTION};
 
 	///Two points furthest apart to form a axis aligned bouning box
 	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
@@ -58,8 +59,6 @@ public:
 	glm::f32vec3 _albedo;
 	MATERIAL_TYPE _material_type;
 
-
-	RT_Mesh(Vertex* vertices, const unsigned int *indices, unsigned int vertices_len, unsigned int indices_len, bool singleSided, /*glm::f32vec3 _color,*/ float albedo, MATERIAL_TYPE material);
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
 
