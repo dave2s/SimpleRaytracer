@@ -83,14 +83,17 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		aiColor4D ambient;
 		aiColor4D specular;
 		aiColor4D emissive;
-		float shininess;
-		float indexOfRefraction = 0;
+		float shininess = 1.f;
+		float ior = 1.f;
+		int shading_model = -1;
+
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emissive);
 		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
-		aiGetMaterialFloat(mtl, AI_MATKEY_REFRACTI, &indexOfRefraction);
+		aiGetMaterialFloat(mtl, AI_MATKEY_REFRACTI, &ior);
+		aiGetMaterialInteger(mtl, AI_MATKEY_SHADING_MODEL, &shading_model);
 
 		///TODO alpha
 		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a) == glm::f32vec4(0)) ? glm::f32vec3(AMBIENT_LIGHT) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
@@ -98,9 +101,46 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
 		my_material.emissive_color = glm::f32vec4(emissive.r, emissive.g, emissive.b, emissive.a);
 		my_material.shininess = shininess;
-
-		if (shininess > 999)
-			type = RT_Mesh::MIRROR;
+		
+		/*if (shading_model != -1) {
+			switch (shading_model) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				type = RT_Mesh::PHONG;
+				if (shininess > 999) {
+					type = RT_Mesh::MIRROR;
+				}
+				break;
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				type = RT_Mesh::REFRACTION;
+				if (shininess > 999) {
+					type = RT_Mesh::MIRROR;
+				}
+				break;
+			}
+		}*/
+		if (shading_model == 2 || shading_model == 3){
+			type = ( ior == 1.0f  ) ? RT_Mesh::PHONG : RT_Mesh::REFRACTION;
+		}
+		else {
+			if (shininess == 1.f) {
+				type = RT_Mesh::DIFFUSE;
+			}
+			else {
+				type = RT_Mesh::PHONG;
+				if (shininess > 999) {
+					type = RT_Mesh::MIRROR;
+				}
+			}
+		}
 
 		//color = glm::f32vec3(diffuse.r, diffuse.g, diffuse.b);
 

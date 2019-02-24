@@ -27,12 +27,12 @@
 //#define FINAL_RENDER
 
 #ifndef FINAL_RENDER
-#define SCREEN_SPACE_SUBSAMPLE 1
-#define BBAccel
+#define SCREEN_SPACE_SUBSAMPLE 2
+//#define BBAccel
 //#define MSAA
 #define WIDTH 320
 #define HEIGHT 240
-#define MAX_DEPTH 4
+#define MAX_DEPTH 8
 #define SMOOTH_SHADING
 #define PROFILE
 #else

@@ -63,13 +63,14 @@ public:
 		//ratio of light propagation in incoming space / outcoming space
 		float  in_out_ratio = ior_in / ior_out;
 		float k = 1 - in_out_ratio * in_out_ratio * (1 - cos_in * cos_in);
-
-		return (k>0.f) ?  
-			 in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n 
-			: glm::vec3(0); 
+		glm::vec3 out  = (k < 0.f) ?
+			glm::vec3(0) : in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
+		return out;
+		//return (k<0.f) ?  
+			//glm::vec3(0) : in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
 	}
 
-	void fresnel(const float& ior, float& kr){
+	inline void fresnel(const float& ior, float& kr){
 		float ior_in = 1;
 		float ior_out = ior;
 		glm::vec3 n = this->hit_normal;
@@ -79,7 +80,7 @@ public:
 			std::swap(ior_in, ior_out);
 		}
 		//sin_out = ior1/ior2  *   sqrt(1-cos_in^2) = (ior1/ior2)*sin_in
-		float sin_out = ior_in / ior_out * sqrtf(std::max(0.f, 1 - cos_in * cos_in));
+		float sin_out = (ior_in / ior_out ) * std::sqrtf(std::max(0.f, 1 - cos_in * cos_in));
 
 		///(ior1/ior2)*sin_in = sin_out
 		//if sin_out>1, total internal reflection - light is not transmitted
