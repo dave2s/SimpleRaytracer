@@ -48,11 +48,11 @@ public:
 		return true;
 	}*/
 	//True -refracted, false- reflection
-	glm::vec3 refract(/*glm::vec3& dirOut,*/const float& ior){
+	static glm::vec3 refract(const float& ior, glm::vec3& direction, glm::vec3& hit_normal){
 		float ior_in = 1;
 		float ior_out = ior;
-		glm::vec3 n = this->hit_normal;
-		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
+		glm::vec3 n = hit_normal;
+		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(direction, n));
 
 		if(cos_in < 0) {
 			cos_in = -cos_in;
@@ -65,10 +65,8 @@ public:
 		float  in_out_ratio = ior_in / ior_out;
 		float k = 1 - in_out_ratio * in_out_ratio * (1 - cos_in * cos_in);
 		glm::vec3 out  = (k < 0.f) ?
-			glm::vec3(0) : in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
+			glm::vec3(0) : in_out_ratio * direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
 		return out;
-		//return (k<0.f) ?  
-			//glm::vec3(0) : in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
 	}
 
 	static void fresnel(const float& ior, float& kr, glm::vec3& direction, glm::vec3& hit_normal){
