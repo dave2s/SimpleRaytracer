@@ -28,7 +28,7 @@
 
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 2
-//#define BBAccel
+#define BBAccel
 //#define MSAA
 #define WIDTH 320
 #define HEIGHT 240

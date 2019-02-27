@@ -85,7 +85,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		aiColor4D emissive;
 		float shininess = 1.f;
 		float ior = 1.f;
-		int shading_model = -1;
+		int shading_model = -1; 
 
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
 		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient);
@@ -100,6 +100,7 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
 		my_material.emissive_color = glm::f32vec4(emissive.r, emissive.g, emissive.b, emissive.a);
+		my_material.ior = ior;
 		my_material.shininess = shininess;
 		
 		/*if (shading_model != -1) {

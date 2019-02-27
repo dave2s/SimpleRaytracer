@@ -10,16 +10,17 @@ public:
 	Ray();
 	~Ray();
 
-	glm::vec3 origin;
-	glm::vec3 direction;
-	glm::vec3 hit_normal;
-	glm::vec3 inv_dir;
+	glm::f32vec3 origin;
+	glm::f32vec3 direction;
+	glm::f32vec3 hit_normal;
+	glm::f32vec3 inv_dir;
 	bool sign[3];
 
 	float	prev_D; //if primary, set, if shadow - read
 
 	static glm::vec3 calcRayDirection(glm::vec3 origin, glm::vec3 target);
-	static void calcRayPerspectiveDirection(glm::vec3 &origin, glm::vec3 &dir, float x, float y, float near, Camera &camera) {
+	static void calcRayPerspectiveDirection(glm::vec3 &origin, glm::vec3 &dir, float x, float y, float near, Camera &camera) 
+	{
 		origin = glm::inverse(camera.view_matrix)*glm::vec4(0.f, 0.f, 0.f, 1.f);
 		dir = glm::normalize(glm::vec3(glm::inverse(camera.view_matrix)*glm::vec4(x, y, -near, 1.f)) - origin);
 		return;
@@ -70,17 +71,17 @@ public:
 			//glm::vec3(0) : in_out_ratio * this->direction + (in_out_ratio * cos_in - glm::sqrt(k))*n;
 	}
 
-	inline void fresnel(const float& ior, float& kr){
+	static void fresnel(const float& ior, float& kr, glm::vec3& direction, glm::vec3& hit_normal){
 		float ior_in = 1;
 		float ior_out = ior;
-		glm::vec3 n = this->hit_normal;
-		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(this->direction, n));
+		glm::vec3 n = hit_normal;
+		float cos_in = glm::clamp(-1.f, 1.f, glm::dot(direction, n));
 
 		if (cos_in > 0) {
 			std::swap(ior_in, ior_out);
 		}
 		//sin_out = ior1/ior2  *   sqrt(1-cos_in^2) = (ior1/ior2)*sin_in
-		float sin_out = (ior_in / ior_out ) * std::sqrtf(std::max(0.f, 1 - cos_in * cos_in));
+		float sin_out = ior_in / ior_out * std::sqrtf(std::max(0.f, 1 - cos_in * cos_in));
 
 		///(ior1/ior2)*sin_in = sin_out
 		//if sin_out>1, total internal reflection - light is not transmitted
@@ -88,8 +89,8 @@ public:
 			kr = 1;
 		}
 		else {//cos^2 = 1 - sin^2
-			float cos_out = sqrtf(std::max(0.f, 1 - sin_out * sin_out));
-			cos_in = fabsf(cos_in);
+			float cos_out = std::sqrtf(std::max(0.f, 1 - sin_out * sin_out));
+			cos_in = std::fabsf(cos_in);
 
 			float Rs = ((ior_out * cos_in) - (ior_in * cos_out))
 				     / ((ior_out*cos_in) + (ior_in*cos_out));
