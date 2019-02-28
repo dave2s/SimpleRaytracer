@@ -11,6 +11,7 @@
 
 Ray::Ray()
 {
+	this->isMonochrom = false;
 }
 
 
