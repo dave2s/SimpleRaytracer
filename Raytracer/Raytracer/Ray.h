@@ -5,8 +5,8 @@
 #include "RT_Mesh.h"
 #include <algorithm>
 
-static const std::vector<int> WAVELENGTHS{ 380,440,490,510,580,645,781 };
-#define WIDEN_CONSTANT 10.f
+static const std::vector<int> wavelengths_intervals{ 380,440,490,510,580,645,781 };
+#define WIDEN_CONSTANT 1.f
 
 class Ray
 {

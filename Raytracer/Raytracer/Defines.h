@@ -32,7 +32,8 @@
 //#define MSAA
 #define WIDTH 320
 #define HEIGHT 240
-#define MAX_DEPTH 8
+#define MAX_DEPTH 6
+#define WAVE_SAMPLES 6
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -42,6 +43,7 @@
 #define WIDTH 1024
 #define HEIGHT 768
 #define MAX_DEPTH 3
+#define WAVE_SAMPLES 10
 #define SMOOTH_SHADING
 #define PROFILE
 #endif
