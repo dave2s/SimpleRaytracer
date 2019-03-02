@@ -78,6 +78,8 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 	//_material_type = material;
 }
 
+
+
 void RT_Mesh::updateBoundaries(Vertex &vertex) {
 	for (unsigned char i = 0; i < (char)vertex.position.length(); ++i) {
 		if (vertex.position[i] < boundary_points[0][i]) {
@@ -96,6 +98,11 @@ void RT_Mesh::ClearMesh()
 	//delete(this);
 }
 
+
+bool RT_Mesh::intersect(const glm::f32vec3& ray_orig, const glm::f32vec3& ray_dir, float& t_near) const
+{
+	return false;
+}
 
 RT_Mesh::~RT_Mesh()
 {
