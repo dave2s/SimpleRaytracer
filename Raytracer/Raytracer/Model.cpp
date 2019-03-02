@@ -33,7 +33,7 @@ std::vector<Texture> LoadTextures(aiMaterial *mtl, aiTextureType type, std::stri
 	return textures;
 }
 
-RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
+std::unique_ptr<RT_Mesh*> ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 	std::vector< Vertex >vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
@@ -151,11 +151,11 @@ RT_Mesh* ProcessTreeMesh(const aiScene* scene, aiMesh* mesh, std::string& dir) {
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	RT_Mesh* my_mesh = new RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures);
+	std::unique_ptr<RT_Mesh*> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));
 	return my_mesh;
 }
 
-void ProcessSceneTree(const aiScene* scene, std::vector<RT_Mesh*> &meshes, aiNode* node, std::string& dir)
+void ProcessSceneTree(const aiScene* scene, std::vector<std::unique_ptr<RT_Mesh*>> &meshes, aiNode* node, std::string& dir)
 {
 	for (uint32_t i = 0; i < node->mNumMeshes; ++i)
 	{
@@ -169,7 +169,7 @@ void ProcessSceneTree(const aiScene* scene, std::vector<RT_Mesh*> &meshes, aiNod
 	}
 }
 
-void LoadScene(std::string& modelPath, std::vector<RT_Mesh*>& meshes)
+void LoadScene(std::string& modelPath, std::vector<std::unique_ptr<RT_Mesh*>>& meshes)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = nullptr;
