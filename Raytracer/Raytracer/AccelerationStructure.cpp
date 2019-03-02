@@ -1,17 +1,19 @@
 #include "AccelerationStructure.h"
 
-AccelerationStructure::AccelerationStructure(std::vector<std::unique_ptr<const RT_Mesh*>>& m) : meshes(std::move(m)) {}
+AccelerationStructure::AccelerationStructure(std::vector<std::unique_ptr<const RT_Mesh>>& m) : meshes(std::move(m)) {}
 
-bool AccelerationStructure::intersect(const glm::f32vec3& orig, const glm::f32vec3& dir, const uint32_t& rayId, float& tHit) const
+bool AccelerationStructure::intersect(Ray* ray, float& tHit) const
 {
-	const RT_Mesh* intersectedMesh = nullptr;
 	float t = inf;
-	for (const auto& mesh : meshes) {
-		if ((*mesh)->intersect(orig, dir, t) && t < tHit) {
-			intersectedMesh = (*mesh);
-			tHit = t;
+	uint32_t triangle_count;
+	const RT_Mesh* hit_mesh = nullptr;
+
+	for (const auto& mesh : meshes)
+	{
+		if (mesh->intersect(ray, t) && t < tHit) {
+			hit_mesh = mesh.get();
+			tHit = t;		
 		}
 	}
-
-	return (intersectedMesh != nullptr);
+	return (hit_mesh != nullptr);
 }

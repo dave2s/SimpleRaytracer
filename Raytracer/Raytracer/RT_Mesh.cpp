@@ -59,7 +59,7 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 	_indices(indices),
 	//_indices_len(indices_len),
 	_vertices(vertices),
-	_triangleCount(indices.size() / 3),
+	_triangle_count(indices.size() / 3),
 	_vertices_len(vertices.size()),
 	_singleSided(singleSided)
 {
@@ -99,12 +99,48 @@ void RT_Mesh::ClearMesh()
 }
 
 
-bool RT_Mesh::intersect(const glm::f32vec3& ray_orig, const glm::f32vec3& ray_dir, float& t_near) const
+bool RT_Mesh::intersect(Ray* ray, float& t_near) const
 {
-	return false;
+	//if(mesh->material == RT_Mesh::DIFFUSE)
+		//glm::vec3 NHit;
+	float t, u, v, u_prim, v_prim;
+	glm::f32vec3 PHit; float PHit_dist; glm::f32vec3 closest_PHit;
+	glm::f32vec3 tmp_N_hit; float min_dist = inf;
+	glm::f32vec3 N_hit; uint32_t mesh_triangle_index;
+	bool intersected = false;
+	//uint32_t triangle_count = this.getTriangleCount();
+	for (uint32_t idx = 0; idx < _triangle_count; ++idx) {///For every triangle of the mesh
+		//if (x == 161 && y == 120 && i == 0) {
+		//	camera.Update(glm::vec3(0.f, 0.f, -1.f));
+		//}
+		//float w = 1-u-v
+		float u_prim; float v_prim;
+		Vertex v0 = _vertices[_indices[0 + 3 * idx]];
+		Vertex v1 = _vertices[_indices[1 + 3 * idx]];
+		Vertex v2 = _vertices[_indices[2 + 3 * idx]];
+		if (ray->intersectTriangleMT(true,
+			v0,v1,v2,
+			_singleSided,
+			PHit,
+			tmp_N_hit,
+			PHit_dist,
+			u_prim,
+			v_prim,
+			min_dist)) 
+		{
+			N_hit = tmp_N_hit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
+			u = u_prim; v = v_prim;
+			mesh_triangle_index = idx;
+			min_dist = PHit_dist;
+			closest_PHit = PHit;
+			intersected = true;
+		}
+		return intersected;
+	}
+
 }
 
-RT_Mesh::~RT_Mesh()
+	RT_Mesh::~RT_Mesh()
 {
 	ClearMesh();
 }

@@ -62,8 +62,8 @@ public:
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
 
-	inline bool isSingleSided() { return _singleSided; };
-	inline int getTriangleCount() { return _triangleCount; }
+	inline bool isSingleSided() { return _singleSided; }
+	inline uint32_t getTriangleCount() { return _triangle_count; }
 	inline std::vector<Texture>& GetTextures()
 	{
 		return _textures;
@@ -87,7 +87,7 @@ public:
 	}
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 
-	bool intersect(const glm::f32vec3&,const glm::f32vec3&,float&) const;
+	bool intersect(Ray* ray,float&) const;
 		//Ray.h method bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
 
 	///TODO
@@ -106,7 +106,7 @@ private:
 	std::vector<Vertex> _vertices;
 	unsigned int _vertices_len;
 	bool _singleSided;
-	uint32_t _triangleCount;
+	uint32_t _triangle_count;
 	std::vector<Texture> _textures;
 	
 	///Not implemented

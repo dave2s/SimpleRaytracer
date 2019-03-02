@@ -2,13 +2,14 @@
 #include <vector>
 #include <memory>
 #include "RT_Mesh.h"
+#include "Ray.h"
 class AccelerationStructure
 {
 public:
-	AccelerationStructure(std::vector<std::unique_ptr<const RT_Mesh*>>& m);
+	AccelerationStructure(std::vector<std::unique_ptr<const RT_Mesh>>& m);
 	virtual ~AccelerationStructure();
-	virtual bool intersect(const glm::f32vec3& orig, const glm::f32vec3& dir, const uint32_t& rayId, float& tHit) const;
+	virtual bool intersect(Ray* ray, float& tHit) const;
 protected:
-	const std::vector<std::unique_ptr<const RT_Mesh*>> meshes;
+	const std::vector<std::unique_ptr<const RT_Mesh>> meshes;
 };
 

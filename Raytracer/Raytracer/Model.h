@@ -8,7 +8,7 @@
 #define AMBIENT_LIGHT 0.15f
 
 
-void LoadScene(std::string& modelPath, std::vector<RT_Mesh*>& meshes);
+std::vector<std::unique_ptr<const RT_Mesh>> LoadScene(std::string& modelPath);
 
 
 
