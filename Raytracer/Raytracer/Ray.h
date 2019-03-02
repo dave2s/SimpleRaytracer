@@ -4,9 +4,9 @@
 #include "Camera.h"
 #include "RT_Mesh.h"
 #include <algorithm>
+#include "Defines.h"
 
 static const std::vector<int> wavelengths_intervals{ 380,440,490,510,580,645,781 };
-#define WIDEN_CONSTANT 1.f
 
 class Ray
 {
