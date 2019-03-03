@@ -98,6 +98,15 @@ void RT_Mesh::ClearMesh()
 	//delete(this);
 }
 
+void RT_Mesh::computeBounds(const glm::f32vec3 &planeNormal, float &dnear, float &dfar) const
+{
+	float d;
+	for (uint32_t i = 0; i < _vertices_len; ++i) {
+		d = glm::dot(planeNormal, _vertices[i].position);
+		if (d < dnear) dnear = d;
+		if (d > dfar) dfar = d;
+	}
+}
 
 bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {

@@ -69,6 +69,8 @@ public:
 		return _textures;
 	}
 
+	void computeBounds(const glm::f32vec3 &planeNormal, float &dnear, float &dfar) const;
+
     void updateBoundaries(Vertex &vertex);
 
 	//Return triangle by index of the triangle
