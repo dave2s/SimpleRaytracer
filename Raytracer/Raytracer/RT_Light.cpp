@@ -5,7 +5,7 @@
 
 /**From: https://github.com/lkesteloot/prism
  * From: https://www.johndcook.com/wavelength_to_RGB.html
- */
+ *//*
 inline glm::vec3 RT_Light::wavelen2rgb(int wavelength)
 {
 	float r, g, b;
@@ -62,7 +62,7 @@ inline glm::vec3 RT_Light::wavelen2rgb(int wavelength)
 	}
 
 	return glm::vec3(r*factor, g*factor, b*factor);
-}
+}*/
 
 RT_Light::RT_Light(float _intensity, glm::f32vec3 col)
 {

@@ -151,7 +151,8 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 	}
 
-	std::unique_ptr<const RT_Mesh> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));
+	//std::unique_ptr<const RT_Mesh> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));
+	std::unique_ptr<const RT_Mesh> my_mesh(new RT_Mesh(vertices, indices, false, my_material, 0.18f, type, textures));
 	return my_mesh;
 }
 

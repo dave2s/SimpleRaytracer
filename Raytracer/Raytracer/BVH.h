@@ -27,7 +27,7 @@ static std::atomic<unsigned long long> num_ray_volume_tests = 0;
 class BVH : AccelerationStructure
 {
 	static const uint8_t plane_count = 7;
-	const glm::vec3 setPlanes[plane_count];
+	//const glm::vec3 setPlanes[plane_count];
 
 	static const glm::f32vec3 planeSetNormals[plane_count];
 	struct Extents
@@ -48,7 +48,7 @@ class BVH : AccelerationStructure
 			const float *precomputedNumerator, const float *precomputeDenominator,
 			float &tNear, float &tFar, uint8_t &planeIndex);
 		float d[plane_count][2]; // d values for each plane-set normals 
-		const RT_Mesh *mesh; // pointer contained by the volume (used by octree) 
+		const RT_Mesh* mesh; // pointer contained by the volume (used by octree) 
 	};
 	Extents *extents;
 	struct OctreeNode
@@ -170,11 +170,11 @@ Octree *octree;
 	
 public:
 
-	BVH(const std::vector<RT_Mesh*>& mesh_list);
-	bool intersect(Ray& ray, float& t_near, Ray::Hitinfo& info) const;
+	BVH(std::vector<std::unique_ptr<const RT_Mesh>>& mesh_list);
+	bool intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const;
 	~BVH();
 
-	static int getVolumeTestCount() {
+	static unsigned long long getVolumeTestCount() {
 		return num_ray_volume_tests;
 	}
 

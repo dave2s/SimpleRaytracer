@@ -1,7 +1,7 @@
 #include "BVH.h"
 
 
-BVH::BVH(const std::vector<RT_Mesh*>& mesh_list) : 
+BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& mesh_list) : 
 	AccelerationStructure(mesh_list),
 	extents(NULL),
 	octree(NULL)
@@ -12,7 +12,7 @@ BVH::BVH(const std::vector<RT_Mesh*>& mesh_list) :
 		for (uint8_t j = 0; j < plane_count; ++j) {
 			mesh_list[i]->computeBounds(planeSetNormals[j], extents[i].d[j][0], extents[i].d[j][1]);
 		}
-		extents[i].mesh = mesh_list[i];
+		extents[i].mesh = mesh_list[i].get();
 		sceneExtents.extendBy(extents[i]);
 	}
 	// create hierarchy                                                                                                                                                                                     
@@ -41,13 +41,13 @@ inline bool BVH::Extents::intersect(
 	return true;
 }
 
-bool BVH::intersect(Ray &ray, float& t_near, Ray::Hitinfo& info) const
+bool BVH::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {
 	const RT_Mesh *hitObject = NULL;
 	float precomputedNumerator[BVH::plane_count], precomputeDenominator[BVH::plane_count];
 	for (uint8_t i = 0; i < plane_count; ++i) {
-		precomputedNumerator[i] = glm::dot(planeSetNormals[i], ray.origin);
-		precomputeDenominator[i] = glm::dot(planeSetNormals[i], ray.direction);
+		precomputedNumerator[i] = glm::dot(planeSetNormals[i], ray->origin);
+		precomputeDenominator[i] = glm::dot(planeSetNormals[i], ray->direction);
 	}
 #if 0 
 	float tClosest = ray.tmax;
@@ -68,11 +68,12 @@ bool BVH::intersect(Ray &ray, float& t_near, Ray::Hitinfo& info) const
 	}
 #else 
 	uint8_t planeIndex = 0;
-	float tNear = 0, tFar = ray.tmax;
+	float tNear = 0, tFar = ray->tmax;
 	if (!octree->root->extents.intersect(precomputedNumerator, precomputeDenominator, tNear, tFar, planeIndex)
-		|| tFar < 0 || tNear > ray.tmax)
+		|| tFar < 0 || tNear > ray->tmax)
 		return NULL;
-	float tMin = tFar;
+	OUT float t;
+	float tMin = t = tFar;
 	std::priority_queue<BVH::Octree::QueueElement> queue;
 	queue.push(BVH::Octree::QueueElement(octree->root, 0));
 	while (!queue.empty() && queue.top().t < tMin) {
@@ -80,12 +81,12 @@ bool BVH::intersect(Ray &ray, float& t_near, Ray::Hitinfo& info) const
 		queue.pop();
 		if (node->isLeaf) {
 			for (uint32_t i = 0; i < node->data.size(); ++i) {
-				IsectData isectDataCurrent;
-				if (node->data[i]->mesh->intersect(ray, isectDataCurrent)) {
-					if (isectDataCurrent.t < tMin) {
-						tMin = isectDataCurrent.t;
+				Ray::Hitinfo info_current;
+				if (node->data[i]->mesh->intersect(ray,OUT t, info_current)) {
+					if (t < tMin) {
+						tMin = t;///Somehow too much Ts...redundant? no time to think
 						hitObject = node->data[i]->mesh;
-						isectData = isectDataCurrent;
+						info = info_current;
 					}
 				}
 			}

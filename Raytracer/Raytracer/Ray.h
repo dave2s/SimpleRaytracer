@@ -18,6 +18,7 @@ public:
 	glm::f32vec3 direction;
 	glm::f32vec3 hit_normal;
 	glm::f32vec3 inv_dir;
+	const float tmax = inf;
 	bool isMonochrom;
 	int wavelength;
 	bool sign[3];
@@ -119,15 +120,15 @@ public:
 	static float iorFromWavelength(int wavelength){
 	// https://en.wikipedia.org/wiki/Cauchy%27s_equation
 	//Borosilicate glass BK7
-	float B = 1.5046;
-	float C = 0.00420;
+	float B = 1.5046f;
+	float C = 0.00420f;
 
 	// Widen rainbow, renormalize B.
 	float new_C = C * WIDEN_CONSTANT;// WIDEN_CONSTANT;
-	B = B + C / (.540*.540) - new_C / (.540*.540);
+	B = B + C / (.540f*.540f) - new_C / (.540f*.540f);
 	C = new_C;
 
-	float wl_um = wavelength / 1000.0;
+	float wl_um = wavelength / 1000.0f;
 	return B + C / (wl_um*wl_um);
 }
 	/**From https://github.com/lkesteloot/prism
@@ -137,54 +138,54 @@ public:
 		float red, green, blue;
 
 		if (wavelength >= 380 && wavelength < 440) {
-			red = -(wavelength - 440) / (440 - 380.);
-			green = 0.0;
-			blue = 1.0;
+			red = -(wavelength - 440) / (440 - 380.f);
+			green = 0.0f;
+			blue = 1.0f;
 		}
 		else if (wavelength >= 440 && wavelength < 490) {
-			red = 0.0;
-			green = (wavelength - 440) / (490 - 440.);
-			blue = 1.0;
+			red = 0.0f;
+			green = (wavelength - 440) / (490 - 440.f);
+			blue = 1.0f;
 		}
 		else if (wavelength >= 490 && wavelength < 510) {
-			red = 0.0;
-			green = 1.0;
-			blue = -(wavelength - 510) / (510 - 490.);
+			red = 0.0f;
+			green = 1.0f;
+			blue = -(wavelength - 510) / (510 - 490.f);
 		}
 		else if (wavelength >= 510 && wavelength < 580) {
-			red = (wavelength - 510) / (580 - 510.);
-			green = 1.0;
-			blue = 0.0;
+			red = (wavelength - 510) / (580 - 510.f);
+			green = 1.0f;
+			blue = 0.0f;
 		}
 		else if (wavelength >= 580 && wavelength < 645) {
-			red = 1.0;
-			green = -(wavelength - 645) / (645 - 580.);
-			blue = 0.0;
+			red = 1.0f;
+			green = -(wavelength - 645) / (645 - 580.f);
+			blue = 0.0f;
 		}
 		else if (wavelength >= 645 && wavelength < 781) {
-			red = 1.0;
-			green = 0.0;
-			blue = 0.0;
+			red = 1.0f;
+			green = 0.0f;
+			blue = 0.0f;
 		}
 		else {
-			red = 0.0;
-			green = 0.0;
-			blue = 0.0;
+			red = 0.0f;
+			green = 0.0f;
+			blue = 0.0f;
 		}
 
 		// Let the intensity fall off near the vision limits.
 		float factor;
 		if (wavelength >= 380 && wavelength < 420) {
-			factor = 0.3 + 0.7*(wavelength - 380) / (420 - 380.);
+			factor = 0.3f + 0.7f*(wavelength - 380) / (420 - 380.f);
 		}
 		else if (wavelength >= 420 && wavelength < 701) {
-			factor = 1.0;
+			factor = 1.0f;
 		}
 		else if (wavelength >= 701 && wavelength < 781) {
-			factor = 0.3 + 0.7*(780 - wavelength) / (780 - 700.);
+			factor = 0.3f + 0.7f*(780 - wavelength) / (780 - 700.f);
 		}
 		else {
-			factor = 0.0;
+			factor = 0.0f;
 		}
 
 		return glm::vec3(red*factor, green*factor, blue*factor);
