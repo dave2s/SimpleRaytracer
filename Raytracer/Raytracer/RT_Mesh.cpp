@@ -99,14 +99,13 @@ void RT_Mesh::ClearMesh()
 }
 
 
-bool RT_Mesh::intersect(Ray* ray, float& t_near) const
+bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {
 	//if(mesh->material == RT_Mesh::DIFFUSE)
 		//glm::vec3 NHit;
 	float t, u, v, u_prim, v_prim;
-	glm::f32vec3 PHit; float PHit_dist; glm::f32vec3 closest_PHit;
-	glm::f32vec3 tmp_N_hit; float min_dist = inf;
-	glm::f32vec3 N_hit; uint32_t mesh_triangle_index;
+	glm::f32vec3 PHit; float PHit_dist;
+	glm::f32vec3 NHit; float min_dist = inf;
 	bool intersected = false;
 	//uint32_t triangle_count = this.getTriangleCount();
 	for (uint32_t idx = 0; idx < _triangle_count; ++idx) {///For every triangle of the mesh
@@ -122,17 +121,17 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near) const
 			v0,v1,v2,
 			_singleSided,
 			PHit,
-			tmp_N_hit,
+			NHit,
 			PHit_dist,
 			u_prim,
 			v_prim,
 			min_dist)) 
 		{
-			N_hit = tmp_N_hit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
-			u = u_prim; v = v_prim;
-			mesh_triangle_index = idx;
+			info.NHit = ray->hit_normal = NHit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
+			info.u = u_prim; info.v = v_prim;
+			info.tri_idx = idx;
 			min_dist = PHit_dist;
-			closest_PHit = PHit;
+			info.PHit = PHit;
 			intersected = true;
 		}
 		return intersected;

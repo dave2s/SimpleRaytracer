@@ -24,6 +24,13 @@ public:
 
 	float	prev_D; //if primary, set, if shadow - read
 
+	struct Hitinfo {
+		glm::f32vec3 PHit;
+		glm::f32vec3 NHit;
+		uint32_t tri_idx;
+		float u; float v;
+	};
+
 	static glm::vec3 calcRayDirection(glm::vec3 origin, glm::vec3 target);
 	static void calcRayPerspectiveDirection(glm::vec3 &origin, glm::vec3 &dir, float x, float y, float near, Camera &camera)
 	{

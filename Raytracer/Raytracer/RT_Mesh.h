@@ -63,7 +63,7 @@ public:
 	void ClearMesh();
 
 	inline bool isSingleSided() { return _singleSided; }
-	inline uint32_t getTriangleCount() { return _triangle_count; }
+	inline uint32_t getTriangleCount() const { return _triangle_count; }
 	inline std::vector<Texture>& GetTextures()
 	{
 		return _textures;
@@ -87,7 +87,7 @@ public:
 	}
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 
-	bool intersect(Ray* ray,float&) const;
+	bool intersect(Ray* ray,float& a, Ray::Hitinfo& info) const;
 		//Ray.h method bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
 
 	///TODO
