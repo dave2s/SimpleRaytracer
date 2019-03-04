@@ -25,7 +25,7 @@ https://research.nvidia.com/publication/fast-parallel-construction-high-quality-
 */
 static std::atomic<unsigned long long> num_ray_volume_tests = 0;
 
-class BVH : AccelerationStructure
+class BVH : public AccelerationStructure
 {
 	static const uint8_t plane_count = 7;
 	//const glm::vec3 setPlanes[plane_count];
