@@ -183,5 +183,6 @@ std::vector<std::unique_ptr<const RT_Mesh>> LoadScene(std::string& modelPath)
 	std::string dir = modelPath.substr(0, modelPath.find_last_of('/'));
 	aiNode* node = scene->mRootNode;
 	ProcessSceneTree(scene, meshes, node, dir);
+	return meshes;
 }
 

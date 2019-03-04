@@ -23,6 +23,16 @@ BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& mesh_list) :
 	octree->build();
 }
 
+const glm::f32vec3 BVH::planeSetNormals[BVH::plane_count] = {
+	glm::f32vec3(1, 0, 0),
+	glm::f32vec3(0, 1, 0),
+	glm::f32vec3(0, 0, 1),
+	glm::f32vec3(sqrtf(3) / 3.f,  sqrtf(3) / 3.f, sqrtf(3) / 3.f),
+	glm::f32vec3(-sqrtf(3) / 3.f,  sqrtf(3) / 3.f, sqrtf(3) / 3.f),
+	glm::f32vec3(-sqrtf(3) / 3.f, -sqrtf(3) / 3.f, sqrtf(3) / 3.f),
+	glm::f32vec3(sqrtf(3) / 3.f, -sqrtf(3) / 3.f, sqrtf(3) / 3.f) 
+};
+
 inline bool BVH::Extents::intersect(
 	const float *precomputedNumerator, const float *precomputeDenominator,
 	float &tNear, float &tFar, uint8_t &planeIndex)
@@ -50,7 +60,7 @@ bool BVH::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 		precomputeDenominator[i] = glm::dot(planeSetNormals[i], ray->direction);
 	}
 #if 0 
-	float tClosest = ray.tmax;
+/*	float tClosest = ray.tmax;
 	for (uint32_t i = 0; i < rc->objects.size(); ++i) {
 		__sync_fetch_and_add(&numRayVolumeTests, 1);
 		float tNear = -kInfinity, tFar = kInfinity;
@@ -65,7 +75,7 @@ bool BVH::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 				}
 			}
 		}
-	}
+	}*/
 #else 
 	uint8_t planeIndex = 0;
 	float tNear = 0, tFar = ray->tmax;

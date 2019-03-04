@@ -45,6 +45,8 @@ void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, in
 
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float u, float v, glm::vec3& N);
 
+static bool intersectTriangleMT(Ray* ray, bool isPrimary, Vertex& v0, Vertex& v1, Vertex& v2, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
+
 class RT_Mesh
 {
 public:
@@ -54,7 +56,6 @@ public:
 
 	///Two points furthest apart to form a axis aligned bouning box
 	glm::vec3 boundary_points[2] = { glm::vec3(inf), glm::vec3(-inf) };
-
 	
 	Material _material;
 	glm::f32vec3 _albedo;
@@ -91,15 +92,6 @@ public:
 	static glm::vec3 getPlaneIntersection(glm::vec3 &origin, float &intersection_distance,glm::vec3 &ray_direction) { return origin + (intersection_distance*ray_direction) ;}
 
 	bool intersect(Ray* ray,float& a, Ray::Hitinfo& info) const;
-		//Ray.h method bool intersectTriangleMT(bool isPrimary, Vertex* _triangle, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
-
-	///TODO
-	/*static bool shadowRayHitTriangle(std::vector<glm::vec3> _triangle, Ray *ray, bool _singleSided, float& distance, glm::vec3 & PHit, float min_dist);*/
-	///Deprecated
-	//static bool intersectTriangle(bool isPrimary,glm::vec3* _triangle, bool _singleSided, Ray *ray,glm::vec3 &PHit, float &t, float &u, float &v, float &min_dist);
-
-	///Deprecated
-	//static bool rayHitTriangle(glm::vec3* triangle, bool isPrimary, Ray *ray, bool singleSided, float& distance, glm::vec3 & PHit, float min_dist);
 
 	~RT_Mesh();
 
@@ -117,4 +109,3 @@ private:
 	///Not implemented
 	bool VerticesAreUnique(float * vertices, unsigned int vertex_count);
 };
-

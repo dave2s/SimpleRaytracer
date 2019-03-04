@@ -5,7 +5,7 @@ AccelerationStructure::AccelerationStructure(std::vector<std::unique_ptr<const R
 bool AccelerationStructure::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info, const RT_Mesh* mesh) const
 {
 	float t = inf;
-	uint32_t triangle_count;
+//	uint32_t triangle_count;
 	const RT_Mesh* hit_mesh = nullptr;
 
 	for (const auto& m : meshes)

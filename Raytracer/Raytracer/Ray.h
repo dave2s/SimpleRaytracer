@@ -2,10 +2,10 @@
 #define GLM_LEFT_HANDED
 #include <GLM\glm.hpp>
 #include "Camera.h"
-#include "RT_Mesh.h"
 #include <algorithm>
-#include "Defines.h"
-
+#include <vector>
+//#include "Defines.h"
+#define WIDEN_CONSTANT 10.f
 static const std::vector<int> wavelengths_intervals{ 380,440,490,510,580,645,781 };
 
 class Ray
@@ -53,14 +53,6 @@ public:
 
 	static float norm(glm::vec3 vec) { return (vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]); }
 
-	/*bool intersectBB(glm::vec3(&bounds)[2], float &t) {
-		glm::vec3 t0 = (bounds[0] - origin)*inv_dir;
-		glm::vec3 t1 = (bounds[1] - origin)*inv_dir;
-		glm::vec3 tmin = glm::min(t0, t1);
-
-
-		return true;
-	}*/
 	//True -refracted, false- reflection
 	static glm::vec3 refract(const float& ior, glm::vec3& direction, glm::vec3& hit_normal) {
 		float ior_in = 1;
@@ -220,6 +212,4 @@ public:
 		return true;
 	}
 
-	bool intersectTriangleMT(bool isPrimary, Vertex& v0, Vertex& v1, Vertex& v2, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist);
 };
-

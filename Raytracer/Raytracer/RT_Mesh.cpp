@@ -1,6 +1,4 @@
 #include "RT_Mesh.h"
-#include "Ray.h"
-#include "Defines.h"
 
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords)
 {
@@ -43,6 +41,56 @@ void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2,float u, float v, glm::
 	//Perspective correction: divide by respective v.z then multiply by fragment.z
 	N = glm::normalize((1 - u - v)*v0.normal + u * v1.normal + v * v2.normal);
 #endif
+}
+
+//Moller-Trumbore
+///Split this into primary and secondary function - optimize
+//float margin = 0.001f;
+static bool intersectTriangleMT(Ray* ray, bool isPrimary, Vertex& v0, Vertex& v1, Vertex& v2, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist) {
+	glm::vec3 edge01 = (v1).position - (v0).position;
+	glm::vec3 edge02 = v2.position - v0.position;
+	glm::vec3 pvec = glm::cross(ray->direction, edge02);
+	float D = glm::dot(edge01, pvec);
+
+	if (isPrimary) {
+		if ((D < 0.001f && _singleSided) || (glm::abs(D) < 0.0001f)) {
+			return false;
+		} // 0 backfacing, close to zero miss
+		//if (glm::abs(D) < 0.0001f) return false;//ortho, parallel with normal
+	}
+	else {
+		if ((D > -0.0001f) && (D < 0.0001f)) return false;
+	}
+	glm::vec3 tvec = ray->origin - v0.position;
+	float D_inv = 1 / D;
+	u = glm::dot(tvec, pvec) * D_inv;
+	if (u < 0 || u>1) { return false; }
+
+	tvec = glm::cross(tvec, edge01);
+	v = glm::dot(ray->direction, tvec)*D_inv;
+	if (v < 0 || u + v>1) { return false; }
+
+	t = glm::dot(edge02, tvec) * D_inv;
+	if ((t < 0) || (t > min_dist)) {
+		//PHit = ray->origin + t * ray->direction;
+		return false;
+	}
+	/*else if (t > min_dist) {
+		return false;
+	}*/
+	else if (t < 0.001f)
+	{
+		if (((t < 0.001f) && (t > -0.01f)) && (((ray->prev_D < 0.f) && (D < 0.f)) || ((ray->prev_D > 0.f) && (D > 0.001f))))// goto jmp;
+		{
+		}
+		else {
+			//PHit = ray->origin + t * ray->direction;
+			return false;
+		}
+	}
+	PHit = ray->origin + t * ray->direction;
+	NHit = glm::normalize(glm::cross(edge01, edge02));
+	return true;
 }
 
 
@@ -112,21 +160,16 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {
 	//if(mesh->material == RT_Mesh::DIFFUSE)
 		//glm::vec3 NHit;
-	float t, u, v, u_prim, v_prim;
+	float u_prim, v_prim;
 	glm::f32vec3 PHit; float PHit_dist;
 	glm::f32vec3 NHit; float min_dist = inf;
 	bool intersected = false;
 	//uint32_t triangle_count = this.getTriangleCount();
 	for (uint32_t idx = 0; idx < _triangle_count; ++idx) {///For every triangle of the mesh
-		//if (x == 161 && y == 120 && i == 0) {
-		//	camera.Update(glm::vec3(0.f, 0.f, -1.f));
-		//}
-		//float w = 1-u-v
-		float u_prim; float v_prim;
 		Vertex v0 = _vertices[_indices[0 + 3 * idx]];
 		Vertex v1 = _vertices[_indices[1 + 3 * idx]];
 		Vertex v2 = _vertices[_indices[2 + 3 * idx]];
-		if (ray->intersectTriangleMT(true,
+		if (intersectTriangleMT(ray, true,
 			v0,v1,v2,
 			_singleSided,
 			PHit,
@@ -143,8 +186,8 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 			info.PHit = PHit;
 			intersected = true;
 		}
-		return intersected;
 	}
+	return intersected;
 
 }
 

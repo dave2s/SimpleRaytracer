@@ -14,6 +14,7 @@ https://research.nvidia.com/publication/fast-parallel-construction-high-quality-
 #include "GLM/glm.hpp"
 #include "Ray.h"
 #include "AccelerationStructure.h"
+#include "Defines.h"
 #include <queue>
 #include <atomic>
 

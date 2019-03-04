@@ -25,7 +25,6 @@
 
 #define TEXTURE_REPEAT
 //#define FINAL_RENDER
-#define WIDEN_CONSTANT 10.f
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 2
 //#define BBAccel
