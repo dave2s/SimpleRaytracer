@@ -46,7 +46,7 @@ void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2,float u, float v, glm::
 //Moller-Trumbore
 ///Split this into primary and secondary function - optimize
 //float margin = 0.001f;
-static bool intersectTriangleMT(Ray* ray, bool isPrimary, Vertex& v0, Vertex& v1, Vertex& v2, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float min_dist) {
+static bool intersectTriangleMT(Ray* ray, bool isPrimary, Vertex& v0, Vertex& v1, Vertex& v2, bool _singleSided, glm::vec3 &PHit, glm::vec3 & NHit, float &t, float &u, float &v, float max_dist) {
 	glm::vec3 edge01 = (v1).position - (v0).position;
 	glm::vec3 edge02 = v2.position - v0.position;
 	glm::vec3 pvec = glm::cross(ray->direction, edge02);
@@ -71,7 +71,7 @@ static bool intersectTriangleMT(Ray* ray, bool isPrimary, Vertex& v0, Vertex& v1
 	if (v < 0 || u + v>1) { return false; }
 
 	t = glm::dot(edge02, tvec) * D_inv;
-	if ((t < 0) || (t > min_dist)) {
+	if ((t < 0) || (t > max_dist)) {
 		//PHit = ray->origin + t * ray->direction;
 		return false;
 	}
@@ -156,13 +156,15 @@ void RT_Mesh::computeBounds(const glm::f32vec3 &planeNormal, float &dnear, float
 	}
 }
 
+//t_near comes with maximum distance to trace
+//returns nearest hit
 bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {
 	//if(mesh->material == RT_Mesh::DIFFUSE)
 		//glm::vec3 NHit;
 	float u_prim, v_prim;
 	glm::f32vec3 PHit; float PHit_dist;
-	glm::f32vec3 NHit; float min_dist = inf;
+	glm::f32vec3 NHit; float max_dist = t_near;
 	bool intersected = false;
 	//uint32_t triangle_count = this.getTriangleCount();
 	for (uint32_t idx = 0; idx < _triangle_count; ++idx) {///For every triangle of the mesh
@@ -177,12 +179,12 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 			PHit_dist,
 			u_prim,
 			v_prim,
-			min_dist)) 
+			max_dist)) 
 		{
 			info.NHit = ray->hit_normal = NHit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
 			info.u = u_prim; info.v = v_prim;
 			info.tri_idx = idx;
-			min_dist = PHit_dist;
+			t_near = PHit_dist;
 			info.PHit = PHit;
 			intersected = true;
 		}

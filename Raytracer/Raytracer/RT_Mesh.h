@@ -66,7 +66,7 @@ public:
 
 	inline bool isSingleSided() { return _singleSided; }
 	inline uint32_t getTriangleCount() const { return _triangle_count; }
-	inline std::vector<Texture>& GetTextures()
+	inline const std::vector<Texture>& GetTextures() const
 	{
 		return _textures;
 	}
@@ -76,7 +76,8 @@ public:
     void updateBoundaries(Vertex &vertex);
 
 	//Return triangle by index of the triangle
-	Vertex* getTriangle(unsigned int idx) {
+	Vertex* getTriangle(unsigned int idx)const {
+
 		Vertex triangle[3] = { _vertices[_indices[0 + 3 * idx]],_vertices[_indices[1 + 3 * idx]], _vertices[_indices[2 + 3 * idx]] };
 		return triangle;
 	}
@@ -102,7 +103,7 @@ private:
 	unsigned int _vertices_len;
 	bool _singleSided;
 	uint32_t _triangle_count;
-	std::vector<Texture> _textures;
+	 std::vector<Texture> _textures;
 	
 	///Not implemented
 	void Triangulate();

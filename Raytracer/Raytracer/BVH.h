@@ -172,7 +172,7 @@ Octree *octree;
 public:
 
 	BVH(std::vector<std::unique_ptr<const RT_Mesh>>& mesh_list);
-	bool intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const;
+	const RT_Mesh* intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const;
 	~BVH();
 
 	static unsigned long long getVolumeTestCount() {

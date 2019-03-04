@@ -51,7 +51,7 @@ inline bool BVH::Extents::intersect(
 	return true;
 }
 
-bool BVH::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
+const RT_Mesh* BVH::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 {
 	const RT_Mesh *hitObject = NULL;
 	float precomputedNumerator[BVH::plane_count], precomputeDenominator[BVH::plane_count];

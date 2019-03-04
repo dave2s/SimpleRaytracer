@@ -8,7 +8,7 @@ class AccelerationStructure
 public:
 	AccelerationStructure(std::vector<std::unique_ptr<const RT_Mesh>>& m);
 	virtual ~AccelerationStructure();
-	virtual bool intersect(Ray* ray, float& tHit, Ray::Hitinfo& info, const RT_Mesh* m) const;
+	virtual const RT_Mesh* intersect(Ray* ray, float& tHit, Ray::Hitinfo& inf) const;
 protected:
 	const std::vector<std::unique_ptr<const RT_Mesh>> meshes;
 };
