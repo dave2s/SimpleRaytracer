@@ -60,6 +60,7 @@ public:
 	Material _material;
 	glm::f32vec3 _albedo;
 	MATERIAL_TYPE _material_type;
+	std::vector<Vertex> _vertices;
 
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
@@ -77,7 +78,6 @@ public:
 
 	//Return triangle by index of the triangle
 	Vertex* getTriangle(unsigned int idx)const {
-
 		Vertex triangle[3] = { _vertices[_indices[0 + 3 * idx]],_vertices[_indices[1 + 3 * idx]], _vertices[_indices[2 + 3 * idx]] };
 		return triangle;
 	}
@@ -99,7 +99,7 @@ public:
 private:
 	unsigned int _indices_len;
 	std::vector<unsigned int> _indices;
-	std::vector<Vertex> _vertices;
+	
 	unsigned int _vertices_len;
 	bool _singleSided;
 	uint32_t _triangle_count;

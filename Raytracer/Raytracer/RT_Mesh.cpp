@@ -1,4 +1,5 @@
 #include "RT_Mesh.h"
+#include "Defines.h"
 
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords)
 {
@@ -179,7 +180,7 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 			PHit_dist,
 			u_prim,
 			v_prim,
-			max_dist)) 
+			max_dist) && PHit_dist<t_near) 
 		{
 			info.NHit = ray->hit_normal = NHit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
 			info.u = u_prim; info.v = v_prim;

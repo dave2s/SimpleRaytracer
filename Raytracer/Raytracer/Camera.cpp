@@ -19,7 +19,7 @@ Camera::Camera(glm::vec3 origin,glm::vec3 front, float _fovy, float _aspect_rati
 	//std::cout << "Aspect ratio:" << std::to_string(TO_RADIANS(fovy)) << std::endl;
 	//projection_matrix = glm::perspective(TO_RADIANS(fovy),_aspect_ratio,CAM_NEAR_PLANE, CAM_FAR_PLANE);
 	fovy = _fovy;
-	scale = glm::tan(TO_RADIANS(fovy*0.5));
+	scale = glm::tan(TO_RADIANS(fovy*0.5f));
 	Update(front);
 }
 void Camera::Update(glm::vec3 direction) {

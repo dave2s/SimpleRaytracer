@@ -183,7 +183,7 @@ public:
 		return glm::vec3(red*factor, green*factor, blue*factor);
 	}
 
-	bool intersectBB( glm::vec3(&bounds)[2],float &t) {
+	bool intersectBB(const glm::vec3(&bounds)[2],float &t) {
 		float tx0; float ty0; float tx1; float ty1;
 		
 		tx0 = (bounds[sign[0]].x - origin.x) * inv_dir.x;
