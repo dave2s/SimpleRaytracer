@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <vector>
 //#include "Defines.h"
-#define WIDEN_CONSTANT 10.f
+#define WIDEN_CONSTANT 1.f
 static const std::vector<int> wavelengths_intervals{ 380,440,490,510,580,645,781 };
 
 class Ray

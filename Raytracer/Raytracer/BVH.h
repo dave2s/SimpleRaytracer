@@ -122,7 +122,10 @@ class BVH : public AccelerationStructure
 	static const glm::f32vec3 planeSetNormals[plane_count];
 	struct Extents
 	{
-		Extents();
+		Extents() {
+			for (uint8_t i = 0; i < plane_count; ++i)
+				d[i][0] = inf, d[i][1] = -inf;
+		}
 		void extendBy(const Extents &extents);
 		glm::f32vec3 centroid() const;
 		bool intersect(
@@ -184,7 +187,7 @@ const;
 
 	Octree *octree = nullptr;
 	std::vector<Extents> extents_list;
-
+	
 public:
 	BVH(std::vector<std::unique_ptr<const RT_Mesh>>& mesh_list);
 	const RT_Mesh* intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const;

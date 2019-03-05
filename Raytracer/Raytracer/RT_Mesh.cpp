@@ -164,7 +164,7 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 	//if(mesh->material == RT_Mesh::DIFFUSE)
 		//glm::vec3 NHit;
 	float u_prim, v_prim;
-	glm::f32vec3 PHit; float PHit_dist;
+	glm::f32vec3 PHit; float PHit_dist=inf;
 	glm::f32vec3 NHit; float max_dist = t_near;
 	bool intersected = false;
 	//uint32_t triangle_count = this.getTriangleCount();

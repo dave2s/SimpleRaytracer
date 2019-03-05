@@ -30,10 +30,10 @@
 #define BBAccel
 //#define BVH_ACCEL
 //#define MSAA
-#define WIDTH 320
-#define HEIGHT 240
-#define MAX_DEPTH 10
-#define WAVE_SAMPLES 3
+#define WIDTH 360
+#define HEIGHT 280
+#define MAX_DEPTH 5
+#define WAVE_SAMPLES 6
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -46,6 +46,10 @@
 #define WAVE_SAMPLES 10
 #define SMOOTH_SHADING
 #define PROFILE
+#endif
+
+#ifdef BVH_ACCEL
+#define BBAccel
 #endif
 
 #ifdef MSAA
@@ -67,8 +71,8 @@ const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
 //const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
-//const std::string DEFAULT_MODEL = "example/prism/prism.obj";
-const std::string DEFAULT_MODEL = "example/prism/prism2.obj";
+const std::string DEFAULT_MODEL = "example/prism/prism.obj";
+//const std::string DEFAULT_MODEL = "example/prism/prism2.obj";
 //const std::string DEFAULT_MODEL = "example/bunny/bunny.obj";
 //const std::string DEFAULT_MODEL = "example/f16/f16.obj";
 //const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";

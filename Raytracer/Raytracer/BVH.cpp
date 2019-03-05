@@ -1,10 +1,11 @@
 #include "BVH.h"
-
+/*
 BVH::Extents::Extents()
 {
-	for (uint8_t i = 0; i < plane_count; ++i)
-		d[i][0] = inf, d[i][1] = -inf;
-}
+	for (uint8_t i = 0; i < plane_count; ++i) {
+		d[i][0] = inf; d[i][1] = -inf;
+	}
+}*/
 
 void BVH::Extents::extendBy(const Extents & extents)
 {
@@ -174,7 +175,11 @@ glm::f32vec3(1, 0, 0),
 BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure(m)
 {
 	Extents scene_extents;
-	extents_list.reserve(meshes.size());
+	extents_list.resize(meshes.size());
+	//std::vector<BVH::Extents> extents_list();
+
+	uint32_t total_num_triangles = 0;
+
 	for (uint32_t i = 0; i < meshes.size(); ++i) {
 		for (uint8_t j = 0; j < plane_count; ++j) {
 			for (const auto vertex : meshes[i]->_vertices) {
