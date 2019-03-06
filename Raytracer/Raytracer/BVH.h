@@ -122,6 +122,15 @@ class BVH : public AccelerationStructure
 	static const glm::f32vec3 planeSetNormals[plane_count];
 	struct Extents
 	{
+		struct TriangleDesc
+		{
+			TriangleDesc(const RT_Mesh* m, const uint32_t& t) : mesh(m), tri(t) {}
+			const RT_Mesh* mesh;
+			uint32_t tri;
+		};
+		void insert(const RT_Mesh* mesh, uint32_t t){
+			triangles.push_back(BVH::Extents::TriangleDesc(mesh, t));
+		}
 		Extents() {
 			for (uint8_t i = 0; i < plane_count; ++i)
 				d[i][0] = inf, d[i][1] = -inf;
@@ -133,7 +142,8 @@ class BVH : public AccelerationStructure
 			float &tNear, float &tFar, uint8_t &planeIndex) 
 const;
 		float d[plane_count][2]; // d values for each plane-set normals 
-		const RT_Mesh* mesh; // pointer contained by the volume (used by octree) 
+		//const RT_Mesh* mesh; // pointer contained by the volume (used by octree) 
+		std::vector<TriangleDesc> triangles;
 	};
 
 	struct Octree

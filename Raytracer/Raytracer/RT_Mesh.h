@@ -61,6 +61,7 @@ public:
 	glm::f32vec3 _albedo;
 	MATERIAL_TYPE _material_type;
 	std::vector<Vertex> _vertices;
+	std::vector<unsigned int> _indices;
 
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();
@@ -74,6 +75,8 @@ public:
 
 	void computeBounds(const glm::f32vec3 &planeNormal, float &dnear, float &dfar) const;
 
+	bool intersect_triangle(Ray * ray, uint32_t triangle, float & t_near, Ray::Hitinfo & info) const;
+
     void updateBoundaries(Vertex &vertex);
 
 	//Return triangle by index of the triangle
@@ -82,7 +85,7 @@ public:
 		return triangle;
 	}
 
-//triangle normal not normalized
+	//triangle normal not normalized
 	static float getDistanceFromOrigin(glm::vec3 normal, glm::vec3 vertex) { return glm::dot(normal,vertex); }
 	static float getPlaneIntersectionDistance(bool &isPrimary, float distance_from_origin, glm::vec3 plane_normal, glm::vec3 origin, glm::vec3 ray_direction, bool& _singleSided, int &e) {
 		//if (!isPrimary) { std::cout << "shadow ray je singlesided? " << _singleSided << std::endl; }
@@ -98,7 +101,7 @@ public:
 
 private:
 	unsigned int _indices_len;
-	std::vector<unsigned int> _indices;
+
 	
 	unsigned int _vertices_len;
 	bool _singleSided;

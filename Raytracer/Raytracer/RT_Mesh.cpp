@@ -157,6 +157,36 @@ void RT_Mesh::computeBounds(const glm::f32vec3 &planeNormal, float &dnear, float
 	}
 }
 
+bool RT_Mesh::intersect_triangle(Ray* ray, uint32_t triangle, float& t_near, Ray::Hitinfo& info)const {
+	float u_prim, v_prim;
+	glm::f32vec3 PHit; float PHit_dist = inf;
+	glm::f32vec3 NHit; float max_dist = t_near;
+	bool intersected = false;
+	
+	Vertex v0 = _vertices[_indices[0 + 3 * triangle]];
+	Vertex v1 = _vertices[_indices[1 + 3 * triangle]];
+	Vertex v2 = _vertices[_indices[2 + 3 * triangle]];
+	if (intersectTriangleMT(ray, true,
+		v0, v1, v2,
+		_singleSided,
+		PHit,
+		NHit,
+		PHit_dist,
+		u_prim,
+		v_prim,
+		max_dist) && PHit_dist < t_near)
+	{
+		info.NHit = ray->hit_normal = NHit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
+		info.u = u_prim; info.v = v_prim;
+		info.tri_idx = triangle;
+		t_near = PHit_dist;
+		info.PHit = PHit;
+		intersected = true;
+	}
+
+	return intersected;
+}
+
 //t_near comes with maximum distance to trace
 //returns nearest hit
 bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const

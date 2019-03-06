@@ -175,27 +175,40 @@ glm::f32vec3(1, 0, 0),
 BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure(m)
 {
 	Extents scene_extents;
-	extents_list.resize(meshes.size());
-	//std::vector<BVH::Extents> extents_list();
-
+	//extents_list.resize(meshes.size());
 	uint32_t total_num_triangles = 0;
 
 	for (uint32_t i = 0; i < meshes.size(); ++i) {
-		for (uint8_t j = 0; j < plane_count; ++j) {
-			for (const auto vertex : meshes[i]->_vertices) {
-				float d = glm::dot(planeSetNormals[j], vertex.position);
-				// set dNEar and dFar
-				if (d < extents_list[i].d[j][0]) extents_list[i].d[j][0] = d;
-				if (d > extents_list[i].d[j][1]) extents_list[i].d[j][1] = d;
+			total_num_triangles+=meshes[i]->getTriangleCount();
+	}
+	extents_list.resize(total_num_triangles);
+	//extents_list.resize(1);
+	//const RT_Mesh m;
+	//total_num_triangles = 0;
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		//m = (meshes[i].get());
+		for (uint32_t t = 0; t < meshes[i]->getTriangleCount(); ++t) {//for each trinangle in mesh
+			for (uint8_t j = 0; j < plane_count; ++j) {
+				for (int vx = 0; vx < 3;++vx) {
+					float d = glm::dot(planeSetNormals[j], (meshes[i].get())->_vertices[(meshes[i].get())->_indices[t*3+vx]].position);
+					// set dNEar and dFar
+					if (d < extents_list[i].d[j][0]) extents_list[i].d[j][0] = d;
+					if (d > extents_list[i].d[j][1]) extents_list[i].d[j][1] = d;
+				}
 			}
+			extents_list[t].insert(meshes[i].get(), t); // extent uklada ukazatel na objekt ktery obsahuje
+			scene_extents.extendBy(extents_list[t]); // rozsir rozsah sceny objektu
 		}
-		scene_extents.extendBy(extents_list[i]); // rozsir rozsah sceny objektu
-		extents_list[i].mesh = meshes[i].get(); // extent uklada ukazatel na objekt ktery obsahuje
+		//total_num_triangles += meshes[i]->getTriangleCount();
+		
 	}
 	// Mame rozsah sceny, postavime octree
 	octree = new Octree(scene_extents);
 
-	for (uint32_t i = 0; i < meshes.size(); ++i) {
+	/*for (uint32_t i = 0; i < meshes.size(); ++i) {
+		octree->insert(&extents_list[i]);
+	}*/
+	for (uint32_t i = 0; i < total_num_triangles; ++i) {
 		octree->insert(&extents_list[i]);
 	}
 	//bottom-up
@@ -225,6 +238,7 @@ bool BVH::Extents::intersect(
 const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
 	tHit = inf;
+	Ray::Hitinfo info_current;
 	const RT_Mesh* hit_mesh = nullptr;
 	float precomputedNumerator[BVH::plane_count];
 	float precomputedDenominator[BVH::plane_count];
@@ -248,7 +262,7 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 		}
 	}
 	*/
-
+	
 	uint8_t planeIndex;
 	float tNear = 0, tFar = inf; // tNear, tFar for the intersected extents 
 	if (!octree->root->node_extents.intersect(precomputedNumerator, precomputedDenominator, tNear, tFar, planeIndex) || tFar < 0)
@@ -262,9 +276,11 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 		if (node->isLeaf) {
 			for (const auto& e : node->node_extents_list) {
 				float t = inf;
-				if (e->mesh->intersect(ray,t,info) && t < tHit) {
+				//if (e->mesh->intersect(ray,t,info) && t < tHit) {
+				if(e->triangles[0].mesh->intersect_triangle(ray,e->triangles[0].tri,t,info_current) && t < tHit){
 					tHit = t;
-					hit_mesh = e->mesh;
+					info = info_current;
+					hit_mesh = e->triangles[0].mesh;
 				}
 			}
 		}
