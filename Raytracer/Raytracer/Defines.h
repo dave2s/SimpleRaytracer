@@ -33,7 +33,7 @@
 #define WIDTH 360
 #define HEIGHT 280
 #define MAX_DEPTH 5
-#define WAVE_SAMPLES 5
+#define WAVE_SAMPLES 6
 #define SMOOTH_SHADING
 #define PROFILE
 #else
