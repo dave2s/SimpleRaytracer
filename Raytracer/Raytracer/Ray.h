@@ -109,11 +109,9 @@ public:
 	/*from
 	*https://github.com/lkesteloot/prism
 	*/
-	static float iorFromWavelength(int wavelength){
+	static float iorFromWavelength(int wavelength, float B, float C){
 	// https://en.wikipedia.org/wiki/Cauchy%27s_equation
-	//Borosilicate glass BK7
-	float B = 1.5046f;
-	float C = 0.00420f;
+	
 
 	// Widen rainbow, renormalize B.
 	float new_C = C * WIDEN_CONSTANT;// WIDEN_CONSTANT;

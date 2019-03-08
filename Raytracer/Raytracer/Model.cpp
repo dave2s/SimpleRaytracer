@@ -129,18 +129,21 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 			}
 		}*/
 		if (shading_model == 2 || shading_model == 3){
-			type = ( ior == 1.0f  ) ? RT_Mesh::PHONG : RT_Mesh::REFRACTION;
+			type = ( ior == 1.f  ) ? RT_Mesh::PHONG : RT_Mesh::REFRACTION;
+			if (shininess > 999) {
+				type = RT_Mesh::MIRROR;
+			}
 		}
 		else {
-			if (shininess == 1.f) {
+			/*if (shininess == 1.f) {
 				type = RT_Mesh::DIFFUSE;
-			}
-			else {
+			}*/
+			/*else {*/
 				type = RT_Mesh::PHONG;
 				if (shininess > 999) {
 					type = RT_Mesh::MIRROR;
 				}
-			}
+			/*}*/
 		}
 
 		//color = glm::f32vec3(diffuse.r, diffuse.g, diffuse.b);

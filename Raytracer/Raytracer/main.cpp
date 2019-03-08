@@ -48,17 +48,27 @@ extern "C" {
 static std::atomic<unsigned long long> triangle_intersection_count = 0;
 static std::atomic<unsigned long long> triangle_test_count = 0;
 static std::atomic<unsigned long long> primary_rays = 0;
+static std::atomic<unsigned char> global_light_on = true;
 /*#ifdef BBAccel
 static std::atomic<unsigned long long> box_test_count = 0;
 #endif*/
 #endif
 
+//Borosilicate glass BK7
+//float B = 1.5046f;
+//float C = 0.00420f;
+
+//Diamond
+float B = 2.385f;
+float C = 0.0117f;
+
+float global_cauchy_B = B;
+float global_cauchy_C = C;
+
 ///TODO
 //#define GAMMA 2.2f
 //https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch24.html
 //http://renderwonk.com/blog/index.php/archive/adventures-with-gamma-correct-rendering/
-
-
 
 bool quit = false;
 
@@ -79,8 +89,6 @@ std::vector<RT_Light*> light_list_off;
 
 std::vector<int> wavelengths;
 int wavelengths_size;
-
-bool global_light_on = true;
 
 // How many threads can I use
 static uint16_t g_thread_count;
@@ -384,7 +392,7 @@ void MovePolling(SDL_Event &event,Camera &camera) {
 				for (auto light = light_list.begin(); light != light_list.end(); /*++light*/) {
 					if ((*light)->getType() == RT_Light::distant) {
 						light_list_off.push_back(*light);
-						light_list.erase(light);
+						light = light_list.erase(light);
 					}
 					else light++;
 				}
@@ -393,12 +401,13 @@ void MovePolling(SDL_Event &event,Camera &camera) {
 				for (auto light = light_list_off.begin(); light != light_list_off.end(); /*++light*/) {
 					if ((*light)->getType() == RT_Light::distant) {
 						light_list.push_back(*light);
-						light_list_off.erase(light);
+						light =light_list_off.erase(light);
 					}
 					else light++;
 				}
 			}
-			global_light_on ^= 1;
+			std::atomic_fetch_xor(&global_light_on, 1);
+			//global_light_on ^= 1;
 			updateSkyColor();
 			break;
 		}
@@ -561,7 +570,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 					else {
 
 						for (int i = 0; i < wavelengths_size;++i) {		
-							glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelengths[i]), primary_ray->direction, primary_ray->hit_normal));
+							glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelengths[i],global_cauchy_B,global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
 							glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
 							refract_color += raytrace(accel,refract_orig, refract_dir, depth + 1, true, wavelengths[i]);
 						}
