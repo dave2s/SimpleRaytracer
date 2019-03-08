@@ -727,7 +727,22 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 }//end for each mesh SHADOW RAYS
 
 
-void render(uint16_t thread_id,SDL_Rect rect,SDL_Surface* frame_buffer,std::chrono::time_point<std::chrono::steady_clock> &start, SDL_Event &event, Camera &camera,std::unique_ptr<AccelerationStructure> &accel, SDL_Texture * texture, SDL_Renderer * renderer,std::vector<int>kernel_wh,std::vector<glm::u16vec2> min_whs)
+void render(uint16_t thread_id,
+#ifdef MULTI_THREADING
+	SDL_Rect rect,
+#endif
+	SDL_Surface* frame_buffer,
+	std::chrono::time_point<std::chrono::steady_clock> &start,
+	SDL_Event &event,
+	Camera &camera,
+	std::unique_ptr<AccelerationStructure> &accel,
+	SDL_Texture * texture,
+	SDL_Renderer * renderer,
+	std::vector<int>kernel_wh
+#ifdef MULTI_THREADING
+	,std::vector<glm::u16vec2> min_whs
+#endif
+)
 {
 	glm::f32vec3 pixel_color = glm::f32vec3(0);
 	//actual projection x and y in (-1,1)
@@ -736,9 +751,16 @@ void render(uint16_t thread_id,SDL_Rect rect,SDL_Surface* frame_buffer,std::chro
 	float height_step; float width_step;
 	//SDL_Rect rect;
 	///set rectangle coords
+#ifdef MULTI_THREADING
 	uint16_t min_w = min_whs[thread_id][0];	uint16_t min_h = min_whs[thread_id][1];
 	uint16_t max_w = min_w + kernel_wh[0];	uint16_t max_h = min_h +kernel_wh[1];
 	rect = {min_w,min_h,kernel_wh[0],kernel_wh[1]};
+#else
+	uint16_t min_w; uint16_t min_h;
+	uint16_t max_w; uint16_t max_h;
+	min_w = min_h = 0;
+	max_w = WIDTH; max_h = HEIGHT;
+#endif
 
 #ifdef PROFILING
 	start = std::chrono::high_resolution_clock::now();
@@ -818,12 +840,12 @@ void render(uint16_t thread_id,SDL_Rect rect,SDL_Surface* frame_buffer,std::chro
 			std::atomic_fetch_add(&primary_rays, 1);
 
 #ifdef MSAA	
-			cumulative_color += raytrace(origin, direction);
+			cumulative_color += raytrace(accel,origin, direction);
 			}
 		pixel_color = cumulative_color / (float)msaa_sample_coords.size();
 #else
 			pixel_color = raytrace(accel, origin, direction);
-#endif				
+#endif			
 			setRGBAPixel(frame_buffer, x-min_w, y-min_h, F32vec2U8vec(pixel_color));
 
 		}//end for each pixel (x)
@@ -834,11 +856,16 @@ void render(uint16_t thread_id,SDL_Rect rect,SDL_Surface* frame_buffer,std::chro
 #endif
 	
 	 //SDL_LockSurface(frame_buffer);
-	SDL_UpdateTexture(texture, NULL, frame_buffer->pixels, rect.w * sizeof(Uint32));//
-																				   //SDL_UnlockSurface(frame_buffer);
-	//SDL_RenderCopy(renderer, texture, NULL, NULL);
+	//
+								//SDL_UnlockSurface(frame_buffer);
+#ifdef MULTI_THREADING
+	SDL_UpdateTexture(texture, NULL, frame_buffer->pixels, rect.w * sizeof(Uint32));
 	std::lock_guard<std::mutex> block_threads_until_finish_this_job(barrier);
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+#else
+	SDL_UpdateTexture(texture, NULL, frame_buffer->pixels, WIDTH * sizeof(Uint32));
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+#endif
 
 	//SDL_RenderPresent(renderer);
 
@@ -847,7 +874,7 @@ void render(uint16_t thread_id,SDL_Rect rect,SDL_Surface* frame_buffer,std::chro
 #endif
 g_working--;
 }
-
+#ifdef MULTI_THREADING
 inline bool divisible(unsigned int x, uint16_t factor) {
 	return (x % factor == 0);
 }
@@ -873,7 +900,7 @@ bool subimageDimensions(std::vector<int>& dim,uint16_t w, uint16_t h, uint16_t* 
 	num_o_parts[1] = h / dim[1];
 	return true;
 }
-
+#endif
 int main(int argc, char* argv[])
 {/*
 #ifdef _DEBUG
@@ -927,10 +954,10 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 
 	updateSkyColor();
 
-//	int triangle_count;
 	float view_x;
 	float view_y;
 
+#ifdef MULTI_THREADING
 	g_thread_count = 2*std::thread::hardware_concurrency();
 	std::cout << "Using " << g_thread_count << " threads.\n";
 
@@ -939,25 +966,22 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 	if(!subimageDimensions(wh,WIDTH, HEIGHT, num_o_parts)){
 		return 3;
 	}
-
-	//const int kernel_wh[2] = { int(WIDTH / 4.f) /*(g_thread_count/2.0)*/, int(HEIGHT / 4.f) /*(g_thread_count/2.0)*/ };
-	
-	// Generate the image on multiple threads.
 	std::vector<SDL_Surface*> frame_buffers;//= CreateRGBImage(WIDTH, HEIGHT);
 	std::vector<SDL_Texture*> texture_buffers;
 	std::vector<std::thread> threads;	
+#endif
 
 #ifdef PROFILING
 	std::chrono::steady_clock::duration elapsed;
 	std::chrono::steady_clock::time_point start;
 	unsigned long long microseconds;
 #endif
+
 	SDL_Texture* texture;
+
+#ifdef MULTI_THREADING
 	SDL_Rect rect;
 	std::vector<glm::u16vec2> min_whs;
-
-	//uint8_t row_len_in_rectangles = WIDTH / wh[0];
-//	uint8_t column_len_in_rectangles = HEIGHT / wh[1];
 	///fill min_whs with starting coords of rectangles in image for all threads
 	for (uint8_t y=0; y < num_o_parts[1]; ++y) {
 		for (uint8_t x=0; x < num_o_parts[0]; ++x) {
@@ -972,11 +996,12 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 			min_whs.push_back(glm::vec2(x*wh[0],y*wh[1]));
 		}
 	}
-	
+#endif	
 	while (!quit)
 	{
 		//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	//	SDL_RenderClear(renderer);
+#ifdef MULTI_THREADING
 		g_working = g_thread_count-1;
 		for (uint16_t t = 0; t < num_o_parts[0]*num_o_parts[1]-1; ++t) {
 			SDL_Surface* frame_buffer = frame_buffers[t];
@@ -988,6 +1013,7 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 
 			//SDL_RenderCopy(renderer, texture, NULL, &rect);
 		}
+
 		SDL_Surface* frame_buffer = frame_buffers[num_o_parts[0]*num_o_parts[1]-1];
 		SDL_Texture* texture = texture_buffers[num_o_parts[0] * num_o_parts[1]-1];
 
@@ -996,14 +1022,21 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 		for (auto &thread:threads) {
 			thread.join();
 		}
-		
+#else
+		SDL_Surface* frame_buffer = CreateRGBImage(WIDTH, HEIGHT);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, frame_buffer);
+
+		render(1, frame_buffer, start, event, camera, accel, texture, renderer, std::vector<int> {WIDTH,HEIGHT});
+#endif
 		SDL_RenderPresent(renderer);
 
 		///cleanup
+#ifdef MULTI_THREADING
 		for (auto &thread:threads) {
 			thread.~thread();	
 		}
 		threads.clear();
+#endif
 		
 
 #ifdef PROFILING
@@ -1027,9 +1060,10 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 		break;
 #endif
 	}
-
+#ifdef MULTI_THREADING
 	frame_buffers.clear();
 	texture_buffers.clear();
+#endif
 
 	return 0;//app_exit(0, texture, renderer, frame_buffer, main_window);
 }

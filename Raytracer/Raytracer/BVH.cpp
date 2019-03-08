@@ -185,6 +185,7 @@ BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure
 	//extents_list.resize(1);
 	//const RT_Mesh m;
 	//total_num_triangles = 0;
+	uint32_t tri_idx = 0;
 	for (uint32_t i = 0; i < meshes.size(); ++i) {
 		//m = (meshes[i].get());
 		for (uint32_t t = 0; t < meshes[i]->getTriangleCount(); ++t) {//for each trinangle in mesh
@@ -192,12 +193,13 @@ BVH::BVH(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure
 				for (int vx = 0; vx < 3;++vx) {
 					float d = glm::dot(planeSetNormals[j], (meshes[i].get())->_vertices[(meshes[i].get())->_indices[t*3+vx]].position);
 					// set dNEar and dFar
-					if (d < extents_list[i].d[j][0]) extents_list[i].d[j][0] = d;
-					if (d > extents_list[i].d[j][1]) extents_list[i].d[j][1] = d;
+					if (d < extents_list[tri_idx].d[j][0]) extents_list[tri_idx].d[j][0] = d;
+					if (d > extents_list[tri_idx].d[j][1]) extents_list[tri_idx].d[j][1] = d;
 				}
 			}
-			extents_list[t].insert(meshes[i].get(), t); // extent uklada ukazatel na objekt ktery obsahuje
-			scene_extents.extendBy(extents_list[t]); // rozsir rozsah sceny objektu
+			scene_extents.extendBy(extents_list[tri_idx]); // rozsir rozsah sceny objektu
+			extents_list[tri_idx].insert(meshes[i].get(), t); // extent uklada ukazatel na objekt ktery obsahuje
+			tri_idx++;
 		}
 		//total_num_triangles += meshes[i]->getTriangleCount();
 		
@@ -267,7 +269,7 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 	float tNear = 0, tFar = inf; // tNear, tFar for the intersected extents 
 	if (!octree->root->node_extents.intersect(precomputedNumerator, precomputedDenominator, tNear, tFar, planeIndex) || tFar < 0)
 		return false;
-	tHit = tFar;
+	float t = tHit;
 	std::priority_queue<BVH::Octree::QueueElement> queue;
 	queue.push(BVH::Octree::QueueElement(octree->root, 0));
 	while (!queue.empty() && queue.top().t < tHit) {
@@ -275,7 +277,7 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 		queue.pop();
 		if (node->isLeaf) {
 			for (const auto& e : node->node_extents_list) {
-				float t = inf;
+				//float t = inf;
 				//if (e->mesh->intersect(ray,t,info) && t < tHit) {
 				if(e->triangles[0].mesh->intersect_triangle(ray,e->triangles[0].tri,t,info_current) && t < tHit){
 					tHit = t;
