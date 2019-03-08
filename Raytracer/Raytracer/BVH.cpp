@@ -262,7 +262,7 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 		}
 	}
 	*/
-	
+
 	uint8_t planeIndex;
 	float tNear = 0, tFar = inf; // tNear, tFar for the intersected extents 
 	if (!octree->root->node_extents.intersect(precomputedNumerator, precomputedDenominator, tNear, tFar, planeIndex) || tFar < 0)
