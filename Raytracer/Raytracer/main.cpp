@@ -598,31 +598,34 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			std::memcpy(hit_triangle, hit_mesh->getTriangle(info.tri_idx), sizeof(Vertex) * 3);
 			//for each light cast shadow ray
 			/// CALC LIGHTs
+			shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
 			glm::u8vec3 texture_diffuse_color;
-			for (auto light = light_list.begin(); light != light_list.end(); ++light) {
-				//hit_color = glm::f32vec3(0);
+			for (auto &light : light_list) {
 				is_lit = true;
 				OUT glm::vec3 light_intensity; OUT glm::vec3 light_direction; OUT float light_distance;
-				(*light)->shine(light_intensity, light_distance, light_direction, info.PHit);
-
+				light->shine(light_intensity, light_distance, light_direction, info.PHit);
+			
+				if (light_direction == glm::vec3(0.f, 0.f, -1.0f))
+					shadow_ray->direction = -light_direction;
+				
 				shadow_ray->direction = -light_direction;
 				shadow_ray->origin = info.PHit + info.NHit * HIT_BIAS;
-				shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
-
+				
 #if defined(BBAccel)
 				shadow_ray->precomputeValues();
 #endif
 				///use hit - light distance as maximum distance to trace, this will return actual distance.
 				PHit_dist = light_distance;
 
-				if (!is_lit) { break; }
+				if (!is_lit) {
+					break; 
+}
 
 				if (accel->intersect(shadow_ray, PHit_dist, shadow_info)!=nullptr) {
 					is_lit = false;
 					break;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
-				
 #ifndef GAMMA
 				glm::vec2 tex_coords = glm::vec2(-1.f, -1.f);
 				Texture texture; glm::vec3 N;
@@ -695,11 +698,11 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			Ray::Hitinfo shadow_info;			
 			//for each light cast shadow ray
 			/// CALC LIGHTs
-			for (auto light = light_list.begin(); light != light_list.end(); ++light) {
+			for (auto &light : light_list) {
 				//hit_color = glm::f32vec3(0);
 				is_lit = true;
 				OUT glm::vec3 light_intensity; OUT glm::vec3 light_direction; OUT float light_distance;
-				(*light)->shine(light_intensity, light_distance, light_direction, info.PHit);
+				light->shine(light_intensity, light_distance, light_direction, info.PHit);
 
 				shadow_ray->direction = -light_direction;
 				shadow_ray->origin = info.PHit + primary_ray->hit_normal /*NHit*/ * HIT_BIAS;
