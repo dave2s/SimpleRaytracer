@@ -7,6 +7,7 @@ BBoxAcceleration::BBoxAcceleration(std::vector<std::unique_ptr<const RT_Mesh>>& 
 const RT_Mesh* BBoxAcceleration::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
 	const RT_Mesh* hit_mesh = nullptr;
+	Ray::Hitinfo info_current;
 	//const glm::vec3 invDir = 1 / ray->direction;
 //	const bool sign[] = { ray->direction.x < 0, ray->direction.y < 0, ray->direction.z < 0 };
 	float t = tHit;
@@ -19,10 +20,10 @@ const RT_Mesh* BBoxAcceleration::intersect(Ray* ray, float& tHit, Ray::Hitinfo& 
 			// if the intersection distance is the nearest and if we pass that test as well
 			// then update tNear variable with t and keep a pointer to the intersected mesh
 			//Ray::Hitinfo info_current;
-			if (mesh->intersect(ray, t, info) && t < tHit) {
+			if (mesh->intersect(ray, t, info_current) && t < tHit) {
 				tHit = t;
 				hit_mesh = mesh.get();
-				//info_current = info;
+				info = info_current;
 			}
 		}
 	}

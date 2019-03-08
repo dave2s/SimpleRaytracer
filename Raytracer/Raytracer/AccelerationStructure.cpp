@@ -11,12 +11,14 @@ AccelerationStructure::AccelerationStructure(std::vector<std::unique_ptr<const R
 const RT_Mesh* AccelerationStructure::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
 	float t = tHit;
+	Ray::Hitinfo info_current;
 	const RT_Mesh* hit_mesh = nullptr;
 	for (const auto& m : meshes)
 	{
-		if (m->intersect(ray, t, info) && t < tHit) {
+		if (m->intersect(ray, t, info_current) && t < tHit) {
 			hit_mesh = m.get();
 			tHit = t;		
+			info = info_current;
 		}
 	}
 	//mesh = std::move(hit_mesh);
