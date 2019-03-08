@@ -10,7 +10,7 @@ AccelerationStructure::AccelerationStructure(std::vector<std::unique_ptr<const R
 
 const RT_Mesh* AccelerationStructure::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
-	float t = inf;
+	float t = tHit;
 	const RT_Mesh* hit_mesh = nullptr;
 	for (const auto& m : meshes)
 	{
