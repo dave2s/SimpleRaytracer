@@ -224,7 +224,8 @@ bool BVH::Extents::intersect(
 
 const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
-	tHit = inf;
+	//tHit = inf;
+	Ray::Hitinfo info_current;
 	const RT_Mesh* hit_mesh = nullptr;
 	float precomputedNumerator[BVH::plane_count];
 	float precomputedDenominator[BVH::plane_count];
@@ -261,9 +262,10 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 		queue.pop();
 		if (node->isLeaf) {
 			for (const auto& e : node->node_extents_list) {
-				float t = inf;
-				if (e->mesh->intersect(ray,t,info) && t < tHit) {
+				float t = tHit;
+				if (e->mesh->intersect(ray,t,info_current) && t < tHit) {
 					tHit = t;
+					info = info_current;
 					hit_mesh = e->mesh;
 				}
 			}
