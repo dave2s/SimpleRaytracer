@@ -531,13 +531,14 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 	const RT_Mesh* hit_mesh = accel->intersect(primary_ray, PHit_dist, info);
 	if (hit_mesh != nullptr) {	
 	///IF HIT DECIDE MATERIAL	
-		pixel_color = glm::f32vec3(0.f);
+		//pixel_color = glm::f32vec3(0.f);
 		glm::f32vec3 hit_color = glm::f32vec3(0);
 
 		switch (hit_mesh->_material_type)
 		{
 		case RT_Mesh::MIRROR:
 		{
+			pixel_color = glm::f32vec3(0.f);
 			glm::vec3 direction = primary_ray->direction;
 			Ray::calcReflectedDirection(info.NHit, direction);
 			min_dist = inf;
@@ -551,7 +552,6 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 		break;
 		case RT_Mesh::REFRACTION:
 		{
-
 				glm::f32vec3 refract_color = glm::f32vec3(0);
 				glm::f32vec3 reflect_color = glm::f32vec3(0);
 
@@ -589,6 +589,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 		break;
 		case RT_Mesh::PHONG:
 		{
+			pixel_color = glm::f32vec3(0.f);
 			shadow_ray = new Ray();
 			//is_lit = true;
 			Ray::Hitinfo shadow_info;
@@ -599,7 +600,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			//for each light cast shadow ray
 			/// CALC LIGHTs
 			shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
-			glm::u8vec3 texture_diffuse_color;
+			glm::u8vec3 texture_diffuse_color=glm::f32vec3(0.f);
 			for (auto &light : light_list) {
 				is_lit = true;
 				OUT glm::vec3 light_intensity; OUT glm::vec3 light_direction; OUT float light_distance;
@@ -611,6 +612,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				shadow_ray->direction = -light_direction;
 				shadow_ray->origin = info.PHit + info.NHit * HIT_BIAS;
 				
+
 #if defined(BBAccel)
 				shadow_ray->precomputeValues();
 #endif
@@ -623,7 +625,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 				if (accel->intersect(shadow_ray, PHit_dist, shadow_info)!=nullptr) {
 					is_lit = false;
-					break;
+					continue;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
 #ifndef GAMMA
@@ -671,20 +673,20 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			{
 				if (monochromatic && primary_ray->wavelength != 0) {
 					glm::f32vec3 ray_color = Ray::wavelength2rgb(primary_ray->wavelength);
-					pixel_color = glm::clamp((ray_color)*((/*1.0f*hit_mesh->_material.emissive_color +*/ d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color += glm::clamp((ray_color)*((/*1.0f*hit_mesh->_material.emissive_color +*/ d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 				else
 				{
-					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color += glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 			}
 			else
 			{
 				if (monochromatic&& primary_ray->wavelength != 0) {
-					pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT)), 0.f, 1.f);
+					pixel_color += glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT)), 0.f, 1.f);
 				}
 				else {
-					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color += glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 			}
 			delete(shadow_ray);
@@ -692,7 +694,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 		break;
 		case RT_Mesh::DIFFUSE:
 		default:
-
+			pixel_color = glm::f32vec3(0.f);
 			shadow_ray = new Ray();
 			is_lit = true;
 			Ray::Hitinfo shadow_info;			

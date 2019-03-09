@@ -33,8 +33,8 @@
 //#define MSAA
 #define WIDTH 640
 #define HEIGHT 480
-#define MAX_DEPTH 6
-#define WAVE_SAMPLES 3
+#define MAX_DEPTH 3
+#define WAVE_SAMPLES 1
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -54,7 +54,7 @@
 #endif
 
 #ifdef MSAA
-const std::vector<std::vector<float>> msaa_sample_coords/*(2, std::vector< float >(2, 0.f))*/{ {0.f,0.f}, {-0.25f,+0.25f}, {+0.25f,+0.25f},{-0.25f,-0.25f},{+0.25f,-0.25f} };
+const std::vector<std::vector<float>> msaa_sample_coords/*(2, std::vector< float >(2, 0.f))*/{ /*{0.f,0.f},*/ {-0.25f,+0.25f}, {+0.25f,+0.25f},{-0.25f,-0.25f},{+0.25f,-0.25f} };
 #endif
 
 // mark functions returning via reference
