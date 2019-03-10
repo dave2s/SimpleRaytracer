@@ -55,15 +55,15 @@ static std::atomic<unsigned long long> box_test_count = 0;
 #endif
 
 //Borosilicate glass BK7
-//float B = 1.5046f;
-//float C = 0.00420f;
+float B = 1.5046f;
+float C = 0.00420f;
 
 //float B = 2.37f;
 //float C = 0.24f;
 
 //Diamond
-float B = 2.385f;
-float C = 0.0117f;
+//float B = 2.385f;
+//float C = 0.0117f;
 
 float global_cauchy_B = B;
 float global_cauchy_C = C;
@@ -137,156 +137,6 @@ void updateSkyColor() {
 	}
 }
 
-//glm::u8vec3 quantize(glm::f32vec3 fcolor) {
-//	glm::f32vec3 qcolor;
-//
-//	return glm::u8vec3(qcolor);
-//}
-/*
-void CreateWall(float w, float h,float z, glm::f32vec3 color, RT_Mesh::MATERIAL_TYPE type,bool frontfacing) {
-	/*float vertices[] = {
-		//zadni stena
-		-w/2.f, -h/2.f, z,
-		w/2.f, -h/2.f, z,
-		w/2.f, h/2.f, z,
-		-w/2.f, h/2.f, z
-	};
-	RT_Mesh* plane;
-	RT_Mesh::Vertex vertices[4];
-	vertices[0].position = glm::f32vec3(-w / 2.f, -h / 2.f, z);
-	vertices[1].position = glm::f32vec3(w / 2.f, -h / 2.f, z);
-	vertices[2].position = glm::f32vec3(w / 2.f, h / 2.f, z);
-	vertices[3].position = glm::f32vec3(-w / 2.f, h / 2.f, z);
-
-	if (frontfacing) {
-		unsigned int indices[6]={
-			//zadni stena
-			0,1,2,
-			0,2,3
-		};
-		plane = new RT_Mesh(vertices, indices, *(&vertices + 1) - vertices, *(&indices + 1) - indices, false, color, 0.2f, type);
-	}
-	else {
-		unsigned int indices[6]= {
-			//zadni stena
-			2,1,0,
-			3,2,0
-		};
-		plane = new RT_Mesh(vertices, indices, *(&vertices + 1) - vertices, *(&indices + 1) - indices, false, color, 0.2f, type);
-	}
-	mesh_list.push_back(plane);
-}*/
-/*
-void CreateBox() {
-
-	/*float vertices[] = {
-		//predni stena
-		-1.f, -1.f, -2.5f,
-		1.f, -1.f, -2.5f,
-		1.f, 1.f, -2.5f,
-		-1.f, 1.f, -2.5f,
-		//zadni stena
-		-1.f, -1.f, -5.f,
-		1.f, -1.f, -5.f,
-		1.f, 1.f, -5.f,
-		-1.f, 1.f, -5.f
-	};* /
-
-	struct RT_Mesh::Vertex vertices[8];
-	vertices[0].position = glm::f32vec3(-1.f, -1.f, -2.5f);
-	vertices[1].position = glm::f32vec3(1.f, -1.f, -2.5f);
-	vertices[2].position = glm::f32vec3(1.f, 1.f, -2.5f);
-	vertices[3].position = glm::f32vec3(-1.f, 1.f, -2.5f);
-
-	vertices[4].position = glm::f32vec3(-1.f, -1.f, -5.f);
-	vertices[5].position = glm::f32vec3(1.f, -1.f, -5.f);
-	vertices[6].position = glm::f32vec3(1.f, 1.f, -5.f);
-	vertices[7].position = glm::f32vec3(-1.f, 1.f, -5.f);
-
-	unsigned int indices[] = {
-		//predni stena
-		0,1,2,
-		0,2,3,
-		//zadni stena
-		5,4,7, //7,4,5,
-		5,7,6,
-		//bocni prava stena
-		1,5,6,
-		1,6,2,
-		//bocni leva stena
-		4,0,3,
-		4,3,7,
-		//horni trojuhelnik
-		3,2,6,
-		3,6,7,
-		//spodni trojuhelnik
-		1,0,4,
-		1,4,5
-
-	};
-
-	glm::f32vec3 color = glm::f32vec3(U2F(255),U2F(127),U2F(127));
-
-	RT_Mesh* box = new RT_Mesh(vertices, indices, *(&vertices+1)-vertices, *(&indices + 1) - indices, false, color,0.23f/M_PI, RT_Mesh::DIFFUSE);
-	mesh_list.push_back(box);
-}*/
-/*
-void CreateBox2() {
-
-	/*float vertices[] = {
-		//predni stena
-		-4.f, -1.5f, -2.f,
-		-2.f, -1.5f, -2.f,
-		-2.f, .5f, -2.f,
-		-4.f, .5f, -2.f,
-		//zadni stena
-		-4.f, -1.5f, -4.5f,
-		-2.f, -1.5f, -4.5f,
-		-2.f, .5f, -4.5f,
-		-4.f, .5f, -4.5f
-	};* /
-	RT_Mesh::Vertex vertices[8];
-	vertices[0].position = glm::f32vec3(-4.f, -1.5f, -2.f);
-	vertices[1].position = glm::f32vec3(-2.f, -1.5f, -2.f);
-	vertices[2].position = glm::f32vec3(-2.f, .5f, -2.f);
-	vertices[3].position = glm::f32vec3(-4.f, .5f, -2.f);
-
-	vertices[4].position = glm::f32vec3(-4.f, -1.5f, -4.5f);
-	vertices[5].position = glm::f32vec3(-2.f, -1.5f, -4.5f);
-	vertices[6].position = glm::f32vec3(-2.f, .5f, -4.5f);
-	vertices[7].position = glm::f32vec3(-4.f, .5f, -4.5f);
-
-
-	unsigned int indices[] = {
-		//predni stena
-		0,1,2,
-		0,2,3,
-		//zadni stena
-		5,4,7, //7,4,5,
-		5,7,6,
-		//bocni prava stena
-		1,5,6,
-		1,6,2,
-		//bocni leva stena
-		4,0,3,
-		4,3,7,
-		//horni trojuhelnik
-		3,2,6,
-		3,6,7,
-		//spodni trojuhelnik
-		1,0,4,
-		1,4,5
-
-	};
-
-	glm::f32vec3 color = glm::f32vec3(U2F(127), U2F(136), U2F(255));
-
-	RT_Mesh* box = new RT_Mesh(vertices, indices, *(&vertices + 1) - vertices, *(&indices + 1) - indices, false, color, 0.17f / M_PI, RT_Mesh::DIFFUSE);		//indices vertices length pointer arithmetic 
-	//box->CreateMesh(vertices, indices, *(&vertices + 1) - vertices, *(&indices + 1) - indices, false, color, 0.17f / M_PI,RT_Mesh::DIFFUSE);
-	mesh_list.push_back(box);
-}
-*/
-
 int app_exit(int return_code,SDL_Texture* texture, SDL_Renderer* renderer, SDL_Surface* frame_buffer, SDL_Window* main_window)
 {
 	std::cout << "Ragequit();" << std::endl;
@@ -296,14 +146,6 @@ int app_exit(int return_code,SDL_Texture* texture, SDL_Renderer* renderer, SDL_S
 	SDL_DestroyWindow(main_window);
 	SDL_Quit();
 	
-	//delete texture;
-	///Free/delete objects stored in vectors
-	//int len = mesh_list.size();
-	/*for (auto& mesh : mesh_list) {
-		//mesh_list[i]->ClearMesh;
-		//delete(*mesh);
-
-	}*/
 	mesh_list.erase(mesh_list.cbegin(), mesh_list.cend());
 	//len = light_list.size();
 	for (size_t i = light_list.size() - 1; i >= 0; --i) {
@@ -311,10 +153,7 @@ int app_exit(int return_code,SDL_Texture* texture, SDL_Renderer* renderer, SDL_S
 	}
 	///Free the vectors by redeclaring
 	mesh_list.clear(); light_list.clear();
-	/*
-#ifdef _DEBUG
-	_CrtDumpMemoryLeaks();
-#endif*/
+
 	return return_code;
 }
 
@@ -344,16 +183,16 @@ void MovePolling(SDL_Event &event,Camera &camera) {
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_w:
-			camera.camera_position[2] -= 0.1f;
+			camera.camera_position[2] -= 0.5f;
 			break;
 		case SDLK_s:
-			camera.camera_position[2] += 0.1f;
+			camera.camera_position[2] += 0.5f;
 			break;
 		case SDLK_a:
-			camera.camera_position[0] -= 0.1f;
+			camera.camera_position[0] -= 0.5f;
 			break;
 		case SDLK_d:
-			camera.camera_position[0] += 0.1f;
+			camera.camera_position[0] += 0.5f;
 			break;
 		case SDLK_LEFT:
 			if (!light_list.empty())
@@ -462,18 +301,18 @@ float my_rand() {
 void init_wave_info(){
 	int step = int((wavelengths_intervals.back() - wavelengths_intervals.front()) / WAVE_SAMPLES);
 	int wavelength_max = wavelengths_intervals.back();
-	for (int wave = wavelengths_intervals.front()/*+int(step/2.f)*/; wave <= wavelength_max; wave += step ) {
+	for (int wave = wavelengths_intervals.front()/*+int(step/2.f)*/; wave < wavelength_max; wave += step ) {
 		wavelengths.push_back(wave);
 	}
 	wavelengths_size = wavelengths.size();
 	
-	average_ior = 0.f;
+	/*average_ior = 0.f;
 	uint16_t wavelen;
 	for (int int_idx = 0; int_idx < wavelengths_intervals.size() - 1; ++int_idx) {
 		 wavelen = wavelengths_intervals[int_idx] + 0.5*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
 			average_ior += Ray::iorFromWavelength(wavelen,global_cauchy_B,global_cauchy_C);
 	}
-	average_ior /= ((wavelengths_intervals.size()-1));
+	average_ior /= ((wavelengths_intervals.size()-1));*/
 }
 
 /*
@@ -484,10 +323,10 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 	glm::f32vec3 pixel_color = sky_color_actual;
 
 	if (depth > MAX_DEPTH) {
-		if (monochromatic){
+		/*if (monochromatic){
 			//return Ray::wavelength2rgb(wavelength);
 			return glm::f32vec3(1.f);
-		}
+		}*/
 		return pixel_color;
 	}
 
@@ -531,55 +370,65 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 #define REFLECTION_BIAS
 #ifdef REFLECTION_BIAS
 			glm::vec3 PHit = info.PHit + info.NHit*HIT_BIAS;
-			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specluar_color* raytrace(accel, PHit, direction, depth + 1);
+			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specular_color* raytrace(accel, PHit, direction, depth + 1,monochromatic,wavelength);
 #else
-			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specluar_color* raytrace(accel, info.PHit, direction, depth + 1);
+			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specular_color* raytrace(accel, info.PHit, direction, depth + 1,monochromatic,wavelength);
 #endif
 			pixel_color = glm::clamp(hit_color, 0.f, 1.f);
 		}
 		break;
 		case RT_Mesh::REFRACTION:
 		{
+				hit_color = glm::f32vec3(0.f);
 				glm::f32vec3 refract_color = glm::f32vec3(0);
 				glm::f32vec3 reflect_color = glm::f32vec3(0);
 
-				OUT float kr; min_dist = inf; glm::vec3 bias = primary_ray->hit_normal * HIT_BIAS;
+				OUT float kr; min_dist = inf;
+				glm::vec3 bias = primary_ray->hit_normal * HIT_BIAS;
 
-				Ray::fresnel(average_ior, kr, primary_ray->direction, primary_ray->hit_normal);
-
-				bool outside = glm::dot(primary_ray->direction, primary_ray->hit_normal);
-				// compute refraction if it is not a case of total internal reflection
-				if (kr < 1) {
-					if (primary_ray->isMonochrom) {
-						glm::vec3 refract_dir = glm::normalize(Ray::refract(/*hit_mesh->_material.ior*/Ray::iorFromWavelength(primary_ray->wavelength, global_cauchy_B, global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
-						glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
-						refract_color = raytrace(accel,refract_orig, refract_dir, depth + 1,true,primary_ray->wavelength);
-					}
-					else {
-						/*for (int i = 0; i < wavelengths_size;++i) {		
-							glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelengths[i],global_cauchy_B,global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
-							glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
-							refract_color += raytrace(accel,refract_orig, refract_dir, depth + 1, true, wavelengths[i]);
-						}*/
-						for (int int_idx = 0; int_idx < wavelengths_intervals.size()-1; ++int_idx) {
-							for (int sample = 0; sample < WAVE_SAMPLES; ++sample) {
-								uint16_t wavelen = wavelengths_intervals[int_idx] + 0.5/*my_rand()*/*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
-								glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelen, global_cauchy_B, global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
+				bool outside = glm::dot(primary_ray->direction, primary_ray->hit_normal)<0.f;
+				
+				if (!monochromatic) {
+					//SAMPLE WAVELENGTHS
+					//uint16_t wavelen = 0;
+					//for (int int_idx = 0; int_idx < wavelengths_intervals.size() - 1; ++int_idx) {
+						//for (int sample = 0; sample < WAVE_SAMPLES; ++sample) {
+					for(auto wavelen: wavelengths){
+							//wavelen= wavelengths_intervals[int_idx] + my_rand()*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
+							//CALC FRESNEL
+						float wavelen_ior = Ray::iorFromWavelength(wavelen, global_cauchy_B, global_cauchy_C);
+							Ray::fresnel(wavelen_ior, kr, primary_ray->direction, primary_ray->hit_normal);
+							// REFRACT IF NOT TOTAL INTERNAL REFLECTION
+							if (kr < 1) {
+								//lamu
+								glm::vec3 refract_dir = glm::normalize(Ray::refract(/*hit_mesh->_material.ior*/wavelen_ior, primary_ray->direction, primary_ray->hit_normal));
 								glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
 								refract_color += raytrace(accel, refract_orig, refract_dir, depth + 1, true, wavelen);
 							}
-						}
-						refract_color /= WAVE_SAMPLES*(wavelengths_intervals.size()-1);
+						//}
+					}
+					//refract_color /= (wavelengths_intervals.size() - 1)*WAVE_SAMPLES;
+					refract_color /= wavelengths.size();
+				//refract_color = glm::clamp(refract_color, 0.f, 1.f);
+				}
+				else {
+					//CALC FRESNEL
+					Ray::fresnel(Ray::iorFromWavelength(primary_ray->wavelength, global_cauchy_B, global_cauchy_C), kr, primary_ray->direction, primary_ray->hit_normal);
+					// REFRACT IF NOT TOTAL INTERNAL REFLECTION
+					if (kr < 1) {
+						glm::vec3 refract_dir = glm::normalize(Ray::refract(/*hit_mesh->_material.ior*/Ray::iorFromWavelength(primary_ray->wavelength, global_cauchy_B, global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
+						glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
+						refract_color += raytrace(accel, refract_orig, refract_dir, depth + 1, true, primary_ray->wavelength);
 					}
 				}
 
 				glm::vec3 reflect_dir = primary_ray->direction;
 				Ray::calcReflectedDirection(primary_ray->hit_normal, reflect_dir);
 				glm::vec3 reflect_orig = outside ? info.PHit + bias : info.PHit - bias;
-				reflect_color = raytrace(accel,reflect_orig, reflect_dir, depth + 1);
+				reflect_color = raytrace(accel,reflect_orig, reflect_dir, depth + 1,monochromatic,wavelength);
 
-				hit_color += hit_mesh->_material.specluar_color*reflect_color * kr + hit_mesh->_material.refraction_color*refract_color * (1 - kr);
-				pixel_color = hit_color;
+				hit_color += hit_mesh->_material.specular_color*reflect_color * kr + hit_mesh->_material.refraction_color*refract_color * (1 - kr);
+				pixel_color = glm::clamp(hit_color,0.f,1.f);
 		}
 		break;
 		case RT_Mesh::PHONG:
@@ -663,12 +512,21 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			if (hit_mesh->GetTextures().empty())
 			{
 				if (monochromatic && primary_ray->wavelength != 0) {
-					glm::f32vec3 ray_color = Ray::wavelength2rgb(primary_ray->wavelength);
-					pixel_color = glm::clamp((ray_color)*((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					glm::f32vec3 ray_color = Ray::wavelength2rgb(primary_ray->wavelength);/*
+					hit_color = glm::f32vec3(0.f);
+					glm::f32vec3 wavelen_color;
+					for (auto wavelen : wavelengths) {
+						pixel_color += ray_color*Ray::wavelength2rgb(wavelen)*((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specular_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT);
+					}
+					pixel_color /= wavelengths.size();
+					pixel_color = glm::clamp(pixel_color,0.f,1.f);*/
+					//refract_color /= (wavelengths_intervals.size() - 1)*WAVE_SAMPLES;
+					//refract_color /= wavelengths.size();
+					pixel_color = glm::clamp((ray_color)*((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specular_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 				else
 				{
-					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specular_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 			}
 			else
@@ -859,7 +717,7 @@ void render(uint16_t thread_id,
 			}
 		pixel_color = cumulative_color / (float)msaa_sample_coords.size();
 #else
-			pixel_color = raytrace(accel, origin, direction);
+			pixel_color = raytrace(accel, origin, direction,0,false,0);
 #endif			
 			setRGBAPixel(frame_buffer, x-min_w, y-min_h, F32vec2U8vec(pixel_color));
 
@@ -962,7 +820,7 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 
 	init_wave_info();
 	//CreatePointLight(glm::vec3(-3.f, -0.8f, 0.f), 100.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreatePointLight(glm::vec3(0.f, 0.0f, -3.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	//CreatePointLight(glm::vec3(0.f, 0.0f, -10.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 	//CreatePointLight(glm::vec3(-0.5f, -1.0f, 2.f), 100.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
 	
 	CreateGlobalLight(glm::vec3(0.f, 0.f, -1.f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
@@ -1014,8 +872,8 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 #endif	
 	while (!quit)
 	{
-		//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	//	SDL_RenderClear(renderer);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
 #ifdef MULTI_THREADING
 		g_working = g_thread_count-1;
 		for (uint16_t t = 0; t < num_o_parts[0]*num_o_parts[1]-1; ++t) {
@@ -1050,6 +908,8 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 			thread.~thread();	
 		}
 		threads.clear();
+#else
+		SDL_RenderPresent(renderer);
 #endif
 		
 

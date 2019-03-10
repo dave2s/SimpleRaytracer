@@ -102,7 +102,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 
 		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a) == glm::f32vec4(0)) ? glm::f32vec3(AMBIENT_LIGHT) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
+		my_material.specular_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
 		my_material.emissive_color = glm::clamp(glm::f32vec3(emissive.r, emissive.g, emissive.b),0.f,1.f);
 		my_material.ior = ior;
 		my_material.shininess = shininess;
@@ -135,7 +135,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		}*/
 		if (shading_model == 2 || shading_model == 3){
 			type = ( ior != 1.f && (my_material.refraction_color != glm::f32vec3(-1.f)) ) ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
-			if (my_material.specluar_color == glm::f32vec3(0))
+			if (my_material.specular_color == glm::f32vec3(0))
 				type = RT_Mesh::DIFFUSE;
 			if (shininess > 999) {
 				type = RT_Mesh::MIRROR;

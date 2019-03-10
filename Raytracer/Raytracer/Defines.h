@@ -31,10 +31,10 @@
 //#define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
-#define WIDTH 480
+#define WIDTH 360
 #define HEIGHT 360
 #define MAX_DEPTH 3
-#define WAVE_SAMPLES 2.f
+#define WAVE_SAMPLES 10.f
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -71,7 +71,7 @@ const float global_light_intensity = .4f;
 //const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
-const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
+const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
 //const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-blackwall.obj";
