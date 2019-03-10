@@ -28,7 +28,7 @@
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 2
 #define BBAccel
-#define BVH_ACCEL
+//#define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
 #define WIDTH 480
@@ -71,9 +71,9 @@ const float global_light_intensity = .4f;
 //const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
-//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
+const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
-const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+//const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-blackwall.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-uzsi1.obj";

@@ -2,7 +2,6 @@
 #include "Model.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "Defines.h"
 
 // Prevzato z https://learnopengl.com/Model-Loading/Model
 

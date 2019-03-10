@@ -30,11 +30,11 @@
 #include "RT_Light.h"
 #include "Ray.h"
 #include "Model.h"
-#include "defines.h"
+#include "Defines.h"
 #include <glm/gtc/random.hpp>
+#include "BBoxAcceleration.h"
 #include "BVH.h"
 #include "AccelerationStructure.h"
-#include "BBoxAcceleration.h"
 #include "main.h"
 #include <mutex>
 

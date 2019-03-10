@@ -91,6 +91,7 @@
       <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\res\Assimp\lib\Release\;$(SolutionDir)\res\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,9 +125,12 @@
       <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;vulkan-1.lib;sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\res\Assimp\lib\Release\;$(SolutionDir)\res\SDL2\lib\x64;$(SolutionDir)\..\..\..\GLFW\lib-vc2015;$(SolutionDir)\..\..\..\GLEW\lib\Release\x64;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AccelerationStructure.cpp" />
+    <ClCompile Include="BBoxAcceleration.cpp" />
     <ClCompile Include="BVH.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
@@ -137,6 +141,8 @@
     <ClCompile Include="RT_Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AccelerationStructure.h" />
+    <ClInclude Include="BBoxAcceleration.h" />
     <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Defines.h" />
