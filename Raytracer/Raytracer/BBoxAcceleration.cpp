@@ -15,6 +15,7 @@ const RT_Mesh* BBoxAcceleration::intersect(Ray* ray, float& tHit, Ray::Hitinfo& 
 	//I use intput T as maximum distance to search, therefore i must use tHit again otherwise I'm gonna miss the triangles inside bboxes
 	for (const auto& mesh : meshes) {
 		// If you intersect the box
+		std::atomic_fetch_add(&box_test_count, 1);
 		if(ray->intersectBB((mesh->boundary_points), t2)) {
 			// Then test if the ray intersects the mesh and if does then first check
 			// if the intersection distance is the nearest and if we pass that test as well

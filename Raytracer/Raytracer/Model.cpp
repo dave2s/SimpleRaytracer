@@ -2,6 +2,7 @@
 #include "Model.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "Defines.h"
 
 // Prevzato z https://learnopengl.com/Model-Loading/Model
 
@@ -83,6 +84,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		aiColor4D ambient;
 		aiColor4D specular;
 		aiColor4D emissive;
+		aiColor4D refraction;
 		float shininess = 1.f;
 		float ior = 1.f;
 		int shading_model = -1; 
@@ -94,14 +96,18 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
 		aiGetMaterialFloat(mtl, AI_MATKEY_REFRACTI, &ior);
 		aiGetMaterialInteger(mtl, AI_MATKEY_SHADING_MODEL, &shading_model);
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_TRANSPARENT, &refraction);
 
 		///TODO alpha
+		my_material.refraction_color = glm::f32vec3(-1.f);
+
 		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a) == glm::f32vec4(0)) ? glm::f32vec3(AMBIENT_LIGHT) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 		my_material.specluar_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
-		my_material.emissive_color = glm::f32vec4(emissive.r, emissive.g, emissive.b, emissive.a);
+		my_material.emissive_color = glm::clamp(glm::f32vec3(emissive.r, emissive.g, emissive.b),0.f,1.f);
 		my_material.ior = ior;
 		my_material.shininess = shininess;
+		my_material.refraction_color = glm::f32vec4(refraction.r, refraction.g, refraction.b, refraction.a);
 		
 		/*if (shading_model != -1) {
 			switch (shading_model) {
@@ -129,7 +135,9 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 			}
 		}*/
 		if (shading_model == 2 || shading_model == 3){
-			type = ( ior == 1.f  ) ? RT_Mesh::PHONG : RT_Mesh::REFRACTION;
+			type = ( ior != 1.f && (my_material.refraction_color != glm::f32vec3(-1.f)) ) ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
+			if (my_material.specluar_color == glm::f32vec3(0))
+				type = RT_Mesh::DIFFUSE;
 			if (shininess > 999) {
 				type = RT_Mesh::MIRROR;
 			}

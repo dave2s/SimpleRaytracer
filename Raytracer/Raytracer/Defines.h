@@ -31,10 +31,10 @@
 #define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 480
+#define HEIGHT 360
 #define MAX_DEPTH 3
-#define WAVE_SAMPLES 1
+#define WAVE_SAMPLES 2.f
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -67,18 +67,24 @@ const std::vector<std::vector<float>> msaa_sample_coords/*(2, std::vector< float
 #define U8vec2F32vec(uint_vec) glm::f32vec3(U2F(uint_vec[0]),U2F(uint_vec[1]),U2F(uint_vec[2]))
 
 
-const float global_light_intensity = .1f;
+const float global_light_intensity = .4f;
+//const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
+//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
-//const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+//const std::string DEFAULT_MODEL = "example/prism/prism-blackwall.obj";
+//const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-uzsi1.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism3.obj";
+//const std::string DEFAULT_MODEL = "example/ball/ball.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism2.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism.obj";
 //const std::string DEFAULT_MODEL = "example/bunny/bunny.obj";
-const std::string DEFAULT_MODEL = "example/f16/f16.obj";
+//const std::string DEFAULT_MODEL = "example/f16/f16.obj";
 //const std::string DEFAULT_MODEL = "example/diamond/diamond.obj";
+//const std::string DEFAULT_MODEL = "example/diamond2/untitled.obj";
 //const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";
 //const std::string DEFAULT_MODEL = "example/cruiser/cruiser.obj";
 //const std::string DEFAULT_MODEL = "example/armadillo/armadillo.ply";

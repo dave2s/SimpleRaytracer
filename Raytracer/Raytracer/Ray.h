@@ -109,21 +109,23 @@ public:
 	/*from
 	*https://github.com/lkesteloot/prism
 	*/
-	static float iorFromWavelength(int wavelength, float B, float C){
+	static float iorFromWavelength(float wavelength, float B, float C){
 	// https://en.wikipedia.org/wiki/Cauchy%27s_equation
-	
 
-	// Widen rainbow, renormalize B.
+	/*// Widen rainbow, renormalize B.
 	float new_C = C * WIDEN_CONSTANT;// WIDEN_CONSTANT;
 	B = B + C / (.540f*.540f) - new_C / (.540f*.540f);
 	C = new_C;
 
 	float wl_um = wavelength / 1000.0f;
-	return B + C / (wl_um*wl_um);
-}
+	return B + (C / (wl_um*wl_um));*/
+		wavelength *= 0.001f;
+		return B + ((C*0.001f) / (wavelength*wavelength));
+	}
+
 	/**From https://github.com/lkesteloot/prism
- * From: https://www.johndcook.com/wavelength_to_RGB.html
- */
+	 * From: https://www.johndcook.com/wavelength_to_RGB.html
+	 */
 	static glm::vec3 wavelength2rgb(int wavelength) {
 		float red, green, blue;
 

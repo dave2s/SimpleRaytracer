@@ -58,12 +58,17 @@ static std::atomic<unsigned long long> box_test_count = 0;
 //float B = 1.5046f;
 //float C = 0.00420f;
 
+//float B = 2.37f;
+//float C = 0.24f;
+
 //Diamond
 float B = 2.385f;
 float C = 0.0117f;
 
 float global_cauchy_B = B;
 float global_cauchy_C = C;
+//storing average ior
+float average_ior;
 
 ///TODO
 //#define GAMMA 2.2f
@@ -306,10 +311,10 @@ int app_exit(int return_code,SDL_Texture* texture, SDL_Renderer* renderer, SDL_S
 	}
 	///Free the vectors by redeclaring
 	mesh_list.clear(); light_list.clear();
-
+	/*
 #ifdef _DEBUG
 	_CrtDumpMemoryLeaks();
-#endif
+#endif*/
 	return return_code;
 }
 
@@ -450,39 +455,6 @@ void MovePolling(SDL_Event &event,Camera &camera) {
 	}*/
 }
 
-
-///FOR DEBUGING
-inline static void fresnel_debug(const float& ior, float& kr,glm::vec3& dir, glm::vec3& N) {
-	float ior_in = 1;
-	float ior_out = ior;
-	glm::vec3 n = N;
-	float cos_in = glm::clamp(-1.f, 1.f, glm::dot(dir, n));
-
-	if (cos_in > 0) {
-		std::swap(ior_in, ior_out);
-	}
-	//sin_out = ior1/ior2  *   sqrt(1-cos_in^2) = (ior1/ior2)*sin_in
-	float sin_out = ior_in / ior_out * std::sqrtf(std::max(0.f, 1 - cos_in * cos_in));
-
-	///(ior1/ior2)*sin_in = sin_out
-	//if sin_out>1, total internal reflection - light is not transmitted
-	if (sin_out >= 1) {
-		kr = 1;
-	}
-	else {//cos^2 = 1 - sin^2
-		float cos_out = std::sqrtf(std::max(0.f, 1 - sin_out * sin_out));
-		cos_in = std::fabsf(cos_in);
-
-		float Rs = ((ior_out * cos_in) - (ior_in * cos_out))
-			/ ((ior_out*cos_in) + (ior_in*cos_out));
-
-		float Rp = ((ior_in * cos_in) - (ior_out * cos_out))
-			/ ((ior_in * cos_in) + (ior_out * cos_out));
-
-		kr = (Rs * Rs + Rp * Rp) / 2;
-	}
-}
-
 float my_rand() {
 	return glm::linearRand(0.f, 1.f);
 }
@@ -494,14 +466,28 @@ void init_wave_info(){
 		wavelengths.push_back(wave);
 	}
 	wavelengths_size = wavelengths.size();
+	
+	average_ior = 0.f;
+	uint16_t wavelen;
+	for (int int_idx = 0; int_idx < wavelengths_intervals.size() - 1; ++int_idx) {
+		 wavelen = wavelengths_intervals[int_idx] + 0.5*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
+			average_ior += Ray::iorFromWavelength(wavelen,global_cauchy_B,global_cauchy_C);
+	}
+	average_ior /= ((wavelengths_intervals.size()-1));
 }
 
 /*
 * return pixel_color
 */
 glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const glm::vec3 &origin, const glm::vec3 &ray_dir, const uint8_t & depth = 0, bool monochromatic = false, int wavelength = 0) {
+	//glm::f32vec3 pixel_color = glm::f32vec3(1.f);
 	glm::f32vec3 pixel_color = sky_color_actual;
+
 	if (depth > MAX_DEPTH) {
+		if (monochromatic){
+			//return Ray::wavelength2rgb(wavelength);
+			return glm::f32vec3(1.f);
+		}
 		return pixel_color;
 	}
 
@@ -542,12 +528,14 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			glm::vec3 direction = primary_ray->direction;
 			Ray::calcReflectedDirection(info.NHit, direction);
 			min_dist = inf;
+#define REFLECTION_BIAS
 #ifdef REFLECTION_BIAS
-			hit_color += 0.8f * raytrace(accel,PHit + NHit * HIT_BIAS, direction, depth + 1);
+			glm::vec3 PHit = info.PHit + info.NHit*HIT_BIAS;
+			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specluar_color* raytrace(accel, PHit, direction, depth + 1);
 #else
-			hit_color += 0.8f * raytrace(accel, info.PHit, direction, depth + 1);
+			hit_color += 0.2f*hit_mesh->_material.diffuse_color + 0.8f *hit_mesh->_material.specluar_color* raytrace(accel, info.PHit, direction, depth + 1);
 #endif
-			pixel_color = glm::clamp(pixel_color + hit_color, 0.f, 1.f);
+			pixel_color = glm::clamp(hit_color, 0.f, 1.f);
 		}
 		break;
 		case RT_Mesh::REFRACTION:
@@ -557,24 +545,31 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 				OUT float kr; min_dist = inf; glm::vec3 bias = primary_ray->hit_normal * HIT_BIAS;
 
-				Ray::fresnel(hit_mesh->_material.ior, kr, primary_ray->direction, primary_ray->hit_normal);
+				Ray::fresnel(average_ior, kr, primary_ray->direction, primary_ray->hit_normal);
 
 				bool outside = glm::dot(primary_ray->direction, primary_ray->hit_normal);
 				// compute refraction if it is not a case of total internal reflection
 				if (kr < 1) {
 					if (primary_ray->isMonochrom) {
-						glm::vec3 refract_dir = glm::normalize(Ray::refract(hit_mesh->_material.ior, primary_ray->direction, primary_ray->hit_normal));
+						glm::vec3 refract_dir = glm::normalize(Ray::refract(/*hit_mesh->_material.ior*/Ray::iorFromWavelength(primary_ray->wavelength, global_cauchy_B, global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
 						glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
 						refract_color = raytrace(accel,refract_orig, refract_dir, depth + 1,true,primary_ray->wavelength);
 					}
 					else {
-
-						for (int i = 0; i < wavelengths_size;++i) {		
+						/*for (int i = 0; i < wavelengths_size;++i) {		
 							glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelengths[i],global_cauchy_B,global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
 							glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
 							refract_color += raytrace(accel,refract_orig, refract_dir, depth + 1, true, wavelengths[i]);
+						}*/
+						for (int int_idx = 0; int_idx < wavelengths_intervals.size()-1; ++int_idx) {
+							for (int sample = 0; sample < WAVE_SAMPLES; ++sample) {
+								uint16_t wavelen = wavelengths_intervals[int_idx] + 0.5/*my_rand()*/*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
+								glm::vec3 refract_dir = glm::normalize(Ray::refract(Ray::iorFromWavelength(wavelen, global_cauchy_B, global_cauchy_C), primary_ray->direction, primary_ray->hit_normal));
+								glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
+								refract_color += raytrace(accel, refract_orig, refract_dir, depth + 1, true, wavelen);
+							}
 						}
-						refract_color /= WAVE_SAMPLES;
+						refract_color /= WAVE_SAMPLES*(wavelengths_intervals.size()-1);
 					}
 				}
 
@@ -583,7 +578,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				glm::vec3 reflect_orig = outside ? info.PHit + bias : info.PHit - bias;
 				reflect_color = raytrace(accel,reflect_orig, reflect_dir, depth + 1);
 
-				hit_color += reflect_color * kr + refract_color * (1 - kr);
+				hit_color += hit_mesh->_material.specluar_color*reflect_color * kr + hit_mesh->_material.refraction_color*refract_color * (1 - kr);
 				pixel_color = hit_color;
 		}
 		break;
@@ -599,7 +594,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			std::memcpy(hit_triangle, hit_mesh->getTriangle(info.tri_idx), sizeof(Vertex) * 3);
 			//for each light cast shadow ray
 			/// CALC LIGHTs
-			shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
+			//shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
 			glm::u8vec3 texture_diffuse_color=glm::f32vec3(0.f);
 			for (auto &light : light_list) {
 				is_lit = true;
@@ -610,7 +605,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 					shadow_ray->direction = -light_direction;
 				
 				shadow_ray->direction = -light_direction;
-				shadow_ray->origin = info.PHit + info.NHit * HIT_BIAS;
+				shadow_ray->origin = info.PHit + primary_ray->hit_normal * HIT_BIAS;
 				
 
 #if defined(BBAccel)
@@ -619,13 +614,9 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				///use hit - light distance as maximum distance to trace, this will return actual distance.
 				PHit_dist = light_distance;
 
-				if (!is_lit) {
-					break; 
-}
-
 				if (accel->intersect(shadow_ray, PHit_dist, shadow_info)!=nullptr) {
 					is_lit = false;
-					continue;
+					//continue;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
 #ifndef GAMMA
@@ -673,20 +664,20 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			{
 				if (monochromatic && primary_ray->wavelength != 0) {
 					glm::f32vec3 ray_color = Ray::wavelength2rgb(primary_ray->wavelength);
-					pixel_color += glm::clamp((ray_color)*((/*1.0f*hit_mesh->_material.emissive_color +*/ d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color = glm::clamp((ray_color)*((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 				else
 				{
-					pixel_color += glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specluar_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 			}
 			else
 			{
 				if (monochromatic&& primary_ray->wavelength != 0) {
-					pixel_color += glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT)), 0.f, 1.f);
+					pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT)), 0.f, 1.f);
 				}
 				else {
-					pixel_color += glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT), 0.f, 1.f);
+					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * U8vec2F32vec(texture_diffuse_color) + U8vec2F32vec(texture_diffuse_color)*AMBIENT_LIGHT), 0.f, 1.f);
 				}
 			}
 			delete(shadow_ray);
@@ -697,7 +688,11 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			pixel_color = glm::f32vec3(0.f);
 			shadow_ray = new Ray();
 			is_lit = true;
-			Ray::Hitinfo shadow_info;			
+			Ray::Hitinfo shadow_info;		
+			Vertex hit_triangle[3];
+			glm::f32vec3 hit_color = glm::f32vec3(0.f);
+			std::memcpy(hit_triangle, hit_mesh->getTriangle(info.tri_idx), sizeof(Vertex) * 3);
+			glm::f32vec3 N;
 			//for each light cast shadow ray
 			/// CALC LIGHTs
 			for (auto &light : light_list) {
@@ -716,26 +711,32 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 #endif
 				PHit_dist = light_distance;
 
-					if (!is_lit) { break; }
-					if (accel->intersect(shadow_ray, PHit_dist, shadow_info)!=nullptr) {
-						is_lit = false;
-						break;
-					}
-					if (monochromatic&& primary_ray->wavelength != 0) {
-						hit_color += Ray::wavelength2rgb(primary_ray->wavelength)*((hit_mesh->_albedo)*light_intensity*glm::f32vec3(std::max(0.f, glm::dot(shadow_ray->hit_normal, -light_direction))));
-					}
-					else {
-						hit_color += (hit_mesh->_albedo)*light_intensity*glm::f32vec3(std::max(0.f, glm::dot(shadow_ray->hit_normal, -light_direction)));
-					}
-				pixel_color = pixel_color + (float)is_lit*hit_mesh->_material.diffuse_color*hit_color;
+					//if (!is_lit) { break; }
+				if (accel->intersect(shadow_ray, PHit_dist, shadow_info)!=nullptr) {
+					is_lit = false;
+					//continue;
+				}
+
+				GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, N);
+
+				if (monochromatic&& primary_ray->wavelength != 0) {
+					hit_color += Ray::wavelength2rgb(primary_ray->wavelength)*((float)is_lit*hit_mesh->_material.diffuse_color*(hit_mesh->_albedo)*light_intensity*glm::f32vec3(std::max(0.f, glm::dot(N, -light_direction))));
+				}
+				else {
+					hit_color += (float)is_lit*hit_mesh->_material.diffuse_color*(hit_mesh->_albedo)*light_intensity*glm::f32vec3(std::max(0.f, glm::dot(N, -light_direction)));
+				}
+				//pixel_color = pixel_color + (float)is_lit*hit_mesh->_material.diffuse_color*hit_color;
 
 			}//end for each light in the scene
-			pixel_color = glm::clamp(pixel_color + hit_mesh->_material.ambient_color *AMBIENT_LIGHT,0.f,1.f);
+			pixel_color = glm::clamp(hit_color + hit_mesh->_material.emissive_color + hit_mesh->_material.ambient_color *AMBIENT_LIGHT, 0.f,1.f);
 			delete(shadow_ray);
 			break;
 		}
 		
 	}//end if primary ray hit mesh
+	else {
+		pixel_color = sky_color_actual;
+	}
 	delete(primary_ray);		
 	return pixel_color;
 }//end for each mesh SHADOW RAYS
@@ -925,7 +926,7 @@ int main(int argc, char* argv[])
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
 	///CAMERA
-	Camera camera = Camera(glm::vec3(0.f,-0.5f,4.5f), glm::vec3(0.f,0.f,-1.f), 50.f, (float)WIDTH/ (float)HEIGHT);
+	Camera camera = Camera(glm::vec3(0.f,0.f,6.f), glm::vec3(0.f,0.f,-1.f),25.f, (float)WIDTH/ (float)HEIGHT);
 	
 	SDL_Init(SDL_INIT_VIDEO);
 	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_OPENGL);
@@ -961,7 +962,7 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 
 	init_wave_info();
 	//CreatePointLight(glm::vec3(-3.f, -0.8f, 0.f), 100.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreatePointLight(glm::vec3(0.f, -0.8f, -5.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreatePointLight(glm::vec3(0.f, 0.0f, -3.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 	//CreatePointLight(glm::vec3(-0.5f, -1.0f, 2.f), 100.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
 	
 	CreateGlobalLight(glm::vec3(0.f, 0.f, -1.f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
@@ -1031,21 +1032,20 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 		SDL_Surface* frame_buffer = frame_buffers[num_o_parts[0]*num_o_parts[1]-1];
 		SDL_Texture* texture = texture_buffers[num_o_parts[0] * num_o_parts[1]-1];
 
-		render(g_thread_count - 1,rect, frame_buffer, start, event, camera, accel, texture, renderer, wh, min_whs);
-
-		for (auto &thread:threads) {
-			thread.join();
-		}
+		render(num_o_parts[0]*num_o_parts[1] - 1,rect, frame_buffer, start, event, camera, accel, texture, renderer, wh, min_whs);
 #else
 		SDL_Surface* frame_buffer = CreateRGBImage(WIDTH, HEIGHT);
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, frame_buffer);
 
 		render(1, frame_buffer, start, event, camera, accel, texture, renderer, std::vector<int> {WIDTH,HEIGHT});
 #endif
-		SDL_RenderPresent(renderer);
-
+		
 		///cleanup
 #ifdef MULTI_THREADING
+		for (auto &thread : threads) {
+			thread.join();
+		}
+		SDL_RenderPresent(renderer);
 		for (auto &thread:threads) {
 			thread.~thread();	
 		}
@@ -1058,12 +1058,12 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 		microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
 		std::cout << "Frametime: " << std::fixed<<std::setprecision(2)<< (float)microseconds/1000000.f<<"s";
 		std::cout << "; " << std::fixed << std::setprecision(2) << 1000000.f/(float)microseconds << "	fps" << std::endl;
-		std::cout << "Primary rays: " << std::fixed << std::setprecision(2) << primary_rays/1000.f<< "K" << std::endl;
+		std::cout << "Primary rays: " << std::fixed << std::setprecision(2) << primary_rays/1000000.f<< "M" << std::endl;
 #ifdef BBAccel
 		std::cout << "BBox tests: " << std::fixed << std::setprecision(3) << AccelerationStructure::box_test_count / 1000000.f << "M" << std::endl;
 #endif
 //#if defined(BVH_ACCEL)
-		std::cout << "Volumes tested: " << std::fixed << std::setprecision(3) << accel->getVolumeTestCount() / 1000.f << "K" << std::endl;
+		std::cout << "Volumes tested: " << std::fixed << std::setprecision(3) << accel->getVolumeTestCount() / 1000000.f << "M" << std::endl;
 		std::cout << "BBoxes tested: " << std::fixed << std::setprecision(3) << accel->getBoxTestCount() / 1000000.f << "M" << std::endl;
 //#endif
 		std::cout << "Triangles intersected: " <<std::fixed<<std::setprecision(3) << triangle_intersection_count/ 1000.f << "K" << std::endl;

@@ -28,6 +28,7 @@ struct Material {
 	glm::f32vec3 specluar_color;
 	glm::f32vec3 ambient_color;
 	glm::f32vec3 emissive_color;
+	glm::f32vec3 refraction_color;
 	float ior;
 	float shininess;
 };
