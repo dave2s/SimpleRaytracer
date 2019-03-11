@@ -185,16 +185,16 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
 		case SDLK_w:
-			camera.camera_position[2] -= 0.5f;
+			camera.camera_position[2] -= 0.25f;
 			break;
 		case SDLK_s:
-			camera.camera_position[2] += 0.5f;
+			camera.camera_position[2] += 0.25f;
 			break;
 		case SDLK_a:
-			camera.camera_position[0] -= 0.5f;
+			camera.camera_position[0] -= 0.25f;
 			break;
 		case SDLK_d:
-			camera.camera_position[0] += 0.5f;
+			camera.camera_position[0] += 0.25f;
 			break;
 		case SDLK_KP_PLUS:
 			camera.fovy -= 5.f;
@@ -760,7 +760,12 @@ void render(uint16_t thread_id,
 #ifdef MULTI_THREADING
 	SDL_UpdateTexture(texture, NULL, frame_buffer->pixels, rect.w * sizeof(Uint32));
 	std::lock_guard<std::mutex> block_threads_until_finish_this_job(barrier);
+#ifdef UPSCALE
+	SDL_Rect r = {min_w*UPSCALE,min_h*UPSCALE,kernel_wh[0] * UPSCALE,kernel_wh[1] * UPSCALE };
+	SDL_RenderCopy(renderer, texture, NULL, &r);
+#else
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
+#endif
 #else
 	SDL_UpdateTexture(texture, NULL, frame_buffer->pixels, WIDTH * sizeof(Uint32));
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -813,7 +818,11 @@ int main(int argc, char* argv[])
 	Camera camera = Camera(glm::vec3(0.f,0.f,6.f), glm::vec3(0.f,0.f,-1.f),25.f, (float)WIDTH/ (float)HEIGHT);
 	
 	SDL_Init(SDL_INIT_VIDEO);
+#ifdef UPSCALE
+	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH*UPSCALE,HEIGHT*UPSCALE,SDL_WINDOW_OPENGL);
+#else
 	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_OPENGL);
+#endif
 	if (main_window==NULL) {
 		std::cerr << "SDL2 Main window creation failed.";
 		return 1;
@@ -822,17 +831,16 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = SDL_CreateRenderer(main_window, -1, 0);
 
 	
-	std::string modelPath[2] = {"none","none"};
+	std::string modelPath;
 	if (argc == 2)
 	{
-		modelPath[0] = std::string(argv[1]);
+		modelPath = std::string(argv[1]);
 	}
 	else
 	{
 		char currentDir[FILENAME_MAX];
 		GetCurrentDir(currentDir, FILENAME_MAX);
-		modelPath[0] = std::string(currentDir).append("/").append(DEFAULT_MODEL);
-		modelPath[1] = std::string(currentDir).append("/").append(DEFAULT_MODEL2);
+		modelPath = std::string(currentDir).append("/").append(DEFAULT_MODEL);
 	}
 
 	mesh_list = std::move(LoadScene(modelPath));
@@ -885,6 +893,7 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 	///fill min_whs with starting coords of rectangles in image for all threads
 	for (uint8_t y=0; y < num_o_parts[1]; ++y) {
 		for (uint8_t x=0; x < num_o_parts[0]; ++x) {
+			//SDL_Surface* frame_buffer = CreateRGBImage(wh[0], wh[1]);
 			SDL_Surface* frame_buffer = CreateRGBImage(wh[0], wh[1]);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, frame_buffer);
 			if (frame_buffer == NULL) {

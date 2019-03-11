@@ -23,7 +23,7 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 2.f
+#define UPSCALE 3.f
 #define TEXTURE_REPEAT
 //#define FINAL_RENDER
 #ifndef FINAL_RENDER
@@ -35,7 +35,7 @@
 #define WIDTH 180
 #define HEIGHT 180
 #define MAX_DEPTH 3
-#define WAVE_SAMPLES 12.f
+#define WAVE_SAMPLES 10.f
 #define SMOOTH_SHADING
 #define PROFILE
 #else
