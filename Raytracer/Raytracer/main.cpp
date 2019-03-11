@@ -91,6 +91,7 @@ const float HI0z = 2;
 glm::f32vec3 sky_color_actual;
 
 std::vector<std::unique_ptr<const RT_Mesh>> mesh_list;
+static std::atomic<unsigned long> total_triangle_count=0;
 //std::vector<std::unique_ptr<const RT_Mesh>> refractive_mesh_list;
 std::vector<RT_Light*> light_list;
 std::vector<RT_Light*> light_list_off;
@@ -931,9 +932,18 @@ int main(int argc, char* argv[])
 	}
 
 	mesh_list = std::move(LoadScene(modelPath));
-
+	for (const auto& mesh : mesh_list) {
+		std::atomic_fetch_add(&total_triangle_count, mesh.get()->getTriangleCount());
+	}
 #if defined(BVH_ACCEL)
-std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
+	std::unique_ptr<AccelerationStructure> accel;
+	if (total_triangle_count > 50)
+	{
+		 accel = std::unique_ptr<AccelerationStructure>(new BVH(mesh_list));
+	}
+	else{
+		accel = std::unique_ptr<AccelerationStructure>(new BBoxAcceleration(mesh_list));
+	}
 #elif defined(BBAccel)
 	std::unique_ptr<AccelerationStructure> accel(new BBoxAcceleration(mesh_list));
 #else

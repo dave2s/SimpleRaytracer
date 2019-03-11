@@ -2,7 +2,8 @@
 
 
 
-BBoxAcceleration::BBoxAcceleration(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure(m) {};
+BBoxAcceleration::BBoxAcceleration(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure(m) {
+};
 
 const RT_Mesh* BBoxAcceleration::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {

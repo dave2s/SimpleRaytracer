@@ -33,7 +33,7 @@
 #ifndef FINAL_RENDER
 #define SCREEN_SPACE_SUBSAMPLE 1
 #define BBAccel
-//#define BVH_ACCEL
+#define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
 #define WIDTH 240
