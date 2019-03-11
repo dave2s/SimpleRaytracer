@@ -23,7 +23,7 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 2.f
+#define UPSCALE 3.f
 #define TEXTURE_REPEAT
 
 #define SETTINGS_WIDTH 500

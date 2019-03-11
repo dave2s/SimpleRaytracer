@@ -210,22 +210,22 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 			break;
 		case SDLK_h:
 			barrier.lock();
-			global_cauchy_B += 0.1f;
+			global_cauchy_B = (global_cauchy_B >=5.f)? global_cauchy_B : global_cauchy_B + 0.1f;
 			barrier.unlock();
 			break;
 		case SDLK_b:
 			barrier.lock();
-			global_cauchy_B -= 0.1f;
+			global_cauchy_B = (global_cauchy_B <= 1.1f) ? global_cauchy_B : global_cauchy_B - 0.1f;
 			barrier.unlock();
 			break;
 		case SDLK_f:
 			barrier.lock();
-			global_cauchy_C += 0.01f;
+			global_cauchy_C = (global_cauchy_C >= .99f) ? global_cauchy_C : global_cauchy_C + 0.001f;
 			barrier.unlock();
 			break;
 		case SDLK_c:
 			barrier.lock();
-			global_cauchy_C -= 0.01f;
+			global_cauchy_C = (global_cauchy_C <= -0.1f) ? global_cauchy_C : global_cauchy_C - 0.001f;
 			barrier.unlock();
 			break;
 		case SDLK_q:
