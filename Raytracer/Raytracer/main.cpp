@@ -1,4 +1,4 @@
-/*#ifdef _DEBUG
+﻿/*#ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC  
 #include <crtdbg.h>  
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -10,12 +10,13 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include <atomic>
 #include <thread>
 #include "SDL.h"
 #include <SDL_pixels.h>
 #include <SDL_render.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #include <algorithm>
+#include <sstream>
 //#define GLM_FORCE_CUDA
 #define GLM_LEFT_HANDED
 #define GLM_FORCE_RADIANS
@@ -37,6 +38,7 @@
 #include "AccelerationStructure.h"
 #include "main.h"
 #include <mutex>
+#include <atomic>
 
 //Enable external gpu on a laptop supporting nvidia optimus
 /*#include <Windows.h>
@@ -93,9 +95,11 @@ std::vector<std::unique_ptr<const RT_Mesh>> mesh_list;
 std::vector<RT_Light*> light_list;
 std::vector<RT_Light*> light_list_off;
 
+///Dispersion constants
 std::vector<int> wavelengths;
 int wavelengths_size;
 static std::atomic<unsigned char> global_refraction = true;
+static std::atomic<unsigned char> wave2rgb_model = 0;
 
 // How many threads can I use
 static uint16_t g_thread_count;
@@ -197,20 +201,34 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 			camera.camera_position[0] += 0.25f;
 			break;
 		case SDLK_KP_PLUS:
-			camera.fovy -= 5.f;
+			camera.fovy = (camera.fovy <=6 ) ? camera.fovy : camera.fovy - 5.f;
 			camera.UpdateFov();
 			break;
 		case SDLK_KP_MINUS:
-			camera.fovy += 5.f;
+			camera.fovy = (camera.fovy >= 90) ? camera.fovy : camera.fovy + 5.f;
 			camera.UpdateFov();
 			break;
+		case SDLK_h:
+			barrier.lock();
+			global_cauchy_B += 0.1f;
+			barrier.unlock();
+			break;
+		case SDLK_b:
+			barrier.lock();
+			global_cauchy_B -= 0.1f;
+			barrier.unlock();
+			break;
+		case SDLK_f:
+			barrier.lock();
+			global_cauchy_C += 0.01f;
+			barrier.unlock();
+			break;
+		case SDLK_c:
+			barrier.lock();
+			global_cauchy_C -= 0.01f;
+			barrier.unlock();
+			break;
 		case SDLK_q:
-/*			for (const auto &mesh : accel.meshes) {
-				if (mesh.get()->_material_type == RT_Mesh::REFRACTION) {
-					refractive_mesh_list.push_back(mesh);
-					mesh.get()->_material_type = RT_Mesh::DIFFUSE;
-				}
-			}*/
 			std::atomic_fetch_xor(&global_refraction, 1);
 			break;
 		case SDLK_LEFT:
@@ -237,7 +255,7 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 			if (!light_list.empty())
 				((RT_PointLight*)light_list.at(0))->_position[2] -= .1f;
 			break;
-		case SDLK_c:
+		case SDLK_x:
 			camera.camera_position[1] -= 0.1f;
 			break;
 		case SDLK_r:
@@ -804,14 +822,69 @@ bool subimageDimensions(std::vector<int>& dim,uint16_t w, uint16_t h, uint16_t* 
 	num_o_parts[1] = h / dim[1];
 	return true;
 }
+
+void display_settings(SDL_Window* settings_window) {
+	
+		SDL_Renderer* renderer = SDL_CreateRenderer(settings_window, -1, 0);;
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
+		SDL_RenderClear(renderer);
+		SDL_RenderPresent(renderer);
+		if (TTF_Init() < 0) {
+			std::cerr << "TTF_Init() failed" << std::endl;
+		}
+
+		if (TTF_WasInit()) {
+			SDL_Texture* Message_Cauchy=nullptr;
+			SDL_Texture* Message_B = nullptr;
+			SDL_Texture* Message_C = nullptr;
+			SDL_Surface* surfaceMessage_C = nullptr;
+			SDL_Surface* surfaceMessage_B = nullptr;
+			SDL_Surface* surfaceMessage_Cauchy = nullptr;
+			TTF_Font* Sans = TTF_OpenFont("OpenSans-Regular.ttf", 32); //this opens a font style and sets a size
+			SDL_Rect rect_b = { 0,0,200,25 }; //create a rect
+			SDL_Rect rect_c = { 0,35,200,25 }; //create a rect
+			SDL_Rect rect_cauchy = { 220,18,200,25 }; //create a rect
+			SDL_Color Blue = { 200, 200, 255 };  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+			std::ostringstream _B;
+			std::ostringstream _C;
+			while (!quit) {
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
+				SDL_RenderClear(renderer);
+				
+				 _B << "Cauchy parametr B: " << std::fixed << std::setprecision(3) <<global_cauchy_B ;
+				 _C << "Cauchy parametr C: " << std::fixed << std::setprecision(3) <<global_cauchy_C ;
+				surfaceMessage_B = TTF_RenderText_Solid(Sans,_B.str().c_str(), Blue);
+				surfaceMessage_C = TTF_RenderText_Solid(Sans,_C.str().c_str(), Blue);
+				surfaceMessage_Cauchy = TTF_RenderText_Solid(Sans,std::string("n(lambda) = B + C / lambda^2").c_str(), Blue);
+
+				Message_B = SDL_CreateTextureFromSurface(renderer, surfaceMessage_B); //now you can convert it into a texture
+				Message_C = SDL_CreateTextureFromSurface(renderer, surfaceMessage_C); //now you can convert it into a texture
+				Message_Cauchy = SDL_CreateTextureFromSurface(renderer, surfaceMessage_Cauchy); //now you can convert it into a texture
+				//Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+
+				SDL_RenderCopy(renderer, Message_B, NULL, &rect_b);
+				SDL_RenderCopy(renderer, Message_C, NULL, &rect_c);
+				SDL_RenderCopy(renderer, Message_Cauchy, NULL, &rect_cauchy);
+				SDL_RenderPresent(renderer);
+				SDL_DestroyTexture(Message_Cauchy); SDL_DestroyTexture(Message_C);	SDL_DestroyTexture(Message_B);
+
+				_B.clear();
+				_C.clear();
+				//Don't forget too free your surface and texture
+			}
+			
+		}
+		TTF_Quit();
+}
+
 #endif
 int main(int argc, char* argv[])
 {/*
 #ifdef _DEBUG
 	_crtBreakAlloc = -1;
 #endif*/
-	SDL_Window* main_window;
-	SDL_Event event;
+	SDL_Window* main_window; SDL_Window* settings_window;
+	SDL_Event event; std::thread settings_thread;
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
 	///CAMERA
@@ -819,7 +892,7 @@ int main(int argc, char* argv[])
 	
 	SDL_Init(SDL_INIT_VIDEO);
 #ifdef UPSCALE
-	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH*UPSCALE,HEIGHT*UPSCALE,SDL_WINDOW_OPENGL);
+	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH*UPSCALE,HEIGHT*UPSCALE,NULL);
 #else
 	main_window = SDL_CreateWindow("Raytracer",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_OPENGL);
 #endif
@@ -827,6 +900,17 @@ int main(int argc, char* argv[])
 		std::cerr << "SDL2 Main window creation failed.";
 		return 1;
 	}
+	int main_window_h; int main_window_w;
+	SDL_GetWindowSize(main_window,&main_window_w,&main_window_h);
+	int main_window_x; int main_window_y;
+	SDL_GetWindowPosition(main_window,&main_window_x,&main_window_y);
+	settings_window = SDL_CreateWindow("RT_Settings",main_window_x+main_window_w , main_window_y, SETTINGS_WIDTH, SETTINGS_HEIGHT, NULL);
+	if (settings_window == NULL) {
+		std::cerr << "SDL2 Settings window creation failed.";
+		return 1;
+	}
+
+	settings_thread = std::thread(display_settings,std::ref(settings_window));
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(main_window, -1, 0);
 
