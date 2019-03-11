@@ -73,7 +73,7 @@ float global_cauchy_C = C;
 float average_ior;
 
 ///TODO
-//#define GAMMA 2.2f
+//#define GAMMA 1.7f
 //https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch24.html
 //http://renderwonk.com/blog/index.php/archive/adventures-with-gamma-correct-rendering/
 
@@ -101,6 +101,7 @@ std::vector<int> wavelengths;
 int wavelengths_size;
 static std::atomic<unsigned char> global_refraction = true;
 static std::atomic<unsigned char> wave2rgb_model = 0;
+static std::atomic<unsigned char> settings_changed = true;
 
 // How many threads can I use
 static uint16_t g_thread_count;
@@ -209,29 +210,36 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 			camera.fovy = (camera.fovy >= 90) ? camera.fovy : camera.fovy + 5.f;
 			camera.UpdateFov();
 			break;
+		///SETTINGS FOR DISPERSION
 		case SDLK_h:
 			barrier.lock();
 			global_cauchy_B = (global_cauchy_B >=5.f)? global_cauchy_B : global_cauchy_B + 0.1f;
 			barrier.unlock();
+			std::atomic_fetch_xor(&settings_changed, 1);
 			break;
 		case SDLK_b:
 			barrier.lock();
 			global_cauchy_B = (global_cauchy_B <= 1.1f) ? global_cauchy_B : global_cauchy_B - 0.1f;
 			barrier.unlock();
+			std::atomic_fetch_xor(&settings_changed, 1);
 			break;
 		case SDLK_f:
 			barrier.lock();
 			global_cauchy_C = (global_cauchy_C >= .99f) ? global_cauchy_C : global_cauchy_C + 0.001f;
 			barrier.unlock();
+			std::atomic_fetch_xor(&settings_changed, 1);
 			break;
 		case SDLK_c:
 			barrier.lock();
 			global_cauchy_C = (global_cauchy_C <= -0.1f) ? global_cauchy_C : global_cauchy_C - 0.001f;
 			barrier.unlock();
+			std::atomic_fetch_xor(&settings_changed, 1);
 			break;
 		case SDLK_q:
 			std::atomic_fetch_xor(&global_refraction, 1);
+			std::atomic_fetch_xor(&settings_changed, 1);
 			break;
+
 		case SDLK_LEFT:
 			if (!light_list.empty())
 				((RT_PointLight*)light_list.at(0))->_position[0] -= .1f;
@@ -513,7 +521,6 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 					//continue;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
-#ifndef GAMMA
 				glm::vec2 tex_coords = glm::vec2(-1.f, -1.f);
 				Texture texture; glm::vec3 N;
 				if (!hit_mesh->GetTextures().empty())
@@ -549,9 +556,6 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				Ray::calcReflectedDirection(primary_ray->hit_normal, ref_dir);
 #endif
 				s += (float)is_lit * light_intensity * std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess);
-#else
-				pixel_color = glm::clamp(glm::pow(pixel_color + hit_mesh->color*hit_color, glm::f32vec3(GAMMA)), 0.f, 1.f);
-#endif
 			}//end for each light in the scene
 
 			if (hit_mesh->GetTextures().empty())
@@ -640,8 +644,13 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 	else {
 		pixel_color = sky_color_actual;
 	}
-	delete(primary_ray);		
+	delete(primary_ray);	
+#ifdef GAMMA
+	return glm::clamp(glm::f32vec3(glm::pow(pixel_color, glm::f32vec3(1.f/GAMMA))), 0.f, 1.f);
+#else
 	return pixel_color;
+#endif
+
 }//end for each mesh SHADOW RAYS
 
 
@@ -827,54 +836,79 @@ bool subimageDimensions(std::vector<int>& dim,uint16_t w, uint16_t h, uint16_t* 
 void display_settings(SDL_Window* settings_window) {
 	
 		SDL_Renderer* renderer = SDL_CreateRenderer(settings_window, -1, 0);;
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
+		SDL_SetRenderDrawColor(renderer, 200, 200, 200, 0);
 		SDL_RenderClear(renderer);
 		SDL_RenderPresent(renderer);
 		if (TTF_Init() < 0) {
 			std::cerr << "TTF_Init() failed" << std::endl;
 		}
-
+		using namespace std;
 		if (TTF_WasInit()) {
-			
+			///TODO USE VECTORS FOR CLEAN CODE's SAKE
 			SDL_Surface* surfaceMessage_C = nullptr;
 			SDL_Surface* surfaceMessage_B = nullptr;
 			SDL_Surface* surfaceMessage_Cauchy = nullptr;
-			TTF_Font* Sans = TTF_OpenFont("OpenSans-Regular.ttf", 32); //this opens a font style and sets a size
+			SDL_Surface* surfaceMessage_ior400 = nullptr;
+			SDL_Surface* surfaceMessage_ior700 = nullptr;
+			SDL_Surface* surfaceMessage_refractive = nullptr;
+			TTF_Font* Sans = TTF_OpenFont("OpenSans-Regular.ttf", 100); //this opens a font style and sets a size
 			SDL_Rect rect_b = { 0,0,200,25 }; //create a rect
 			SDL_Rect rect_c = { 0,35,200,25 }; //create a rect
 			SDL_Rect rect_cauchy = { 220,18,200,25 }; //create a rect
-			SDL_Color Blue = { 200, 200, 255 };  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
-			std::ostringstream _B;
-			std::ostringstream _C;
+			SDL_Rect rect_ior400 = { 220,50,200,25 }; //create a rect
+			SDL_Rect rect_ior700 = { 220,82,200,25 }; //create a rect
+			SDL_Rect rect_refractive = { 0,125,100,25 }; //create a rect
+			SDL_Color Violet = { 131, 0, 181 };  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+			SDL_Color TextColor = { 100, 100, 200 };  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+			SDL_Color Red = { 255, 0, 0 };  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+			ostringstream _B;
+			ostringstream _C;
+			ostringstream _ior400;
+			ostringstream _ior700;
+
 			while (!quit) {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
-				SDL_RenderClear(renderer);
-				
-				 _B << "Cauchy parametr B: " << std::fixed << std::setprecision(3) <<global_cauchy_B ;
-				 _C << "Cauchy parametr C: " << std::fixed << std::setprecision(3) <<global_cauchy_C ;
-				surfaceMessage_B = TTF_RenderText_Solid(Sans,_B.str().c_str(), Blue);
-				surfaceMessage_C = TTF_RenderText_Solid(Sans,_C.str().c_str(), Blue);
-				surfaceMessage_Cauchy = TTF_RenderText_Solid(Sans,std::string("n(lambda) = B + (Cx5) / lambda^2").c_str(), Blue);
 
-				SDL_Texture* Message_Cauchy = nullptr;
-				SDL_Texture* Message_B = nullptr;
-				SDL_Texture* Message_C = nullptr;
-				Message_B = SDL_CreateTextureFromSurface(renderer, surfaceMessage_B); //now you can convert it into a texture
-				Message_C = SDL_CreateTextureFromSurface(renderer, surfaceMessage_C); //now you can convert it into a texture
-				Message_Cauchy = SDL_CreateTextureFromSurface(renderer, surfaceMessage_Cauchy); //now you can convert it into a texture
-				//Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+				if (settings_changed) {
+					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 1);
+					SDL_RenderClear(renderer);
 
-				SDL_RenderCopy(renderer, Message_B, NULL, &rect_b);
-				SDL_RenderCopy(renderer, Message_C, NULL, &rect_c);
-				SDL_RenderCopy(renderer, Message_Cauchy, NULL, &rect_cauchy);
-				SDL_RenderPresent(renderer);
+					_B << "Cauchy parametr B: " << std::fixed << std::setprecision(3) << global_cauchy_B;
+					_C << "Cauchy parametr C: " << std::fixed << std::setprecision(4) << global_cauchy_C;
+					_ior400 << "IOR(400nm): " << std::fixed << std::setprecision(3) << Ray::iorFromWavelength(400,global_cauchy_B,global_cauchy_C);
+					_ior700 << "IOR(700nm): " << std::fixed << std::setprecision(3) << Ray::iorFromWavelength(700, global_cauchy_B, global_cauchy_C);
+					surfaceMessage_B = TTF_RenderText_Solid(Sans, _B.str().c_str(), TextColor);
+					surfaceMessage_C = TTF_RenderText_Solid(Sans, _C.str().c_str(), TextColor);
+					surfaceMessage_ior400 = TTF_RenderText_Solid(Sans, _ior400.str().c_str(), Violet);
+					surfaceMessage_ior700 = TTF_RenderText_Solid(Sans, _ior700.str().c_str(), Red);
+					surfaceMessage_Cauchy = TTF_RenderText_Solid(Sans, string("n(lambda) = B + (Cx5) / lambda^2").c_str(), TextColor);
+					surfaceMessage_refractive = TTF_RenderText_Solid(Sans, string("Refraction: "+(global_refraction?string("ON"):string("OFF"))).c_str(), TextColor);
 
-				SDL_FreeSurface(surfaceMessage_B); SDL_FreeSurface(surfaceMessage_C); SDL_FreeSurface(surfaceMessage_Cauchy);
-				SDL_DestroyTexture(Message_Cauchy); SDL_DestroyTexture(Message_C);	SDL_DestroyTexture(Message_B);
+					SDL_Texture* Message_Cauchy = nullptr;SDL_Texture* Message_B = nullptr;SDL_Texture* Message_C = nullptr;SDL_Texture* Message_ior400 = nullptr;SDL_Texture* Message_ior700 = nullptr;SDL_Texture* Message_refractive = nullptr;
+					Message_B = SDL_CreateTextureFromSurface(renderer, surfaceMessage_B);
+					Message_C = SDL_CreateTextureFromSurface(renderer, surfaceMessage_C);
+					Message_Cauchy = SDL_CreateTextureFromSurface(renderer, surfaceMessage_Cauchy);
+					Message_ior400 = SDL_CreateTextureFromSurface(renderer, surfaceMessage_ior400);
+					Message_ior700 = SDL_CreateTextureFromSurface(renderer, surfaceMessage_ior700);
+					Message_refractive = SDL_CreateTextureFromSurface(renderer, surfaceMessage_refractive);
 
-				_B.str(std::string());
-				_C.str(std::string());
-				//Don't forget too free your surface and texture
+					SDL_RenderCopy(renderer, Message_B, NULL, &rect_b);
+					SDL_RenderCopy(renderer, Message_C, NULL, &rect_c);
+					SDL_RenderCopy(renderer, Message_Cauchy, NULL, &rect_cauchy);
+					SDL_RenderCopy(renderer, Message_ior400, NULL, &rect_ior400);
+					SDL_RenderCopy(renderer, Message_ior700, NULL, &rect_ior700);
+					SDL_RenderCopy(renderer, Message_refractive, NULL, &rect_refractive);
+					SDL_RenderPresent(renderer);
+
+					SDL_FreeSurface(surfaceMessage_B); SDL_FreeSurface(surfaceMessage_C); SDL_FreeSurface(surfaceMessage_Cauchy); SDL_FreeSurface(surfaceMessage_ior400); SDL_FreeSurface(surfaceMessage_ior700); SDL_FreeSurface(surfaceMessage_refractive);
+					SDL_DestroyTexture(Message_Cauchy); SDL_DestroyTexture(Message_C);	SDL_DestroyTexture(Message_B); SDL_DestroyTexture(Message_B); SDL_DestroyTexture(Message_ior400); SDL_DestroyTexture(Message_ior700); SDL_DestroyTexture(Message_refractive);
+
+					_B.str(string());
+					_C.str(string());
+					_ior400.str(string());
+					_ior700.str(string());
+					//Don't forget too free your surface and texture
+					std::atomic_fetch_and(&settings_changed,0);
+				}
 			}
 			TTF_CloseFont(Sans);
 		}

@@ -31,7 +31,7 @@
 
 //#define FINAL_RENDER
 #ifndef FINAL_RENDER
-#define SCREEN_SPACE_SUBSAMPLE 1
+//#define SCREEN_SPACE_SUBSAMPLE 1
 #define BBAccel
 #define BVH_ACCEL
 #define MULTI_THREADING
@@ -41,7 +41,7 @@
 #define MAX_DEPTH 3
 #define WAVE_SAMPLES 10.f
 #define SMOOTH_SHADING
-#define PROFILE
+//#define PROFILE
 #else
 #define SCREEN_SPACE_SUBSAMPLE 1
 #define MSAA
@@ -78,8 +78,8 @@ const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 
 ///MODELS FOR DISPERSION SIMULATION
-const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
-//const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
+//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
+const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 
 
 //const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
