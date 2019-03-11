@@ -23,18 +23,19 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
+#define UPSCALE 2.f
 #define TEXTURE_REPEAT
 //#define FINAL_RENDER
 #ifndef FINAL_RENDER
-#define SCREEN_SPACE_SUBSAMPLE 2
+#define SCREEN_SPACE_SUBSAMPLE 1
 #define BBAccel
 //#define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
-#define WIDTH 360
-#define HEIGHT 360
+#define WIDTH 180
+#define HEIGHT 180
 #define MAX_DEPTH 3
-#define WAVE_SAMPLES 10.f
+#define WAVE_SAMPLES 12.f
 #define SMOOTH_SHADING
 #define PROFILE
 #else
@@ -71,11 +72,16 @@ const float global_light_intensity = .4f;
 //const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
-const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
+
+///MODELS FOR DISPERSION SIMULATION
+//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
+const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
+
+
+//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
 //const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-blackwall.obj";
-//const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-uzsi1.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism3.obj";
 //const std::string DEFAULT_MODEL = "example/ball/ball.obj";

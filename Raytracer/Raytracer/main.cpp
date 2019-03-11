@@ -89,11 +89,13 @@ const float HI0z = 2;
 glm::f32vec3 sky_color_actual;
 
 std::vector<std::unique_ptr<const RT_Mesh>> mesh_list;
+//std::vector<std::unique_ptr<const RT_Mesh>> refractive_mesh_list;
 std::vector<RT_Light*> light_list;
 std::vector<RT_Light*> light_list_off;
 
 std::vector<int> wavelengths;
 int wavelengths_size;
+static std::atomic<unsigned char> global_refraction = true;
 
 // How many threads can I use
 static uint16_t g_thread_count;
@@ -176,7 +178,7 @@ void resetLightsPositions() {
 	}
 }
 
-void MovePolling(SDL_Event &event,Camera &camera) {
+void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationStructure> &accel) {
 	//SDL_PollEvent(&event);
 	//bool left_click;
 
@@ -193,6 +195,23 @@ void MovePolling(SDL_Event &event,Camera &camera) {
 			break;
 		case SDLK_d:
 			camera.camera_position[0] += 0.5f;
+			break;
+		case SDLK_KP_PLUS:
+			camera.fovy -= 5.f;
+			camera.UpdateFov();
+			break;
+		case SDLK_KP_MINUS:
+			camera.fovy += 5.f;
+			camera.UpdateFov();
+			break;
+		case SDLK_q:
+/*			for (const auto &mesh : accel.meshes) {
+				if (mesh.get()->_material_type == RT_Mesh::REFRACTION) {
+					refractive_mesh_list.push_back(mesh);
+					mesh.get()->_material_type = RT_Mesh::DIFFUSE;
+				}
+			}*/
+			std::atomic_fetch_xor(&global_refraction, 1);
 			break;
 		case SDLK_LEFT:
 			if (!light_list.empty())
@@ -357,9 +376,16 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 	if (hit_mesh != nullptr) {	
 	///IF HIT DECIDE MATERIAL	
 		//pixel_color = glm::f32vec3(0.f);
+		int material_type;
+		if (hit_mesh->_material_type == RT_Mesh::REFRACTION) {
+			material_type = global_refraction ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
+		}
+		else {
+			material_type = hit_mesh->_material_type;
+		}
 		glm::f32vec3 hit_color = glm::f32vec3(0);
 
-		switch (hit_mesh->_material_type)
+		switch (material_type)
 		{
 		case RT_Mesh::MIRROR:
 		{
@@ -655,7 +681,7 @@ void render(uint16_t thread_id,
 
 	for (uint16_t y = min_h; y < max_h; ++y) {
 		while (SDL_PollEvent(&event)) {
-			MovePolling(event, camera);
+			MovePolling(event, camera,accel);
 		}
 #ifdef SCREEN_SPACE_SUBSAMPLE
 		if ((y - min_h) %SCREEN_SPACE_SUBSAMPLE) {
@@ -796,16 +822,17 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = SDL_CreateRenderer(main_window, -1, 0);
 
 	
-	std::string modelPath;
+	std::string modelPath[2] = {"none","none"};
 	if (argc == 2)
 	{
-		modelPath = std::string(argv[1]);
+		modelPath[0] = std::string(argv[1]);
 	}
 	else
 	{
 		char currentDir[FILENAME_MAX];
 		GetCurrentDir(currentDir, FILENAME_MAX);
-		modelPath = std::string(currentDir).append("/").append(DEFAULT_MODEL);
+		modelPath[0] = std::string(currentDir).append("/").append(DEFAULT_MODEL);
+		modelPath[1] = std::string(currentDir).append("/").append(DEFAULT_MODEL2);
 	}
 
 	mesh_list = std::move(LoadScene(modelPath));

@@ -28,6 +28,9 @@ void Camera::Update(glm::vec3 direction) {
 #endif
 	view_matrix = glm::lookAt(camera_position, camera_position + direction, glm::vec3(0.f, 1.f, 0.f));
 }
+void Camera::UpdateFov() {
+	scale = glm::tan(TO_RADIANS(fovy*0.5f));
+}
 
 Camera::~Camera()
 {

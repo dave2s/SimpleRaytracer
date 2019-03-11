@@ -29,6 +29,7 @@ public:
 	float scale;
 
 	void Update(glm::vec3 direction);
+	void UpdateFov();
 	/*float near_plane = NEAR_PLANE;
 	float far_plane = FAR_PLANE;*/
 

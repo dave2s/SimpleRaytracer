@@ -126,7 +126,7 @@ public:
 	}
 
 
-	static glm::vec3 wavelength2rgb(int l) {
+	static glm::vec3 wavelength2rgb2(int l) {
 			double t;  double r = 0.0; double g = 0.0; double b = 0.0;
 			if ((l >= 400.0) && (l < 410.0)) { t = (l - 400.0) / (410.0 - 400.0); r = +(0.33*t) - (0.20*t*t); }
 			else if ((l >= 410.0) && (l < 475.0)) { t = (l - 410.0) / (475.0 - 410.0); r = 0.14 - (0.13*t*t); }
@@ -144,7 +144,7 @@ public:
 	/**From https://github.com/lkesteloot/prism
 	 * From: https://www.johndcook.com/wavelength_to_RGB.html
 	 */
-	static glm::vec3 wavelength2rgb2(int wavelength) {
+	static glm::vec3 wavelength2rgb(int wavelength) {
 		float red, green, blue;
 
 		if (wavelength >= 380.f && wavelength < 440.f) {

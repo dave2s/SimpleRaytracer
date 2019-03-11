@@ -83,7 +83,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		aiColor4D ambient;
 		aiColor4D specular;
 		aiColor4D emissive;
-		aiColor4D refraction;
+		aiColor4D global_refraction;
 		float shininess = 1.f;
 		float ior = 1.f;
 		int shading_model = -1; 
@@ -95,7 +95,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		aiGetMaterialFloat(mtl, AI_MATKEY_SHININESS, &shininess);
 		aiGetMaterialFloat(mtl, AI_MATKEY_REFRACTI, &ior);
 		aiGetMaterialInteger(mtl, AI_MATKEY_SHADING_MODEL, &shading_model);
-		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_TRANSPARENT, &refraction);
+		aiGetMaterialColor(mtl, AI_MATKEY_COLOR_TRANSPARENT, &global_refraction);
 
 		///TODO alpha
 		my_material.refraction_color = glm::f32vec3(-1.f);
@@ -106,7 +106,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		my_material.emissive_color = glm::clamp(glm::f32vec3(emissive.r, emissive.g, emissive.b),0.f,1.f);
 		my_material.ior = ior;
 		my_material.shininess = shininess;
-		my_material.refraction_color = glm::f32vec4(refraction.r, refraction.g, refraction.b, refraction.a);
+		my_material.refraction_color = glm::f32vec4(global_refraction.r, global_refraction.g, global_refraction.b, global_refraction.a);
 		
 		/*if (shading_model != -1) {
 			switch (shading_model) {
