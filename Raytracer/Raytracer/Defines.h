@@ -78,8 +78,8 @@ const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 
 ///MODELS FOR DISPERSION SIMULATION
-//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
-const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
+const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
+//const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 
 
 //const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";

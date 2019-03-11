@@ -834,9 +834,7 @@ void display_settings(SDL_Window* settings_window) {
 		}
 
 		if (TTF_WasInit()) {
-			SDL_Texture* Message_Cauchy=nullptr;
-			SDL_Texture* Message_B = nullptr;
-			SDL_Texture* Message_C = nullptr;
+			
 			SDL_Surface* surfaceMessage_C = nullptr;
 			SDL_Surface* surfaceMessage_B = nullptr;
 			SDL_Surface* surfaceMessage_Cauchy = nullptr;
@@ -855,8 +853,11 @@ void display_settings(SDL_Window* settings_window) {
 				 _C << "Cauchy parametr C: " << std::fixed << std::setprecision(3) <<global_cauchy_C ;
 				surfaceMessage_B = TTF_RenderText_Solid(Sans,_B.str().c_str(), Blue);
 				surfaceMessage_C = TTF_RenderText_Solid(Sans,_C.str().c_str(), Blue);
-				surfaceMessage_Cauchy = TTF_RenderText_Solid(Sans,std::string("n(lambda) = B + C / lambda^2").c_str(), Blue);
+				surfaceMessage_Cauchy = TTF_RenderText_Solid(Sans,std::string("n(lambda) = B + (Cx5) / lambda^2").c_str(), Blue);
 
+				SDL_Texture* Message_Cauchy = nullptr;
+				SDL_Texture* Message_B = nullptr;
+				SDL_Texture* Message_C = nullptr;
 				Message_B = SDL_CreateTextureFromSurface(renderer, surfaceMessage_B); //now you can convert it into a texture
 				Message_C = SDL_CreateTextureFromSurface(renderer, surfaceMessage_C); //now you can convert it into a texture
 				Message_Cauchy = SDL_CreateTextureFromSurface(renderer, surfaceMessage_Cauchy); //now you can convert it into a texture
@@ -866,13 +867,15 @@ void display_settings(SDL_Window* settings_window) {
 				SDL_RenderCopy(renderer, Message_C, NULL, &rect_c);
 				SDL_RenderCopy(renderer, Message_Cauchy, NULL, &rect_cauchy);
 				SDL_RenderPresent(renderer);
+
+				SDL_FreeSurface(surfaceMessage_B); SDL_FreeSurface(surfaceMessage_C); SDL_FreeSurface(surfaceMessage_Cauchy);
 				SDL_DestroyTexture(Message_Cauchy); SDL_DestroyTexture(Message_C);	SDL_DestroyTexture(Message_B);
 
-				_B.clear();
-				_C.clear();
+				_B.str(std::string());
+				_C.str(std::string());
 				//Don't forget too free your surface and texture
 			}
-			
+			TTF_CloseFont(Sans);
 		}
 		TTF_Quit();
 }
@@ -909,7 +912,7 @@ int main(int argc, char* argv[])
 		std::cerr << "SDL2 Settings window creation failed.";
 		return 1;
 	}
-
+	///Display settings
 	settings_thread = std::thread(display_settings,std::ref(settings_window));
 
 	SDL_Renderer* renderer = SDL_CreateRenderer(main_window, -1, 0);
@@ -1028,6 +1031,7 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 			thread.~thread();	
 		}
 		threads.clear();
+
 #else
 		SDL_RenderPresent(renderer);
 #endif
@@ -1058,6 +1062,11 @@ std::unique_ptr<AccelerationStructure> accel(new BVH(mesh_list));
 	frame_buffers.clear();
 	texture_buffers.clear();
 #endif
+
+	if(settings_thread.joinable())
+		settings_thread.join();
+
+	//_CrtDumpMemoryLeaks();
 
 	return 0;//app_exit(0, texture, renderer, frame_buffer, main_window);
 }
