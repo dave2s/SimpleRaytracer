@@ -23,7 +23,7 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 1.f
+#define UPSCALE 2.f
 #define TEXTURE_REPEAT
 
 #define SETTINGS_WIDTH 500
@@ -38,7 +38,7 @@
 //#define MSAA
 #define WIDTH 200
 #define HEIGHT 180
-#define MAX_DEPTH 6
+#define MAX_DEPTH 5
 #define WAVE_SAMPLES 9.f
 #define SMOOTH_SHADING
 #define PROFILING

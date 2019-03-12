@@ -450,22 +450,25 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 					//uint16_t wavelen = 0;
 					//for (int int_idx = 0; int_idx < wavelengths_intervals.size() - 1; ++int_idx) {
 						//for (int sample = 0; sample < WAVE_SAMPLES; ++sample) {
+					uint16_t num_refracted = 0;
 					for(auto wavelen: wavelengths){
 							//wavelen= wavelengths_intervals[int_idx] + my_rand()*(wavelengths_intervals[int_idx + 1] - wavelengths_intervals[int_idx]);
 							//CALC FRESNEL
 						float wavelen_ior = Ray::iorFromWavelength(wavelen, global_cauchy_B, global_cauchy_C);
 							Ray::fresnel(wavelen_ior, kr, primary_ray->direction, primary_ray->hit_normal);
 							// REFRACT IF NOT TOTAL INTERNAL REFLECTION
+							
 							if (kr < 1) {
 								//lamu
 								glm::vec3 refract_dir = glm::normalize(Ray::refract(/*hit_mesh->_material.ior*/wavelen_ior, primary_ray->direction, primary_ray->hit_normal));
 								glm::vec3 refract_orig = outside ? info.PHit - bias : info.PHit + bias;
 								refract_color += raytrace(accel, refract_orig, refract_dir, depth + 1, true, wavelen);
+								num_refracted++;
 							}
 						//}
 					}
 					//refract_color /= (wavelengths_intervals.size() - 1)*WAVE_SAMPLES;
-					refract_color /= wavelengths.size();
+					refract_color /= num_refracted;
 				//refract_color = glm::clamp(refract_color, 0.f, 1.f);
 				}
 				else {
@@ -501,6 +504,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			//for each light cast shadow ray
 			/// CALC LIGHTs
 			//shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
+			//const RT_Mesh* hit_shadow_mesh;
 			glm::u8vec3 texture_diffuse_color=glm::f32vec3(0.f);
 			for (auto &light : light_list) {
 				is_lit = true;
