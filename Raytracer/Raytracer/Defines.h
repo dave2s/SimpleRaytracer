@@ -8,10 +8,10 @@
 #define GetCurrentDir getcwd
 #endif
 
-#define PROFILING
+//#define PROFILING
 //#define ONE_FRAME
 
-#define HIT_BIAS 0.0005f // to prevent shadow acne
+#define HIT_BIAS 0.005f // to prevent shadow acne
 
 // Preprocessor directive for converting colors from floats to unsigned and vice-versa.
 #define F2U(float_x) (uint8_t)round(float_x * 255.0f)
@@ -23,7 +23,7 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 3.f
+#define UPSCALE 1.f
 #define TEXTURE_REPEAT
 
 #define SETTINGS_WIDTH 500
@@ -36,12 +36,12 @@
 #define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
-#define WIDTH 240
+#define WIDTH 200
 #define HEIGHT 180
-#define MAX_DEPTH 3
-#define WAVE_SAMPLES 10.f
+#define MAX_DEPTH 6
+#define WAVE_SAMPLES 9.f
 #define SMOOTH_SHADING
-//#define PROFILE
+#define PROFILING
 #else
 #define SCREEN_SPACE_SUBSAMPLE 1
 #define MSAA
@@ -79,12 +79,12 @@ const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 
 ///MODELS FOR DISPERSION SIMULATION
 //const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
-const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
+//const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
+//const std::string DEFAULT_MODEL = "example/suzanne/suzanne2.obj";
 
-
-//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid2.obj";
+//const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
 //const std::string DEFAULT_MODEL = "example/sponza2/sponza.obj";
-//const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-Mirror.obj";
+const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-water.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-blackwall.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism-uzsi1.obj";
 //const std::string DEFAULT_MODEL = "example/prism/prism3.obj";
@@ -95,6 +95,6 @@ const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 //const std::string DEFAULT_MODEL = "example/f16/f16.obj";
 //const std::string DEFAULT_MODEL = "example/diamond/diamond.obj";
 //const std::string DEFAULT_MODEL = "example/diamond2/untitled.obj";
-//const std::string DEFAULT_MODEL = "example/suzanne/suzanne.obj";
+
 //const std::string DEFAULT_MODEL = "example/cruiser/cruiser.obj";
 //const std::string DEFAULT_MODEL = "example/armadillo/armadillo.ply";

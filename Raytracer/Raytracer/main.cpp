@@ -14,7 +14,7 @@
 #include "SDL.h"
 #include <SDL_pixels.h>
 #include <SDL_render.h>
-#include <SDL2_ttf/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <algorithm>
 #include <sstream>
 //#define GLM_FORCE_CUDA
@@ -46,7 +46,7 @@ extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }*/
 
-#ifdef PROFILING
+
 static std::atomic<unsigned long long> triangle_intersection_count = 0;
 static std::atomic<unsigned long long> triangle_test_count = 0;
 static std::atomic<unsigned long long> primary_rays = 0;
@@ -54,7 +54,7 @@ static std::atomic<unsigned char> global_light_on = true;
 /*#ifdef BBAccel
 static std::atomic<unsigned long long> box_test_count = 0;
 #endif*/
-#endif
+
 
 //Borosilicate glass BK7
 float B = 1.5046f;
@@ -437,10 +437,14 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				glm::f32vec3 reflect_color = glm::f32vec3(0);
 
 				OUT float kr; min_dist = inf;
+#ifdef SMOOTH_SHADING
+				Vertex hit_triangle[3];
+				std::memcpy(hit_triangle, hit_mesh->getTriangle(info.tri_idx), sizeof(Vertex) * 3);
+				GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, primary_ray->hit_normal);
+				//glm::vec3 bias = N * HIT_BIAS;
+#endif
 				glm::vec3 bias = primary_ray->hit_normal * HIT_BIAS;
-
-				bool outside = glm::dot(primary_ray->direction, primary_ray->hit_normal)<0.f;
-				
+				bool outside = glm::dot(primary_ray->direction, primary_ray->hit_normal) < 0.f;
 				if (!monochromatic) {
 					//SAMPLE WAVELENGTHS
 					//uint16_t wavelen = 0;
@@ -851,7 +855,7 @@ void display_settings(SDL_Window* settings_window) {
 			SDL_Surface* surfaceMessage_ior400 = nullptr;
 			SDL_Surface* surfaceMessage_ior700 = nullptr;
 			SDL_Surface* surfaceMessage_refractive = nullptr;
-			TTF_Font* Sans = TTF_OpenFont("OpenSans-Regular.ttf", 100); //this opens a font style and sets a size
+			TTF_Font* Sans = TTF_OpenFont("OpenSans-Regular.ttf", 32); //this opens a font style and sets a size
 			SDL_Rect rect_b = { 0,0,200,25 }; //create a rect
 			SDL_Rect rect_c = { 0,35,200,25 }; //create a rect
 			SDL_Rect rect_cauchy = { 220,18,200,25 }; //create a rect
@@ -985,7 +989,7 @@ int main(int argc, char* argv[])
 #endif
 
 	init_wave_info();
-	//CreatePointLight(glm::vec3(-3.f, -0.8f, 0.f), 100.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreatePointLight(glm::vec3(0.f, 0.0f, 2.f), 100.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 	//CreatePointLight(glm::vec3(0.f, 0.0f, -10.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 	//CreatePointLight(glm::vec3(-0.5f, -1.0f, 2.f), 100.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
 	
@@ -1010,11 +1014,9 @@ int main(int argc, char* argv[])
 	std::vector<std::thread> threads;	
 #endif
 
-#ifdef PROFILING
 	std::chrono::steady_clock::duration elapsed;
 	std::chrono::steady_clock::time_point start;
 	unsigned long long microseconds;
-#endif
 
 	SDL_Texture* texture;
 

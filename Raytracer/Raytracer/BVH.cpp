@@ -239,7 +239,7 @@ bool BVH::Extents::intersect(
 
 const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 {
-	tHit = inf;
+	//tHit = inf;
 	Ray::Hitinfo info_current;
 	const RT_Mesh* hit_mesh = nullptr;
 	float precomputedNumerator[BVH::plane_count];
