@@ -40,6 +40,7 @@ void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2,float u, float v, glm::
 #else
 	//Interpolate vertex normals using barycentric coordinates.
 	//Perspective correction: divide by respective v.z then multiply by fragment.z
+	///Presumption assimp generated normals....should check whether normals are present, if not, has no point
 	N = glm::normalize((1 - u - v)*v0.normal + u * v1.normal + v * v2.normal);
 #endif
 }

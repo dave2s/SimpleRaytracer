@@ -26,4 +26,11 @@ const RT_Mesh* AccelerationStructure::intersect(Ray* ray, float& tHit, Ray::Hiti
 	//return (hit_mesh != nullptr);
 }
 
-AccelerationStructure::~AccelerationStructure() {}
+AccelerationStructure::~AccelerationStructure() {
+	for (const auto &m : meshes) {
+		for (auto &tex : m->GetTextures()) {
+			free(tex.data);
+		}
+		
+	}
+}

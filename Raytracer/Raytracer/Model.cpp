@@ -29,6 +29,7 @@ std::vector<Texture> LoadTextures(aiMaterial *mtl, aiTextureType type, std::stri
 		tex.type = typeName;
 		tex.path = path.C_Str();
 		textures.push_back(tex);
+		
 	}
 	return textures;
 }
@@ -136,7 +137,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		if (shading_model == 2 || shading_model == 3){
 			type = ( ior != 1.f && (my_material.refraction_color != glm::f32vec3(-1.f)) ) ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
 			if (my_material.specular_color == glm::f32vec3(0))
-				type = RT_Mesh::DIFFUSE;
+				//type = RT_Mesh::DIFFUSE;
 			if (shininess > 999) {
 				type = RT_Mesh::MIRROR;
 			}
@@ -153,12 +154,12 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 			/*}*/
 		}
 
-		//color = glm::f32vec3(diffuse.r, diffuse.g, diffuse.b);
-
 		std::vector<Texture> diff_Map = LoadTextures(mtl, aiTextureType_DIFFUSE, "texture_diffuse",dir);
 		textures.insert(textures.end(), diff_Map.begin(), diff_Map.end());
 		std::vector<Texture> spec_map = LoadTextures(mtl, aiTextureType_SPECULAR, "texture_specular",dir);
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
+		std::vector<Texture> displ_map = LoadTextures(mtl, aiTextureType_DISPLACEMENT, "texture_displ", dir);
+		textures.insert(textures.end(), displ_map.begin(), displ_map.end());
 	}
 
 	//std::unique_ptr<const RT_Mesh> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));
