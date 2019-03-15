@@ -62,6 +62,15 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 
 		if (mesh->mTextureCoords[0]) {
 			v._tex_coords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+			tmp.x = mesh->mTangents[i].x;
+			tmp.y = mesh->mTangents[i].y;
+			tmp.z = mesh->mTangents[i].z;
+			v.tangent = tmp;
+
+			tmp.x = mesh->mBitangents[i].x;
+			tmp.y = mesh->mBitangents[i].y;
+			tmp.z = mesh->mBitangents[i].z;
+			v.bitangent = tmp;
 		}
 		else {
 			v._tex_coords = glm::vec2(0.f, 0.f);
@@ -135,8 +144,8 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 			}
 		}*/
 		if (shading_model == 2 || shading_model == 3){
-			type = ( ior != 1.f && (my_material.refraction_color != glm::f32vec3(-1.f)) ) ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
-			if (my_material.specular_color == glm::f32vec3(0))
+			type = ( ior != 1.f && (my_material.refraction_color != glm::f32vec3(1.f)) ) ? RT_Mesh::REFRACTION : RT_Mesh::PHONG;
+			//if (my_material.specular_color == glm::f32vec3(0))
 				//type = RT_Mesh::DIFFUSE;
 			if (shininess > 999) {
 				type = RT_Mesh::MIRROR;
@@ -186,7 +195,7 @@ std::vector<std::unique_ptr<const RT_Mesh>> LoadScene(std::string& modelPath)
 	std::vector<std::unique_ptr<const RT_Mesh>> meshes;
 	Assimp::Importer importer;
 	const aiScene* scene = nullptr;
-	scene = importer.ReadFile(modelPath, aiProcess_FixInfacingNormals | aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+	scene = importer.ReadFile(modelPath, aiProcess_FixInfacingNormals | aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenUVCoords | aiProcess_GenSmoothNormals);
 	if (!scene || !scene->mRootNode || scene->mFlags & (AI_SCENE_FLAGS_INCOMPLETE | AI_SCENE_FLAGS_VALIDATION_WARNING))
 	{
 		std::cerr << "Model importer failed. flags: " << scene->mFlags << std::endl;

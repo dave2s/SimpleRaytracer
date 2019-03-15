@@ -1,17 +1,55 @@
 #include "RT_Mesh.h"
 #include "Defines.h"
 
+void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords, glm::f32vec3& tangent, glm::f32vec3& bitangent)
+{
+#ifndef SMOOTH_SHADING
+	N = getTriangleNormal(v0.position, v1.position, v2.position);
+#else
+	//Interpolate vertex normals using barycentric coordinates.
+	
+	N = glm::normalize((1 - u - v)*v0.normal + u*v1.normal + v*v2.normal);
+#endif
+	///Textures
+	texture_coords.x = ((1 - u - v)*v0._tex_coords.x + u * v1._tex_coords.x + v * v2._tex_coords.x);
+	texture_coords.y = ((1 - u - v)*v0._tex_coords.y + u * v1._tex_coords.y + v * v2._tex_coords.y);
+	tangent = glm::f32vec3(
+		(1 - u - v)*v0.tangent.x + u * v1.tangent.x + v * v2.tangent.x,
+		(1 - u - v)*v0.tangent.y + u * v1.tangent.y + v * v2.tangent.y,
+		(1 - u - v)*v0.tangent.z + u * v1.tangent.z + v * v2.tangent.z);
+	bitangent = glm::f32vec3(
+		(1 - u - v)*v0.bitangent.x + u * v1.bitangent.x + v * v2.bitangent.x,
+		(1 - u - v)*v0.bitangent.y + u * v1.bitangent.y + v * v2.bitangent.y,
+		(1 - u - v)*v0.bitangent.z + u * v1.bitangent.z + v * v2.bitangent.z);
+#ifdef TEXTURE_REPEAT
+	//lets repeat the texture :) /// if 1, rets 0, is ok?
+	if (texture_coords.x < 0)
+		texture_coords.x = 1 + texture_coords.x - (int)texture_coords.x;
+	else
+		texture_coords.x = texture_coords.x - (int)texture_coords.x;
+	if (texture_coords.y < 0)
+		texture_coords.y = 1 + texture_coords.y - (int)texture_coords.y;
+	else
+		texture_coords.y = texture_coords.y - (int)texture_coords.y;
+
+#else
+	texture_coords = glm::clamp(texture_coords, 0.f, 1.f);
+#endif
+	///Let's expand the coords from (0,1) to (0,texture_size);
+	texture_coords.x = texture_coords.x*textureWidth;
+	texture_coords.y = texture_coords.y*textureHeight;
+}
+
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords)
 {
 #ifndef SMOOTH_SHADING
 	N = getTriangleNormal(v0.position, v1.position, v2.position);
 #else
 	//Interpolate vertex normals using barycentric coordinates.
-	//Perspective correction: divide by respective v.z then multiply by fragment.z
-	N = glm::normalize((1 - u - v)*v0.normal + u*v1.normal + v*v2.normal);
+
+	N = glm::normalize((1 - u - v)*v0.normal + u * v1.normal + v * v2.normal);
 #endif
 	///Textures
-	//interpolation with perspective correction (divide by respective vertex depth in camera space, then multiply by fragment depth)
 	texture_coords.x = ((1 - u - v)*v0._tex_coords.x + u * v1._tex_coords.x + v * v2._tex_coords.x);
 	texture_coords.y = ((1 - u - v)*v0._tex_coords.y + u * v1._tex_coords.y + v * v2._tex_coords.y);
 #ifdef TEXTURE_REPEAT
@@ -32,6 +70,7 @@ void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, in
 	texture_coords.x = texture_coords.x*textureWidth;
 	texture_coords.y = texture_coords.y*textureHeight;
 }
+
 
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2,float u, float v, glm::vec3& N)
 {

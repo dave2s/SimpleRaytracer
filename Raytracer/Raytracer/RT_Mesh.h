@@ -11,6 +11,8 @@ struct Vertex {
 	glm::f32vec3 position;
 	glm::f32vec3 normal;
 	glm::f32vec2 _tex_coords;
+	glm::f32vec3 tangent;
+	glm::f32vec3 bitangent;
 };
 
 struct Texture {
@@ -41,6 +43,8 @@ inline glm::vec3 getTriangleUnNormal(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2
 {
 	return glm::cross(v1 - v0, v2 - v0);
 }
+
+void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords, glm::f32vec3& tangent, glm::f32vec3& bitangent);
 
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords);
 
