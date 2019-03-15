@@ -99,8 +99,7 @@ std::vector<RT_Light*> light_list_off;
 ///Dispersion constants
 std::vector<int> wavelengths;
 int wavelengths_size;
-static std::atomic<unsigned char> global_refraction = true;
-static std::atomic<unsigned char> wave2rgb_model = 0;
+static std::atomic<unsigned char> global_refraction = false;
 static std::atomic<unsigned char> settings_changed = true;
 
 // How many threads can I use
@@ -187,12 +186,12 @@ void resetLightsPositions() {
 void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationStructure> &accel, uint32_t d_time) {
 	//SDL_PollEvent(&event);
 	//bool left_click;
-	//float tick_ms=  1000 / float(TICKS_PER_SECOND);
+	//float tick_ms=  1000 / float(FRAMES_PER_SECOND);
 	float lag_compensation = 1.f;
 	if (d_time > ONE_TICK_MS) {
 		lag_compensation = d_time/ONE_TICK_MS;
 	}
-	lag_compensation = (lag_compensation > 10.f) ? 10.f : lag_compensation;
+	lag_compensation = (lag_compensation > 7.f) ? 7.f : lag_compensation;
 	/*
 	if (d_time> ONE_TICK_MS*0.5f){
 		std::this_thread::sleep_for(2000);
@@ -508,15 +507,15 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			//shadow_ray->prev_D = primary_ray->prev_D;///COMMENT THIS OUT EVERYWHERE
 			//const RT_Mesh* hit_shadow_mesh;
 			///get textures
-			glm::u8vec3 texture_diffuse_color = glm::f32vec3(0.f);
-			glm::u8vec3 texture_ambient_color = glm::f32vec3(0.f);
-			glm::f32vec3 texture_displacement;
+			glm::f32vec3 ambient_color = hit_mesh->_material.ambient_color;
+			glm::f32vec3 diffuse_color = hit_mesh->_material.diffuse_color;
+			glm::f32vec3 specular_color = hit_mesh->_material.specular_color;
+
 			glm::vec2 tex_coords = glm::vec2(-1.f, -1.f);
 			Texture texture; glm::vec3 N_current;
 			if (!hit_mesh->GetTextures().empty())
 			{
 				uint32_t texelIndex;
-				
 				for (auto texItr = hit_mesh->GetTextures().begin(); texItr != hit_mesh->GetTextures().end(); ++texItr)
 				{
 					// TODO - should be strcmp
@@ -528,10 +527,10 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
-						texture_diffuse_color = glm::u8vec3(texture.data[0 + texelIndex],
+						diffuse_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
 							texture.data[1 + texelIndex],
 							texture.data[2 + texelIndex]
-						);
+						));
 					}
 					else if ((*texItr).type == "texture_ambient")
 					{
@@ -541,14 +540,28 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
-						texture_ambient_color = glm::u8vec3(texture.data[0 + texelIndex],
+						ambient_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
 							texture.data[1 + texelIndex],
 							texture.data[2 + texelIndex]
-						);
+						));
+					}
+					else if ((*texItr).type == "texture_specular")
+					{
+						texture = (*texItr);
+
+						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
+
+						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+
+						specular_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
+							texture.data[1 + texelIndex],
+							texture.data[2 + texelIndex]
+						));
 					}
 					else if ((*texItr).type == "texture_displ")
 					{
 						glm::f32vec3 t; glm::f32vec3 b;
+						glm::f32vec3 texture_displacement;
 						texture = (*texItr);
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords,t,b);
 
@@ -569,15 +582,15 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 						glm::mat3 tbn = glm::mat3(t, b, N_current);
 
 						///Gram - Schmidt process we can re - orthogonalize
-					/*	vec3 T = normalize(vec3(model * vec4(aTangent, 0.0)));
-						vec3 N_current = normalize(vec3(model * vec4(aNormal, 0.0)));
+						/*glm::vec3 T = glm::normalize(glm::vec3(model * glm::vec4(aTangent, 0.0)));
+						glm::vec3 N_current = glm::normalize(glm::vec3(model * glm::vec4(aNormal, 0.0)));
 						// re-orthogonalize T with respect to N_current
-						T = normalize(T - dot(T, N_current) * N_current);
+						T = normalize(T - glm::dot(T, N_current) * N_current);
 						// then retrieve perpendicular vector B with the cross product of T and N_current
-						vec3 B = cross(N_current, T);
+						//glm::vec3 B = cross(N_current, T);
 
-						mat3 TBN = mat3(T, B, N_current)*/
-
+						//glm::mat3 TBN = glm::mat3(T, B, N_current);
+*/
 						N_current = glm::normalize(tbn * texture_displacement);
 					/*	texture = (*texItr);
 						if (texture.path.find(std::string("ddn.")) != std::string::npos) {
@@ -619,6 +632,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				shadow_ray->precomputeValues();
 #endif
 				if (accel->intersect(shadow_ray, PHit_dist, shadow_info) != nullptr) {
+					//d+=((float)global_light_on)*AMBIENT_LIGHT;
 					continue;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
@@ -626,36 +640,36 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 				glm::vec3 ref_dir = light_direction;
 #ifdef SMOOTH_SHADING
-				d +=  hit_mesh->_albedo * light_intensity * glm::f32vec3(std::max(0.f, glm::dot(N_current, -light_direction)));
+				d +=   light_intensity * glm::clamp(glm::f32vec3(std::max(0.f, glm::dot(N_current, -light_direction))),0.f,1.f);
 				Ray::calcReflectedDirection(N_current, ref_dir);
 #else
-				d +=  hit_mesh->_albedo *light_intensity * glm::f32vec3(std::max(0.f, glm::dot(primary_ray->hit_normal, -light_direction)));
+				d +=  light_intensity * glm::clamp(glm::f32vec3(std::max(0.f, glm::dot(primary_ray->hit_normal, -light_direction))), 0.f, 1.f);
 				Ray::calcReflectedDirection(primary_ray->hit_normal, ref_dir);
 #endif
-				s +=  light_intensity * std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess);
+				s +=  light_intensity * glm::clamp(std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess),0.f,1.f);
 			}//end for each light in the scene
 
-			if (hit_mesh->GetTextures().empty())
+			/*if (hit_mesh->GetTextures().empty())
 			{
-				if (monochromatic && primary_ray->wavelength != 0) {
-					glm::f32vec3 ray_color = Ray::wavelength2rgb(primary_ray->wavelength);
-
-					pixel_color = glm::clamp((ray_color)*((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specular_color) + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+				pixel_color = (1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_albedo * diffuse_color + s * hit_mesh->_albedo_complement * specular_color + ambient_color*AMBIENT_LIGHT);
+				if (monochromatic&& primary_ray->wavelength != 0) {
+					pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*pixel_color, 0.f, 1.f);
 				}
-				else
-				{
-					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_material.diffuse_color + s * hit_mesh->_material.specular_color + hit_mesh->_material.ambient_color*AMBIENT_LIGHT), 0.f, 1.f);
+				else {
+					pixel_color = glm::clamp(pixel_color,0.f,1.f);
 				}
 			}
 			else
-			{
-				if (monochromatic&& primary_ray->wavelength != 0) {
-					pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * hit_mesh->_material.specular_color + U8vec2F32vec(texture_ambient_color)*AMBIENT_LIGHT)), 0.f, 1.f);
-				}
-				else {
-					pixel_color = glm::clamp((1.0f*hit_mesh->_material.emissive_color + d * U8vec2F32vec(texture_diffuse_color) + s * hit_mesh->_material.specular_color + U8vec2F32vec(texture_ambient_color)*AMBIENT_LIGHT), 0.f, 1.f);
-				}
+			{*/
+			pixel_color = (1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_albedo * diffuse_color + s * hit_mesh->_albedo_complement * specular_color +ambient_color*AMBIENT_LIGHT);
+
+			if (monochromatic&& primary_ray->wavelength != 0) {
+				pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*pixel_color,0.f,1.f);
 			}
+			else {
+				pixel_color = glm::clamp(pixel_color, 0.f, 1.f);
+			}
+			//}
 			delete(shadow_ray);
 		break;
 		}
@@ -1050,13 +1064,14 @@ int main(int argc, char* argv[])
 #endif
 
 	init_wave_info();
-	//CreatePointLight(glm::vec3(0.f, 0.0f, 2.f), 100000.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreatePointLight(glm::vec3(0.f, 1.0f, 2.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	//CreatePointLight(glm::vec3(-0.5f, -1.0f, 2.f), 100.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
+	//CreatePointLight(glm::vec3(0.f, 0.0f, 2.f), 1000.f, glm::f32vec3(U2F(200), U2F(255), U2F(255)));
+	//CreatePointLight(glm::vec3(0.f, 1.0f, 2.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreatePointLight(glm::vec3(20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
+	CreatePointLight(glm::vec3(-20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
 	
-	CreateGlobalLight(glm::vec3(0.f, .0f, -1.0f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	//CreateGlobalLight(glm::vec3(0.f, -1.f, -0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	//CreateGlobalLight(glm::vec3(-0.2f, -1.f, 0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	//CreateGlobalLight(glm::vec3(0.f, .0f, -1.0f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreateGlobalLight(glm::vec3(0.f, -1.f, -0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+//	CreateGlobalLight(glm::vec3(-0.1f, -.2f,0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 
 	updateSkyColor();
 
@@ -1139,8 +1154,8 @@ int main(int argc, char* argv[])
 		render(1, frame_buffer, start, event, camera, accel, texture, renderer, std::vector<int> {WIDTH,HEIGHT});
 #endif
 		//d_time_render = 
-		if (SDL_GetTicks() < t_last + ONE_TICK_MS) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(int(ONE_TICK_MS-(SDL_GetTicks()-t_last))));
+		while (SDL_GetTicks() < t_last + ONE_TICK_MS) {
+			true;//std::this_thread::sleep_for(std::chrono::milliseconds(int(ONE_TICK_MS-(SDL_GetTicks()-t_last))));
 		}
 		///cleanup
 #ifdef MULTI_THREADING

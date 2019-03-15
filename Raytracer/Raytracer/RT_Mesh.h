@@ -64,6 +64,7 @@ public:
 	
 	Material _material;
 	glm::f32vec3 _albedo;
+	glm::f32vec3 _albedo_complement;
 	MATERIAL_TYPE _material_type;
 	std::vector<Vertex> _vertices;
 	std::vector<unsigned int> _indices;

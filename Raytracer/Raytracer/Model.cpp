@@ -110,7 +110,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		///TODO alpha
 		my_material.refraction_color = glm::f32vec3(-1.f);
 
-		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a) == glm::f32vec4(0)) ? glm::f32vec3(AMBIENT_LIGHT) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
+		my_material.ambient_color = (glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a));// == glm::f32vec4(0)) ? glm::f32vec3(0.15f) : glm::f32vec4(ambient.r, ambient.g, ambient.b, ambient.a);
 		my_material.diffuse_color = glm::f32vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
 		my_material.specular_color = glm::f32vec4(specular.r, specular.g, specular.b, specular.a);
 		my_material.emissive_color = glm::clamp(glm::f32vec3(emissive.r, emissive.g, emissive.b),0.f,1.f);
@@ -165,6 +165,8 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 
 		std::vector<Texture> diff_Map = LoadTextures(mtl, aiTextureType_DIFFUSE, "texture_diffuse",dir);
 		textures.insert(textures.end(), diff_Map.begin(), diff_Map.end());
+		std::vector<Texture> ambient_Map = LoadTextures(mtl, aiTextureType_AMBIENT, "texture_ambient", dir);
+		textures.insert(textures.end(), ambient_Map.begin(), ambient_Map.end());
 		std::vector<Texture> spec_map = LoadTextures(mtl, aiTextureType_SPECULAR, "texture_specular",dir);
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
 		std::vector<Texture> displ_map = LoadTextures(mtl, aiTextureType_DISPLACEMENT, "texture_displ", dir);
@@ -172,7 +174,7 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 	}
 
 	//std::unique_ptr<const RT_Mesh> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));
-	std::unique_ptr<const RT_Mesh> my_mesh(new RT_Mesh(vertices, indices, false, my_material, 0.18f, type, textures));
+	std::unique_ptr<const RT_Mesh> my_mesh(new RT_Mesh(vertices, indices, false, my_material, /*0.18f*/0.2f, type, textures));
 	return my_mesh;
 }
 

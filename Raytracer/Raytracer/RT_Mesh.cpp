@@ -150,7 +150,8 @@ RT_Mesh::RT_Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 	_vertices(vertices),
 	_triangle_count(indices.size() / 3),
 	_vertices_len(vertices.size()),
-	_singleSided(singleSided)
+	_singleSided(singleSided),
+	_albedo_complement(glm::f32vec3(1-albedo))
 {
 	//_vertices = vertices;
 	//_indices = indices;
