@@ -23,7 +23,7 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 1.f
+#define UPSCALE 5.f
 #define TEXTURE_REPEAT
 #define SETTINGS_WIDTH 500
 #define SETTINGS_HEIGHT 300
@@ -38,9 +38,9 @@ static const float ONE_TICK_MS = 1000 / float(FRAMES_PER_SECOND);
 #define BBAccel
 #define BVH_ACCEL
 #define MULTI_THREADING
-#define MSAA
-#define WIDTH 640
-#define HEIGHT 360
+//#define MSAA
+#define WIDTH 192
+#define HEIGHT 108
 #define MAX_DEPTH 3.f
 #define WAVE_SAMPLES 9.f
 #define SMOOTH_SHADING

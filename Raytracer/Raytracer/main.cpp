@@ -188,14 +188,10 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 	//bool left_click;
 	//float tick_ms=  1000 / float(FRAMES_PER_SECOND);
 	float lag_compensation = 1.f;
-	if (d_time > ONE_TICK_MS) {
-		lag_compensation = d_time/ONE_TICK_MS;
+	if (d_time < ONE_TICK_MS) {
+		lag_compensation = 1.f;
 	}
-	lag_compensation = (lag_compensation > 7.f) ? 7.f : lag_compensation;
-	/*
-	if (d_time> ONE_TICK_MS*0.5f){
-		std::this_thread::sleep_for(2000);
-	}*/
+	lag_compensation = (lag_compensation > 5.f) ? 5.f : lag_compensation;
 
 	if (event.type == SDL_KEYDOWN) {
 		switch (event.key.keysym.sym) {
@@ -1080,7 +1076,7 @@ int main(int argc, char* argv[])
 	float view_y;
 
 #ifdef MULTI_THREADING
-	g_thread_count = 2*std::thread::hardware_concurrency();
+	g_thread_count = 1*std::thread::hardware_concurrency();
 	std::cout << "Using " << g_thread_count << " threads.\n";
 
 	std::vector<int> wh(2);
