@@ -280,6 +280,7 @@ const RT_Mesh* BVH::intersect(Ray* ray, float& tHit, Ray::Hitinfo& info) const
 				//float t = inf;
 				//if (e->mesh->intersect(ray,t,info) && t < tHit) {
 				if(e->triangles[0].mesh->intersect_triangle(ray,e->triangles[0].tri,t,info_current) && t < tHit){
+					std::atomic_fetch_add(&triangles_intersected, 1);
 					tHit = t;
 					info = info_current;
 					hit_mesh = e->triangles[0].mesh;

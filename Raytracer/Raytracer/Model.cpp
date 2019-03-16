@@ -169,8 +169,20 @@ std::unique_ptr<const RT_Mesh> ProcessTreeMesh(const aiScene* scene, aiMesh* mes
 		textures.insert(textures.end(), ambient_Map.begin(), ambient_Map.end());
 		std::vector<Texture> spec_map = LoadTextures(mtl, aiTextureType_SPECULAR, "texture_specular",dir);
 		textures.insert(textures.end(), spec_map.begin(), spec_map.end());
+		std::vector<Texture> bump_map = LoadTextures(mtl, aiTextureType_HEIGHT, "texture_bump", dir);
+		textures.insert(textures.end(), bump_map.begin(), bump_map.end());
+
 		std::vector<Texture> displ_map = LoadTextures(mtl, aiTextureType_DISPLACEMENT, "texture_displ", dir);
+		for (auto texItr = displ_map.begin(); texItr != displ_map.end(); ++texItr) {
+			if ((*texItr).type.find("ddn.") != std::string::npos) { //if ddn, is a normal map - cryteks sponza has normal maps named displ with ddn in the name which according to their site is a normal map. Since displacement is a broad term, here we go -_-
+				(*texItr).type = "texture_normal";
+			}
+		}
 		textures.insert(textures.end(), displ_map.begin(), displ_map.end());
+
+		std::vector<Texture> normal_map = LoadTextures(mtl, aiTextureType_NORMALS, "texture_normal", dir);
+		textures.insert(textures.end(), normal_map.begin(), normal_map.end());
+	
 	}
 
 	//std::unique_ptr<const RT_Mesh> my_mesh = new std::unique_ptr(RT_Mesh(vertices, indices, false, my_material, 0.18f, type,textures));

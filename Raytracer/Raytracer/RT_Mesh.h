@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include <iostream>
 #include <vector>
+#include <atomic>
 #include "Ray.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
@@ -68,6 +69,9 @@ public:
 	MATERIAL_TYPE _material_type;
 	std::vector<Vertex> _vertices;
 	std::vector<unsigned int> _indices;
+	static std::atomic<unsigned long long> triangle_tests;
+
+	static unsigned long long getTriangleTests() { return triangle_tests; }
 
 	RT_Mesh(std::vector<Vertex> vertices, std::vector< unsigned int> indices, bool singleSided, Material my_material, float albedo, MATERIAL_TYPE material, std::vector<Texture> textures);
 	void ClearMesh();

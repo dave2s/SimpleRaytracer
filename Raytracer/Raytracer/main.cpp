@@ -558,7 +558,18 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 							texture.data[2 + texelIndex]
 						));
 					}
-					else if ((*texItr).type == "texture_displ")
+					else if ((*texItr).type == "texture_bump")
+					{
+						texture = (*texItr);
+
+						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
+
+						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+
+						float height_displacement = U2F(texture.data[0 + texelIndex])-0.5f;
+						info.PHit += height_displacement*info.NHit;						
+					}
+					else if ((*texItr).type == "texture_normal")
 					{
 						glm::f32vec3 t; glm::f32vec3 b;
 						glm::f32vec3 texture_displacement;
@@ -770,18 +781,6 @@ void render(uint16_t thread_id,
 	max_w = WIDTH; max_h = HEIGHT;
 #endif
 
-#ifdef PROFILING
-	start = std::chrono::high_resolution_clock::now();
-	std::atomic_fetch_and(&primary_rays, 0);
-	std::atomic_fetch_and(&triangle_intersection_count, 0);
-	std::atomic_fetch_and(&triangle_test_count, 0);
-#ifdef BBAccel
-	std::atomic_fetch_and(&AccelerationStructure::box_test_count, 0);
-#endif
-#ifdef BVH_ACCEL
-	std::atomic_fetch_and(&AccelerationStructure::num_ray_volume_tests, 0);
-#endif
-#endif
 #ifdef SCREEN_SPACE_SUBSAMPLE
 	char mod = 0;
 #endif
@@ -1052,9 +1051,11 @@ int main(int argc, char* argv[])
 	std::unique_ptr<AccelerationStructure> accel;
 	if (total_triangle_count > 50)
 	{
+		std::cout << "Total triangles in scene: "<< total_triangle_count <<" >50 . Using octree based BVH.\n";
 		 accel = std::unique_ptr<AccelerationStructure>(new BVH(mesh_list));
 	}
 	else{
+		std::cout << "Total triangles in scene: " << total_triangle_count << " <= 50. Using mesh bounding boxes only.\n";
 		accel = std::unique_ptr<AccelerationStructure>(new BBoxAcceleration(mesh_list));
 	}
 #elif defined(BBAccel)
@@ -1066,8 +1067,8 @@ int main(int argc, char* argv[])
 	init_wave_info();
 	//CreatePointLight(glm::vec3(0.f, 0.0f, 2.f), 1000.f, glm::f32vec3(U2F(200), U2F(255), U2F(255)));
 	//CreatePointLight(glm::vec3(0.f, 1.0f, 2.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreatePointLight(glm::vec3(20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
-	CreatePointLight(glm::vec3(-20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
+	//CreatePointLight(glm::vec3(20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
+	//CreatePointLight(glm::vec3(-20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
 	
 	//CreateGlobalLight(glm::vec3(0.f, .0f, -1.0f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 	CreateGlobalLight(glm::vec3(0.f, -1.f, -0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
@@ -1094,7 +1095,7 @@ int main(int argc, char* argv[])
 
 	std::chrono::steady_clock::duration elapsed;
 	std::chrono::steady_clock::time_point start;
-	unsigned long long microseconds;
+	unsigned long long microseconds = 0;
 
 	SDL_Texture* texture;
 
@@ -1117,23 +1118,29 @@ int main(int argc, char* argv[])
 		}
 	}
 #endif	
-	unsigned int t_last = 0, t_current;
-	uint32_t d_time_event = 0;
-	uint32_t d_time_render = 0;
+	uint32_t t_last = 0;
+	uint32_t lag = 0.f;
+	uint32_t t_elapsed;
+	uint32_t t_current;
 	while (!quit)
 	{
+		t_current = SDL_GetTicks();
+		t_elapsed = t_current - t_last;
+		t_last = t_current;
+		lag += t_elapsed;
+
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
-
 		g_working = g_thread_count-1;
-
-		t_current = SDL_GetTicks();
-		if (t_current >= (t_last + ONE_TICK_MS)) {
-			d_time_event = t_current - t_last;
+	
+		//if (t_current >= (t_last + ONE_TICK_MS)) {
+	//		d_time_event = t_current - t_last;
+		while (lag >= ONE_TICK_MS){
 			while (SDL_PollEvent(&event)) {
-				MovePolling(event, camera, accel,d_time_event);
+				MovePolling(event, camera, accel,lag/ONE_TICK_MS);
 			}
-			t_last = t_current;
+		lag -= ONE_TICK_MS;
+			//t_last = t_current;
 		}
 #ifdef MULTI_THREADING
 		///multithreaded render loop
@@ -1179,17 +1186,30 @@ int main(int argc, char* argv[])
 		std::cout << "Frametime: " << std::fixed<<std::setprecision(2)<< (float)microseconds/1000000.f<<"s";
 		std::cout << "; " << std::fixed << std::setprecision(2) << 1000000.f/(float)microseconds << "	fps" << std::endl;
 		std::cout << "Primary rays: " << std::fixed << std::setprecision(2) << primary_rays/1000000.f<< "M" << std::endl;
-#ifdef BBAccel
-		std::cout << "BBox tests: " << std::fixed << std::setprecision(3) << AccelerationStructure::box_test_count / 1000000.f << "M" << std::endl;
-#endif
+/*#ifdef BBAccel
+		std::cout << "BBox tested: " << std::fixed << std::setprecision(3) << AccelerationStructure::box_test_count / 1000000.f << "M" << std::endl;
+#endif*/
 //#if defined(BVH_ACCEL)
 		std::cout << "Volumes tested: " << std::fixed << std::setprecision(3) << accel->getVolumeTestCount() / 1000000.f << "M" << std::endl;
 		std::cout << "BBoxes tested: " << std::fixed << std::setprecision(3) << accel->getBoxTestCount() / 1000000.f << "M" << std::endl;
 //#endif
-		std::cout << "Triangles intersected: " <<std::fixed<<std::setprecision(3) << triangle_intersection_count/ 1000.f << "K" << std::endl;
-		std::cout << "Triangles tested: " << std::fixed <<std::setprecision(3) << triangle_test_count /1000000.f << "M \n" << std::endl;
+		std::cout << "Triangles intersected: " <<std::fixed<<std::setprecision(3) << accel->getTrianglesIntersected() / 1000000.f << "M" << std::endl;
+		std::cout << "Triangles tested: " << std::fixed <<std::setprecision(3) << RT_Mesh::getTriangleTests() /1000000.f << "M \n" << std::endl;
 		std::flush(std::cout);
+
+		start = std::chrono::high_resolution_clock::now();
+
+		std::atomic_fetch_and(&primary_rays, 0);
+		std::atomic_fetch_and(&RT_Mesh::triangle_tests, 0);
+		std::atomic_fetch_and(&AccelerationStructure::triangles_intersected, 0);
+	#ifdef BBAccel
+			std::atomic_fetch_and(&AccelerationStructure::box_test_count, 0);
+	#endif
+	#ifdef BVH_ACCEL
+			std::atomic_fetch_and(&AccelerationStructure::num_ray_volume_tests, 0);
+	#endif
 #endif
+
 #ifdef ONE_FRAME
 		break;
 #endif

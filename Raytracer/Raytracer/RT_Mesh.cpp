@@ -1,6 +1,8 @@
 #include "RT_Mesh.h"
 #include "Defines.h"
 
+std::atomic<unsigned long long> RT_Mesh::triangle_tests = 0;
+
 void GetHitProperties(Vertex& v0, Vertex& v1, Vertex& v2, float& u, float& v, int& textureHeight, int& textureWidth, glm::vec3& N, glm::vec2 &texture_coords, glm::f32vec3& tangent, glm::f32vec3& bitangent)
 {
 #ifndef SMOOTH_SHADING
@@ -207,6 +209,7 @@ bool RT_Mesh::intersect_triangle(Ray* ray, uint32_t triangle, float& t_near, Ray
 	Vertex v0 = _vertices[_indices[0 + 3 * triangle]];
 	Vertex v1 = _vertices[_indices[1 + 3 * triangle]];
 	Vertex v2 = _vertices[_indices[2 + 3 * triangle]];
+	std::atomic_fetch_add(&triangle_tests, 1);
 	if (intersectTriangleMT(ray, true,
 		v0, v1, v2,
 		_singleSided,
@@ -243,6 +246,7 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 		Vertex v0 = _vertices[_indices[0 + 3 * idx]];
 		Vertex v1 = _vertices[_indices[1 + 3 * idx]];
 		Vertex v2 = _vertices[_indices[2 + 3 * idx]];
+		std::atomic_fetch_add(&triangle_tests, 1);
 		if (intersectTriangleMT(ray, true,
 			v0,v1,v2,
 			_singleSided,
@@ -253,6 +257,7 @@ bool RT_Mesh::intersect(Ray* ray, float& t_near, Ray::Hitinfo& info) const
 			v_prim,
 			max_dist) && PHit_dist<t_near) 
 		{
+			std::atomic_fetch_add(&triangle_tests, 1);
 			info.NHit = ray->hit_normal = NHit; //NHit changes with calculations, N_hit is transfered to the next section as last normal
 			info.u = u_prim; info.v = v_prim;
 			info.tri_idx = idx;

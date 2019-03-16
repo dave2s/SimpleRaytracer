@@ -1,7 +1,5 @@
 #include "BBoxAcceleration.h"
 
-
-
 BBoxAcceleration::BBoxAcceleration(std::vector<std::unique_ptr<const RT_Mesh>>& m) : AccelerationStructure(m) {
 };
 
@@ -23,6 +21,7 @@ const RT_Mesh* BBoxAcceleration::intersect(Ray* ray, float& tHit, Ray::Hitinfo& 
 			// then update tNear variable with t and keep a pointer to the intersected mesh
 			//Ray::Hitinfo info_current;
 			if (mesh->intersect(ray, t, info_current) && t < tHit) {
+				std::atomic_fetch_add(&triangles_intersected, 1);
 				tHit = t;
 				hit_mesh = mesh.get();
 				info = info_current;
