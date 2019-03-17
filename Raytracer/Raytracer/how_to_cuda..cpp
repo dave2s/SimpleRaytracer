@@ -26,3 +26,16 @@ uint lane_offset = lane % 4; // for groups of 4 threads
 //Again, the mask is trivially computed
 //with the lane index (e.g for groups of 4):
 uint group_mask = 0 x0000000f << ( lane & 0 xfffffffc );
+
+
+if ( lane == 0)
+ray_idx = atomicAdd ( g_warpCounter , num_groups );
+ray_idx = __shfl ( ray_idx , 0) + my_group ;
+
+
+
+
+int curr_idx = stack [ lane_group ][ stack_pointer - -];
+vec4 xy = nodes [ curr_idx + lane_offset ];
+vec4 zi = nodes [ curr_idx + 2 + lane_offset ];
+
