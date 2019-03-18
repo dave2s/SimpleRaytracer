@@ -1,7 +1,11 @@
 #include <iostream>
 #include "Model.h"
 #define STB_IMAGE_IMPLEMENTATION
+//#define CRT_SECURE_NO_WARNINGS
 #include "stb_image.h"
+#include "gli/gli/gli.hpp"
+#include "gli/gli/texture2d.hpp"
+#include "gli/gli/convert.hpp"
 
 // Prevzato z https://learnopengl.com/Model-Loading/Model
 
@@ -16,8 +20,34 @@ std::vector<Texture> LoadTextures(aiMaterial *mtl, aiTextureType type, std::stri
 		int width, height, channels;
 
 		mtl->GetTexture(type, i, &path);
-		stbi_set_flip_vertically_on_load(true);
-		tex.data = stbi_load((dir + "/" + path.C_Str()).c_str(), &width, &height, &channels, 3);
+		std::string s = std::string(path.C_Str()); std::string dds = ".dds";
+		if (s.compare(s.size() - dds.size(), dds.size(), dds) == 0){
+			//gli::texture gli_texture = gli::load(dir + "/" + path.C_Str());
+			//RGBA_DXT1_UNORM_BLOCK8
+			gli::texture gli_texture;// = gli::convert(gli::load(dir + "/" + path.C_Str()), gli::FORMAT_RGB8_UNORM_PACK8);
+			if (gli_texture.empty()) {
+				continue;
+			}
+			//tex.data = 
+			//std::memcpy(&tex.data,gli_texture.data(),sizeof(gli_texture.data()));
+			//tex.levels = gli_texture.levels();
+			//for (std::size_t Level = 0; Level < 1/*gli_texture.levels()*/; ++Level)
+		//	{
+				//glm::tvec3<uint16_t> Extent(gli_texture.extent(Level));
+				//width = Extent.r; height = Extent.g; channels = 3;
+				//static_cast<uint16_t>(Level), 0, 0, Extent.x, Extent.y,
+				//size_type index_cache(size_type Layer, size_type Face, size_type Level) const
+				//{
+				//	return ((Layer * this->Faces) + Face) * this->Levels + Level;
+				//}
+				//std::memcpy(&tex.data, gli_texture.data(0,0,Level), sizeof(gli_texture.size(Level)));
+				 //static_cast<uint16_t>(gli_texture.size(Level)), gli_texture.data(0, 0, Level);
+		//	}
+		}
+		else {
+			stbi_set_flip_vertically_on_load(true);
+			tex.data = stbi_load((dir + "/" + path.C_Str()).c_str(), &width, &height, &channels, 4);
+		}
 		if (tex.data == nullptr)
 		{
 			continue;
