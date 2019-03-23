@@ -46,7 +46,7 @@ std::vector<Texture> LoadTextures(aiMaterial *mtl, aiTextureType type, std::stri
 		}
 		else {
 			stbi_set_flip_vertically_on_load(true);
-			tex.data = stbi_load((dir + "/" + path.C_Str()).c_str(), &width, &height, &channels, 4);
+			tex.data = stbi_load((dir + "/" + path.C_Str()).c_str(), &width, &height, &channels, STBI_rgb_alpha);
 		}
 		if (tex.data == nullptr)
 		{

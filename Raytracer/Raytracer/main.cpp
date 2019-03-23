@@ -189,7 +189,7 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 	//float tick_ms=  1000 / float(FRAMES_PER_SECOND);
 	float lag_compensation = 1.f;
 	if (d_time < ONE_TICK_MS) {
-		lag_compensation = 1.f;
+		lag_compensation = 1.f+d_time;
 	}
 	lag_compensation = (lag_compensation > 5.f) ? 5.f : lag_compensation;
 
@@ -506,12 +506,13 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			glm::f32vec3 ambient_color = hit_mesh->_material.ambient_color;
 			glm::f32vec3 diffuse_color = hit_mesh->_material.diffuse_color;
 			glm::f32vec3 specular_color = hit_mesh->_material.specular_color;
-
+			float_t alpha = 1.f;
+			
 			glm::vec2 tex_coords = glm::vec2(-1.f, -1.f);
-			Texture texture; glm::vec3 N_current;
+			glm::vec3 N_current;
 			if (!hit_mesh->GetTextures().empty())
 			{
-				uint32_t texelIndex;
+				uint32_t texelIndex; Texture texture;
 				for (auto texItr = hit_mesh->GetTextures().begin(); texItr != hit_mesh->GetTextures().end(); ++texItr)
 				{
 					// TODO - should be strcmp
@@ -527,6 +528,18 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 							texture.data[1 + texelIndex],
 							texture.data[2 + texelIndex]
 						));
+
+						alpha = U2F(texture.data[3 + texelIndex]);
+						/*if (alpha < 1.f) {
+							glm::f32vec3 passtrough_color = raytrace(accel, info.PHit+primary_ray->direction*HIT_BIAS, primary_ray->direction, depth, monochromatic, wavelength);
+							//diffuse_color = alpha * diffuse_color + (1.f - alpha) * passtrough_color;
+							if (alpha < 0.05f) {
+								
+								pixel_color = diffuse_color;
+							}
+							break;
+						}*/
+						
 					}
 					else if ((*texItr).type == "texture_ambient")
 					{
@@ -616,6 +629,19 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			else{
 				GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, N_current);
 			}
+			//Alpha.
+			//If too small, return just passtrough color as pixel color.
+			//Otherwise use precalculated passtrough_color and use alpha to multiply the rest when assigning pixel color at the end
+			glm::f32vec3 passtrough_color = glm::f32vec3(0);
+			if (alpha < 1.f) {
+				passtrough_color = raytrace(accel, info.PHit + primary_ray->direction*HIT_BIAS, primary_ray->direction, depth, monochromatic, wavelength);
+				//diffuse_color = alpha * diffuse_color + (1.f - alpha) * passtrough_color;
+				if (alpha < 0.05f) {
+					pixel_color = passtrough_color;
+					break;
+				}				
+			}
+
 			OUT glm::vec3 light_intensity; OUT glm::vec3 light_direction; OUT float light_distance;
 			for (auto &light : light_list) {
 				
@@ -651,7 +677,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 				s +=  light_intensity * std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess);
 			}//end for each light in the scene
 
-			pixel_color = (1.0f*hit_mesh->_material.emissive_color + d /** hit_mesh->_albedo*/ * diffuse_color + s * specular_color +ambient_color*AMBIENT_LIGHT);
+			pixel_color =  (1.f - alpha)*passtrough_color + alpha*(1.0f*hit_mesh->_material.emissive_color + d /** hit_mesh->_albedo*/ * diffuse_color + s * specular_color +ambient_color*AMBIENT_LIGHT);
 
 			if (monochromatic&& primary_ray->wavelength != 0) {
 				pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*pixel_color,0.f,1.f);
@@ -1050,7 +1076,7 @@ int main(int argc, char* argv[])
 	//CreatePointLight(glm::vec3(-20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
 	
 	//CreateGlobalLight(glm::vec3(0.f, .0f, -1.0f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreateGlobalLight(glm::vec3(0.f, -1.f, -0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreateGlobalLight(glm::vec3(0.f, -0.2f, -1.f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 //	CreateGlobalLight(glm::vec3(-0.1f, -.2f,0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 
 	updateSkyColor();
