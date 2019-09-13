@@ -189,7 +189,7 @@ void MovePolling(SDL_Event &event,Camera &camera, std::unique_ptr<AccelerationSt
 	//float tick_ms=  1000 / float(FRAMES_PER_SECOND);
 	float lag_compensation = 1.f;
 	if (d_time < ONE_TICK_MS) {
-		lag_compensation = 1.f;
+		lag_compensation = 1.f+d_time;
 	}
 	lag_compensation = (lag_compensation > 5.f) ? 5.f : lag_compensation;
 
@@ -506,12 +506,13 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 			glm::f32vec3 ambient_color = hit_mesh->_material.ambient_color;
 			glm::f32vec3 diffuse_color = hit_mesh->_material.diffuse_color;
 			glm::f32vec3 specular_color = hit_mesh->_material.specular_color;
-
+			float_t alpha = 1.f;
+			
 			glm::vec2 tex_coords = glm::vec2(-1.f, -1.f);
-			Texture texture; glm::vec3 N_current;
+			glm::vec3 N_current;
 			if (!hit_mesh->GetTextures().empty())
 			{
-				uint32_t texelIndex;
+				uint32_t texelIndex; Texture texture;
 				for (auto texItr = hit_mesh->GetTextures().begin(); texItr != hit_mesh->GetTextures().end(); ++texItr)
 				{
 					// TODO - should be strcmp
@@ -521,12 +522,24 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
 						diffuse_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
 							texture.data[1 + texelIndex],
 							texture.data[2 + texelIndex]
 						));
+
+						alpha = U2F(texture.data[3 + texelIndex]);
+						/*if (alpha < 1.f) {
+							glm::f32vec3 passtrough_color = raytrace(accel, info.PHit+primary_ray->direction*HIT_BIAS, primary_ray->direction, depth, monochromatic, wavelength);
+							//diffuse_color = alpha * diffuse_color + (1.f - alpha) * passtrough_color;
+							if (alpha < 0.05f) {
+								
+								pixel_color = diffuse_color;
+							}
+							break;
+						}*/
+						
 					}
 					else if ((*texItr).type == "texture_ambient")
 					{
@@ -534,7 +547,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
 						ambient_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
 							texture.data[1 + texelIndex],
@@ -547,7 +560,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
 						specular_color = U8vec2F32vec(glm::u8vec3(texture.data[0 + texelIndex],
 							texture.data[1 + texelIndex],
@@ -560,7 +573,7 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords);
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
 						float height_displacement = U2F(texture.data[0 + texelIndex])-0.5f;
 						info.PHit += height_displacement*info.NHit;						
@@ -572,20 +585,20 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 						texture = (*texItr);
 						GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, texture.height, texture.width, N_current, tex_coords,t,b);
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 
-						/*glm::vec3 t = glm::cross(N_current, glm::vec3(0.0f, 1.0f, 0.0f));
-						glm::vec3 b;
+						/*glm::vec3 */t = glm::cross(N_current, glm::vec3(0.0f, 1.0f, 0.0f));
+						/*glm::vec3 b;*/
 						if (!glm::length(t)) {
 							t = glm::cross(N_current, glm::vec3(0.0, 0.0, -1.0));
 						}
 						t = glm::normalize(t);
 						b = glm::normalize((glm::cross(N_current, t)));
 
-						texelIndex = 3 * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
+						//texelIndex = texture.channels * (glm::clamp((int)tex_coords.x, 0, texture.width - 1) + (texture.width)*glm::clamp((int)tex_coords.y, 0, texture.height - 1));
 						texture_displacement = glm::f32vec3(texture.data[0 + texelIndex],texture.data[1 + texelIndex],texture.data[2 + texelIndex]);
 						//map_n * 2 - 1
-						texture_displacement = texture_displacement*2.f - glm::vec3(1.f);*/
+						texture_displacement = texture_displacement*2.f - glm::vec3(1.f);
 						glm::mat3 tbn = glm::mat3(t, b, N_current);
 
 						///Gram - Schmidt process we can re - orthogonalize
@@ -613,62 +626,58 @@ glm::f32vec3 raytrace(const std::unique_ptr<AccelerationStructure>& accel, const
 					}
 				}
 			}
-			else
-			{
+			else{
 				GetHitProperties(hit_triangle[0], hit_triangle[1], hit_triangle[2], info.u, info.v, N_current);
+			}
+			//Alpha.
+			//If too small, return just passtrough color as pixel color.
+			//Otherwise use precalculated passtrough_color and use alpha to multiply the rest when assigning pixel color at the end
+			glm::f32vec3 passtrough_color = glm::f32vec3(0);
+			if (alpha < 1.f) {
+				passtrough_color = raytrace(accel, info.PHit + primary_ray->direction*HIT_BIAS, primary_ray->direction, depth, monochromatic, wavelength);
+				//diffuse_color = alpha * diffuse_color + (1.f - alpha) * passtrough_color;
+				if (alpha < 0.05f) {
+					pixel_color = passtrough_color;
+					break;
+				}				
 			}
 
 			OUT glm::vec3 light_intensity; OUT glm::vec3 light_direction; OUT float light_distance;
 			for (auto &light : light_list) {
 				
 				light->shine(light_intensity, light_distance, light_direction, info.PHit);
-			
+				if (light_intensity.r < HIT_BIAS && light_intensity.g < HIT_BIAS && light_intensity.b < HIT_BIAS) {
+					continue;
+				}			
 				shadow_ray->direction = -light_direction;
-
 				///use hit - light distance as maximum distance to trace, this will return actual distance.
 				PHit_dist = light_distance;
-
 #ifndef SMOOTH_SHADING
 				shadow_ray->origin = info.PHit + primary_ray->hit_normal * HIT_BIAS;
 #else
 				shadow_ray->origin = info.PHit + N_current * HIT_BIAS;
 #endif
-
 #if defined(BBAccel)
 				//must have direction
 				shadow_ray->precomputeValues();
 #endif
 				if (accel->intersect(shadow_ray, PHit_dist, shadow_info) != nullptr) {
-					//d+=((float)global_light_on)*AMBIENT_LIGHT;
 					continue;
 					///TODO pridat zde nejaky testy jestli je object opaque a lomit svetlo? :) stinitko by mozna hodilo duhu
 				}
 
-
 				glm::vec3 ref_dir = light_direction;
 #ifdef SMOOTH_SHADING
-				d +=   light_intensity * glm::clamp(glm::f32vec3(std::max(0.f, glm::dot(N_current, -light_direction))),0.f,1.f);
+				d +=   light_intensity * glm::f32vec3(std::max(0.f, glm::dot(N_current, -light_direction)));
 				Ray::calcReflectedDirection(N_current, ref_dir);
 #else
-				d +=  light_intensity * glm::clamp(glm::f32vec3(std::max(0.f, glm::dot(primary_ray->hit_normal, -light_direction))), 0.f, 1.f);
+				d +=  light_intensity * glm::f32vec3(std::max(0.f, glm::dot(primary_ray->hit_normal, -light_direction)));
 				Ray::calcReflectedDirection(primary_ray->hit_normal, ref_dir);
 #endif
-				s +=  light_intensity * glm::clamp(std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess),0.f,1.f);
+				s +=  light_intensity * std::pow(std::max(0.f, glm::dot(ref_dir, -ray_dir)), hit_mesh->_material.shininess);
 			}//end for each light in the scene
 
-			/*if (hit_mesh->GetTextures().empty())
-			{
-				pixel_color = (1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_albedo * diffuse_color + s * hit_mesh->_albedo_complement * specular_color + ambient_color*AMBIENT_LIGHT);
-				if (monochromatic&& primary_ray->wavelength != 0) {
-					pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*pixel_color, 0.f, 1.f);
-				}
-				else {
-					pixel_color = glm::clamp(pixel_color,0.f,1.f);
-				}
-			}
-			else
-			{*/
-			pixel_color = (1.0f*hit_mesh->_material.emissive_color + d * hit_mesh->_albedo * diffuse_color + s * hit_mesh->_albedo_complement * specular_color +ambient_color*AMBIENT_LIGHT);
+			pixel_color =  (1.f - alpha)*passtrough_color + alpha*(1.0f*hit_mesh->_material.emissive_color + d /** hit_mesh->_albedo*/ * diffuse_color + s * specular_color +ambient_color*AMBIENT_LIGHT);
 
 			if (monochromatic&& primary_ray->wavelength != 0) {
 				pixel_color = glm::clamp(Ray::wavelength2rgb(primary_ray->wavelength)*pixel_color,0.f,1.f);
@@ -1061,13 +1070,13 @@ int main(int argc, char* argv[])
 #endif
 
 	init_wave_info();
-	//CreatePointLight(glm::vec3(0.f, 0.0f, 2.f), 1000.f, glm::f32vec3(U2F(200), U2F(255), U2F(255)));
-	//CreatePointLight(glm::vec3(0.f, 1.0f, 2.f), 400.f, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreatePointLight(glm::vec3(-2.f, 1.0f, -2.f), 100.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
+	//CreatePointLight(glm::vec3(2.f, 1.0f, 2.f), 400.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
 	//CreatePointLight(glm::vec3(20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(244), U2F(174), U2F(66)));
 	//CreatePointLight(glm::vec3(-20.f, 50.0f, 20.f), 100000.f, glm::f32vec3(U2F(66), U2F(174), U2F(244)));
 	
 	//CreateGlobalLight(glm::vec3(0.f, .0f, -1.0f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
-	CreateGlobalLight(glm::vec3(0.f, -1.f, -0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
+	CreateGlobalLight(glm::vec3(0.f, -0.2f, -1.f), global_light_intensity, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 //	CreateGlobalLight(glm::vec3(-0.1f, -.2f,0.2f), global_light_intensity*1, glm::f32vec3(U2F(255), U2F(255), U2F(255)));
 
 	updateSkyColor();

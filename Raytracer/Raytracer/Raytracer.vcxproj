@@ -86,6 +86,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\res\SDL2_ttf\include\;$(SolutionDir)\res\;$SolutionDir)\res\SDL2_ttf\;$(SolutionDir)\res\SDL2\include\;$(SolutionDir)\res\GLFW\include\;$(SolutionDir)\res\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\res\Assimp\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>assimp-vc140-mt.lib;sdl2.lib;sdl2main.lib;sdl2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -118,6 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\res\SDL2_ttf\include\;$(SolutionDir)\res\;$SolutionDir)\res\SDL2_ttf\;$(SolutionDir)\res\SDL2\include\;$(SolutionDir)\res\GLFW\include\;$(SolutionDir)\res\GLM\;$(SolutionDir)\..\..\..\VulkanSDK\1.1.82.1\include\;$(SolutionDir)\res\Assimp\include\;$(SolutionDir)\..\..\..\SDL2\include\;$(SolutionDir)\..\..\..\GLEW\include\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

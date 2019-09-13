@@ -1,0 +1,26 @@
+# Blender MTL File: 'TigerII.blend'
+# Material Count: 2
+
+newmtl Material_1
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Tiger_II_track.tga
+map_Ks Tiger_II_track_SM.tga
+map_Kn Tiger_II_track_NM.tga
+
+newmtl Material_1.003
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd PzVIB_Tiger_II_2048.tga
+map_Ks PzVIB_Tiger_II_SM_2048.tga
+map_Kn PzVIB_Tiger_II_NM_2048.tga

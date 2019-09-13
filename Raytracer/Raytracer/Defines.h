@@ -23,13 +23,13 @@
 #define M_PI 3.14159265358979323846264f
 #endif
 //#define DEBUG
-#define UPSCALE 5.f
+#define UPSCALE 2.f
 #define TEXTURE_REPEAT
-#define SETTINGS_WIDTH 500
-#define SETTINGS_HEIGHT 300
+#define SETTINGS_WIDTH 50
+#define SETTINGS_HEIGHT 30
 
-#define CONTROLS_MULTIPLIER 100
-#define FRAMES_PER_SECOND 24
+#define CONTROLS_MULTIPLIER 5
+#define FRAMES_PER_SECOND 60
 static const float ONE_TICK_MS = 1000 / float(FRAMES_PER_SECOND);
 
 //#define FINAL_RENDER
@@ -39,10 +39,10 @@ static const float ONE_TICK_MS = 1000 / float(FRAMES_PER_SECOND);
 #define BVH_ACCEL
 #define MULTI_THREADING
 //#define MSAA
-#define WIDTH 192
-#define HEIGHT 108
+#define WIDTH 320
+#define HEIGHT 200
 #define MAX_DEPTH 3.f
-#define WAVE_SAMPLES 9.f
+#define WAVE_SAMPLES 3.f
 #define SMOOTH_SHADING
 #define PROFILING
 #else
@@ -86,7 +86,8 @@ const glm::f32vec3 const_sky_color = glm::f32vec3(U2F(160), U2F(217), U2F(255));
 //const std::string DEFAULT_MODEL = "example/prism/prism-arealight.obj";
 //const std::string DEFAULT_MODEL = "example/suzanne/suzanne2.obj";
 //const std::string DEFAULT_MODEL = "example/hexapyramid/hexapyramid.obj";
-const std::string DEFAULT_MODEL = "example/sponza3/sponza.obj";
+//const std::string DEFAULT_MODEL = "example/sponza3/sponza.obj";
+const std::string DEFAULT_MODEL = "example/tanks/tiger2/TigerII.obj";
 //const std::string DEFAULT_MODEL = "example/sponza/sponza.obj";
 
 //const std::string DEFAULT_MODEL = "example/CornellBox/CornellBox-mirror.obj";

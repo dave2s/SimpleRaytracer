@@ -24,6 +24,7 @@ struct Texture {
 	int width;
 	int height;
 	int channels;
+	uint16_t levels;
 };
 
 struct Material {
